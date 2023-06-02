@@ -8,8 +8,7 @@ const ChessBoard: React.FC = () => {
   const [pieces, setPieces] = useState(() =>
     Array.from({ length: 8 }, () => Array(8).fill(null))
   );
-
-  const [draggingPiece, setDraggingPiece] = useState({row: 0, col: 0, piece: null});
+  const [prevClickedPiece, setPrevClickedPiece] = useState('');
       
   pieces[6][0] = {piece: 'p', color: 'd'};
   pieces[6][1] = {piece: 'p', color: 'd'};
@@ -54,19 +53,7 @@ const ChessBoard: React.FC = () => {
 
       setPieces(updatedPieces);
     }
-  };
-
-  const handleDragStart = (row: number, col: number) => {
-    setDraggingPiece({row: row, col: col, piece: pieces[row][col]});
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault(); // This is needed to allow dropping.
-  };
-
-  const handleDrop = (row: number, col: number) => {
-    handlePieceMove(draggingPiece.row, draggingPiece.col, row, col);
-  };
+  }; 
 
   const isValidMove = (fromRow: number, fromCol: number, toRow: number, toCol: number) => {
     // Add your custom logic to validate the move
@@ -88,6 +75,7 @@ const ChessBoard: React.FC = () => {
             key={key}
             row={i}
             col={j}
+            handleClick={handleCellClick}
           >
             {piece && (
               <Piece
@@ -103,11 +91,17 @@ const ChessBoard: React.FC = () => {
     return board;
   };
 
-  const handleCellClick = (row: number, col: number) => {
+  const handleCellClick = (event: React.MouseEvent<HTMLDivElement>) => {
     // Handle the cell click event
     // You can implement your own logic to determine the piece to move and the target cell
     // Call handlePieceMove with the appropriate parameters to update the pieces state
-    handlePieceMove(0, 0, row, col);
+    if (prevClickedPiece == '') setPrevClickedPiece(event.currentTarget.id);
+    if (prevClickedPiece != '') {
+      const [newRow, newCol] = event.currentTarget.id.split("-");
+      const [oldRow, oldCol] = prevClickedPiece.split("-");
+      handlePieceMove(parseInt(oldRow), parseInt(oldCol), parseInt(newRow), parseInt(newCol));
+      setPrevClickedPiece('');
+    }
   };
 
   return (

@@ -3,7 +3,7 @@ import React from 'react';
 
 interface PieceProps {
   piece: string,
-  color: string
+  color: string,
 }
 
 const Piece: React.FC<PieceProps> = ({piece, color}) => {
