@@ -1,10 +1,9 @@
-import Image from 'next/image'
-import ChessBoard from './ChessBoard'
+import ReviewSession from './ReviewSession'
 
 export default function Home() {
   return (
     <>
-      <ChessBoard />
+      <ReviewSession />
     </>
   )
 }

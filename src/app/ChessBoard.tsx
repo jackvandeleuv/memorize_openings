@@ -5,55 +5,41 @@ import Cell from './Cell';
 import Piece from './Piece';
 import { Chess, Square, Move } from 'chess.js';
 
-interface Piece {
+export interface Piece {
   piece: 'p' | 'r' | 'n' | 'b' | 'k' | 'q';
   color: 'l' | 'd'; 
 }
-type PiecesState = (Piece | null)[][];
 
-const ChessBoard: React.FC = () => {
-  const [pieces, setPieces] = useState<PiecesState>(() => {
-    const initialPieces = Array.from({ length: 8 }, () => Array(8).fill(null));
-    for (let i = 0; i < 8; i++) {
-      initialPieces[6][i] = {piece: 'p', color: 'l'};
-      initialPieces[1][i] = {piece: 'p', color: 'd'};
-    }
-    initialPieces[7][0] = {piece: 'r', color: 'l'};
-    initialPieces[7][1] = {piece: 'n', color: 'l'};
-    initialPieces[7][2] = {piece: 'b', color: 'l'};
-    initialPieces[7][3] = {piece: 'q', color: 'l'};
-    initialPieces[7][4] = {piece: 'k', color: 'l'};
-    initialPieces[7][5] = {piece: 'b', color: 'l'};
-    initialPieces[7][6] = {piece: 'n', color: 'l'};
-    initialPieces[7][7] = {piece: 'r', color: 'l'};
-    initialPieces[0][0] = {piece: 'r', color: 'd'};
-    initialPieces[0][1] = {piece: 'n', color: 'd'};
-    initialPieces[0][2] = {piece: 'b', color: 'd'};
-    initialPieces[0][3] = {piece: 'q', color: 'd'};
-    initialPieces[0][4] = {piece: 'k', color: 'd'};
-    initialPieces[0][5] = {piece: 'b', color: 'd'};
-    initialPieces[0][6] = {piece: 'n', color: 'd'};
-    initialPieces[0][7] = {piece: 'r', color: 'd'};
-  
-    return initialPieces;
-  });
+export type BoardState = (Piece | null)[][];
+
+interface ChessBoardProps {
+  currentLine: Piece[][][];
+}
+
+const ChessBoard: React.FC<ChessBoardProps> = ({ currentLine }) => {
+  const [boardState, setBoardState] = useState<BoardState>(currentLine[0]);
   const [prevClickedPiece, setPrevClickedPiece] = useState('');
   const [highlightedCells, setHighlightedCells] = useState<string[]>([]);
 
   const [gameState, setGameState] = useState<Chess>(new Chess());
   const gameRef = useRef(gameState);
-  useEffect(() => { gameRef.current = gameState }, [gameState])
+  useEffect(() => { gameRef.current = gameState }, [gameState]);
+
+  useEffect(() => {
+    setBoardState(currentLine[0]);
+  }, [currentLine]);
   
   const handlePieceMove = (fromRow: number, fromCol: number, toRow: number, toCol: number) => {
     // Validate the move and update the pieces state
     if (isValidMove(fromRow, fromCol, toRow, toCol)) {
-      const updatedPieces = [...pieces];
+      const updatedPieces: BoardState = [...boardState];
       const pieceToMove = updatedPieces[fromRow][fromCol];
       updatedPieces[fromRow][fromCol] = null;
       updatedPieces[toRow][toCol] = pieceToMove;
-      setPieces(updatedPieces);
+      setBoardState(updatedPieces);
     } 
     toggleCellHighlight(`${fromRow}-${fromCol}`)
+    console.log('Board state: ' + boardState);
   }; 
 
   const validateSquare = (square: string): square is Square => {
@@ -97,7 +83,7 @@ const ChessBoard: React.FC = () => {
     for (let i = 0; i < 8; i++) {
       for (let j = 0; j < 8; j++) {
         const key = `${i}-${j}`;
-        const piece = pieces[i][j];
+        const piece = boardState[i][j];
         board.push(
           <Cell
             key={key}
