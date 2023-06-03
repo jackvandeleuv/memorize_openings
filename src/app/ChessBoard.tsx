@@ -4,45 +4,42 @@ import React, { useState } from 'react';
 import Cell from './Cell';
 import Piece from './Piece';
 
-const ChessBoard: React.FC = () => {
-  const [pieces, setPieces] = useState(() =>
-    Array.from({ length: 8 }, () => Array(8).fill(null))
-  );
-  const [prevClickedPiece, setPrevClickedPiece] = useState('');
-      
-  pieces[6][0] = {piece: 'p', color: 'd'};
-  pieces[6][1] = {piece: 'p', color: 'd'};
-  pieces[6][2] = {piece: 'p', color: 'd'};
-  pieces[6][3] = {piece: 'p', color: 'd'};
-  pieces[6][4] = {piece: 'p', color: 'd'};
-  pieces[6][5] = {piece: 'p', color: 'd'};
-  pieces[6][6] = {piece: 'p', color: 'd'};
-  pieces[6][7] = {piece: 'p', color: 'd'};
-  pieces[1][0] = {piece: 'p', color: 'l'};
-  pieces[1][1] = {piece: 'p', color: 'l'};
-  pieces[1][2] = {piece: 'p', color: 'l'};
-  pieces[1][3] = {piece: 'p', color: 'l'};
-  pieces[1][4] = {piece: 'p', color: 'l'};
-  pieces[1][5] = {piece: 'p', color: 'l'};
-  pieces[1][6] = {piece: 'p', color: 'l'};
-  pieces[1][7] = {piece: 'p', color: 'l'};
-  pieces[7][0] = {piece: 'r', color: 'd'};
-  pieces[7][1] = {piece: 'n', color: 'd'};
-  pieces[7][2] = {piece: 'b', color: 'd'};
-  pieces[7][3] = {piece: 'k', color: 'd'};
-  pieces[7][4] = {piece: 'q', color: 'd'};
-  pieces[7][5] = {piece: 'b', color: 'd'};
-  pieces[7][6] = {piece: 'n', color: 'd'};
-  pieces[7][7] = {piece: 'r', color: 'd'};
-  pieces[0][0] = {piece: 'r', color: 'l'};
-  pieces[0][1] = {piece: 'n', color: 'l'};
-  pieces[0][2] = {piece: 'b', color: 'l'};
-  pieces[0][3] = {piece: 'q', color: 'l'};
-  pieces[0][4] = {piece: 'k', color: 'l'};
-  pieces[0][5] = {piece: 'b', color: 'l'};
-  pieces[0][6] = {piece: 'n', color: 'l'};
-  pieces[0][7] = {piece: 'r', color: 'l'};
+interface Piece {
+  piece: 'p' | 'r' | 'n' | 'b' | 'k' | 'q';
+  color: 'l' | 'd'; 
+}
+type PiecesState = (Piece | null)[][];
 
+const ChessBoard: React.FC = () => {
+  const [pieces, setPieces] = useState<PiecesState>(() => {
+    const initialPieces = Array.from({ length: 8 }, () => Array(8).fill(null));
+    for (let i = 0; i < 8; i++) {
+      initialPieces[6][i] = {piece: 'p', color: 'd'};
+      initialPieces[1][i] = {piece: 'p', color: 'l'};
+    }
+    initialPieces[7][0] = {piece: 'r', color: 'd'};
+    initialPieces[7][1] = {piece: 'n', color: 'd'};
+    initialPieces[7][2] = {piece: 'b', color: 'd'};
+    initialPieces[7][3] = {piece: 'q', color: 'd'};
+    initialPieces[7][4] = {piece: 'k', color: 'd'};
+    initialPieces[7][5] = {piece: 'b', color: 'd'};
+    initialPieces[7][6] = {piece: 'n', color: 'd'};
+    initialPieces[7][7] = {piece: 'r', color: 'd'};
+    initialPieces[0][0] = {piece: 'r', color: 'l'};
+    initialPieces[0][1] = {piece: 'n', color: 'l'};
+    initialPieces[0][2] = {piece: 'b', color: 'l'};
+    initialPieces[0][3] = {piece: 'q', color: 'l'};
+    initialPieces[0][4] = {piece: 'k', color: 'l'};
+    initialPieces[0][5] = {piece: 'b', color: 'l'};
+    initialPieces[0][6] = {piece: 'n', color: 'l'};
+    initialPieces[0][7] = {piece: 'r', color: 'l'};
+  
+    return initialPieces;
+  });
+  const [prevClickedPiece, setPrevClickedPiece] = useState('');
+  const [highlightedCells, setHighlightedCells] = useState<string[]>([]);
+
+  
   const handlePieceMove = (fromRow: number, fromCol: number, toRow: number, toCol: number) => {
     // Validate the move and update the pieces state
     if (isValidMove(fromRow, fromCol, toRow, toCol)) {
@@ -50,8 +47,8 @@ const ChessBoard: React.FC = () => {
       const pieceToMove = updatedPieces[fromRow][fromCol];
       updatedPieces[fromRow][fromCol] = null;
       updatedPieces[toRow][toCol] = pieceToMove;
-
       setPieces(updatedPieces);
+      toggleCellHighlight(`${fromRow}-${fromCol}`)
     }
   }; 
 
@@ -76,7 +73,8 @@ const ChessBoard: React.FC = () => {
             row={i}
             col={j}
             handleClick={handleCellClick}
-          >
+            isHighlighted={highlightedCells.includes(`${i}-${j}`)}
+            >
             {piece && (
               <Piece
                 piece={piece.piece}
@@ -91,12 +89,30 @@ const ChessBoard: React.FC = () => {
     return board;
   };
 
+  // const highlightCell = (cellId: string) => {
+  //   const [row, col] = cellId.split('-');
+  //   const updatedCells = [...highlightedCells];
+  //   updatedCell[fromRow][fromCol] = null;
+  //   updatedPieces[toRow][toCol] = pieceToMove;
+  //   setPieces(updatedPieces);
+  // };
+
+  const toggleCellHighlight = (id: string) => {
+    if (!highlightedCells.includes(id)) {
+      const updatedCells = [...highlightedCells]
+      updatedCells.push(id);
+      setHighlightedCells(updatedCells);
+    } else {
+      const updatedCells = [...highlightedCells].filter(item => item !== id);
+      setHighlightedCells(updatedCells);
+    }
+  }
+
   const handleCellClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    // Handle the cell click event
-    // You can implement your own logic to determine the piece to move and the target cell
-    // Call handlePieceMove with the appropriate parameters to update the pieces state
-    if (prevClickedPiece == '') setPrevClickedPiece(event.currentTarget.id);
-    if (prevClickedPiece != '') {
+    toggleCellHighlight(event.currentTarget.id);
+    if (prevClickedPiece == '') { 
+      setPrevClickedPiece(event.currentTarget.id); 
+    } else {
       const [newRow, newCol] = event.currentTarget.id.split("-");
       const [oldRow, oldCol] = prevClickedPiece.split("-");
       handlePieceMove(parseInt(oldRow), parseInt(oldCol), parseInt(newRow), parseInt(newCol));

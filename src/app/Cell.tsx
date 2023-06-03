@@ -4,23 +4,21 @@ interface CellProps {
   row: number;
   col: number;
   children?: React.ReactNode;
-  handleClick: (event: React.MouseEvent<HTMLDivElement>) => void;
+  handleClick: (event: React.MouseEvent<HTMLDivElement>, isHighlighted: boolean) => void;
+  isHighlighted: boolean
 }
 
-const Cell: React.FC<CellProps> = ({ row, col, handleClick, children }) => {
+const Cell: React.FC<CellProps> = ({ row, col, handleClick, children, isHighlighted }) => {
   const isWhite = (row + col) % 2 === 0;
-  const [toggled, toggle] = useState(false);
 
-  const cellStyle = `w-full h-full ${toggled ? 'bg-red-400' : (isWhite ? 'bg-white' : 'bg-green-600')}`;
+  const cellStyle = `w-full h-full ${isHighlighted ? 'bg-red-400' : (isWhite ? 'bg-white' : 'bg-green-600')}`;
 
   return (
     <div
-      draggable="true"
       className={cellStyle}
       style={{ position: 'relative' }}
       onClick={(event) => {
-        handleClick(event); 
-        toggle(!toggled);
+        handleClick(event, isHighlighted); 
       }}
       id={`${row}-${col}`}
     >
