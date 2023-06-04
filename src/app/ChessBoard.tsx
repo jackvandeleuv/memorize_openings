@@ -40,15 +40,13 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ currentLine, currentMove, setCu
       // Two state updates in might lead to async errors?
       //
       //
-      const updatedLines = [...currentLine];
-      updatedLines.push(updatedPieces);
-      setCurrentLine(updatedLines);
-
-      const updatedMoveIndex = currentMove + 1;
-      setCurrentMove(updatedMoveIndex);
+      setCurrentLine(prevLines => [...prevLines, updatedPieces]);
+      setCurrentMove(prevMove => prevMove + 1);
     } 
     toggleCellHighlight(`${fromRow}-${fromCol}`)
   }; 
+
+  useEffect(() => {console.log(currentMove); console.log(currentLine.length - 1)}, [currentMove, currentLine]);
 
   const validateSquare = (square: string): square is Square => {
     const validSquares = Array.from({length: 8}, (_, i) => i + 1).flatMap(i =>
