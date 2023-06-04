@@ -13,13 +13,13 @@ export interface Piece {
 export type BoardState = (Piece | null)[][];
 
 interface ChessBoardProps {
-  currentLine: Piece[][][];
-  currentMove: BoardState | undefined;
-  setCurrentMove: React.Dispatch<React.SetStateAction<BoardState>>;
-  lineIndex: number;
+  currentLine: BoardState[];
+  currentMove: number;
+  setCurrentMove: React.Dispatch<React.SetStateAction<number>>;
+  setCurrentLine: React.Dispatch<React.SetStateAction<BoardState[]>>;
 }
 
-const ChessBoard: React.FC<ChessBoardProps> = ({ currentLine, currentMove, setCurrentMove, lineIndex }) => {
+const ChessBoard: React.FC<ChessBoardProps> = ({ currentLine, currentMove, setCurrentMove, setCurrentLine }) => {
   const [prevClickedPiece, setPrevClickedPiece] = useState('');
   const [highlightedCells, setHighlightedCells] = useState<string[]>([]);
 
@@ -29,12 +29,23 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ currentLine, currentMove, setCu
   
   const handlePieceMove = (fromRow: number, fromCol: number, toRow: number, toCol: number) => {
     // Validate the move and update the pieces state
-    if (lineIndex === currentLine.length - 1 && isValidMove(fromRow, fromCol, toRow, toCol)) {
-      const updatedPieces: BoardState = [...currentMove!];
+    if (currentMove === currentLine.length - 1 && isValidMove(fromRow, fromCol, toRow, toCol)) {
+      const updatedPieces: BoardState = [...currentLine[currentMove]];
       const pieceToMove = updatedPieces[fromRow][fromCol];
       updatedPieces[fromRow][fromCol] = null;
       updatedPieces[toRow][toCol] = pieceToMove;
-      setCurrentMove(updatedPieces);
+
+      // 
+      //
+      // Two state updates in might lead to async errors?
+      //
+      //
+      const updatedLines = [...currentLine];
+      updatedLines.push(updatedPieces);
+      setCurrentLine(updatedLines);
+
+      const updatedMoveIndex = currentMove + 1;
+      setCurrentMove(updatedMoveIndex);
     } 
     toggleCellHighlight(`${fromRow}-${fromCol}`)
   }; 
@@ -80,7 +91,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ currentLine, currentMove, setCu
     for (let i = 0; i < 8; i++) {
       for (let j = 0; j < 8; j++) {
         const key = `${i}-${j}`;
-        const piece = currentMove![i][j];
+        const piece = currentLine[currentMove][i][j];
         board.push(
           <Cell
             key={key}

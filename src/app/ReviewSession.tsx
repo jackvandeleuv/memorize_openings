@@ -15,24 +15,20 @@ interface ChessMove {
 }
 
 const ReviewSession: React.FC = () => {
-    const [lineIndex, setLineIndex] = useState<number>(0);
-    const [currentLine, setCurrentLine] = useState<Piece[][][]>([Array.from({ length: 8 }, () => Array(8).fill(null))]);
-    const [currentMove, setCurrentMove] = useState<BoardState>(currentLine[0]);
-    useEffect(() => {
-      setCurrentMove(currentLine[0]);
-    }, [currentLine]);
+    const [currentLine, setCurrentLine] = useState<BoardState[]>([Array.from({ length: 8 }, () => Array(8).fill(null))]);
+    const [currentMove, setCurrentMove] = useState<number>(0);
 
 
     const fenToBoard = (fen: string): Piece[][] => {
         const parts = fen.split(" ");
         const layout = parts[0];
-        let rankIndex = 0;
+        let rankIndex = 7;
         let fileIndex = 0;
         const newBoard = Array.from({ length: 8 }, () => Array(8).fill(null));
     
         for (const char of layout) {
             if (char === "/") {
-                rankIndex++;
+                rankIndex--;
                 fileIndex = 0;
                 continue;
             }
@@ -87,20 +83,18 @@ const ReviewSession: React.FC = () => {
     }
 
     const buttonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-      if (e.currentTarget.id === '>' && lineIndex < currentLine.length - 1) {
-        const newIndex = lineIndex + 1;
-        setLineIndex(newIndex);
-        const updatedPosition = currentLine[lineIndex];
-        setCurrentMove(updatedPosition);
+      if (e.currentTarget.id === '>' && currentMove < currentLine.length - 1) {
+        const newIndex = currentMove + 1;
+        setCurrentMove(newIndex);
       }
 
-      if (e.currentTarget.id === '<' && lineIndex > 0) {
-        const newIndex = lineIndex - 1;
-        setLineIndex(newIndex);
-        const updatedPosition = currentLine[lineIndex];
-        setCurrentMove(updatedPosition);
+      if (e.currentTarget.id === '<' && currentMove > 0) {
+        const newIndex = currentMove - 1;
+        setCurrentMove(newIndex);
       }
     }
+
+    // useEffect(() => {console.log('set lineIndex: ' + lineIndex)}, [lineIndex]);
 
 
     return (
@@ -109,7 +103,7 @@ const ReviewSession: React.FC = () => {
             <ChessBoard
             currentLine={currentLine}
             currentMove={currentMove}
-            lineIndex={lineIndex}
+            setCurrentLine={setCurrentLine}
             setCurrentMove={setCurrentMove}
             />
           </div>
