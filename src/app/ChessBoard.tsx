@@ -21,12 +21,11 @@ interface ChessBoardProps {
 
 const ChessBoard: React.FC<ChessBoardProps> = ({ currentLine, currentMove, setCurrentMove, setCurrentLine }) => {
 	const [prevClickedPiece, setPrevClickedPiece] = useState('');
-	const [highlightedCells, setHighlightedCells] = useState<string[]>([]);
+	const [highlightMap, setHighlightMap] = useState(new Map<string, string>());
 
-	
 	const [gameState, setGameState] = useState<Chess>(() => {
 		const game: Chess = new Chess();
-		game.load(currentLine[currentLine.length - 1])
+		game.load(currentLine[currentLine.length - 2])
 		return game;
 	});
 	const gameRef = useRef(gameState);
@@ -34,32 +33,54 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ currentLine, currentMove, setCu
 	
 
 	const handlePieceMove = (fromRow: number, fromCol: number, toRow: number, toCol: number) => {
-		// Validate the move and update the pieces state
-		if (currentMove === currentLine.length - 1 && isValidMove(fromRow, fromCol, toRow, toCol)) {
-			const updatedPieces: BoardState = [...fenToBoard(currentLine[currentMove])];
-			const pieceToMove = updatedPieces[fromRow][fromCol];
-			updatedPieces[fromRow][fromCol] = null;
-			updatedPieces[toRow][toCol] = pieceToMove;
+		console.log(highlightMap);
+		// Toggle and return if we're earlier in the line or move is invalid
+		if (currentMove >= currentLine.length - 1 || !isValidMove(fromRow, fromCol, toRow, toCol)) {
+			toggleYellowHighlight(`${fromRow}-${fromCol}`);
+			return;
+		}
 
-			const newGameState = new Chess(gameRef.current.fen());
-			newGameState.move({
-				from:indexToAlgebraic(fromCol, fromRow),
-				to:indexToAlgebraic(toCol, toRow)
-			})
-			setGameState(newGameState);
+		// Move the piece on the user's board
+		const updatedPieces: BoardState = [...fenToBoard(currentLine[currentMove])];
+		const pieceToMove = updatedPieces[fromRow][fromCol];
+		updatedPieces[fromRow][fromCol] = null;
+		updatedPieces[toRow][toCol] = pieceToMove;
 
-			const newFen = newGameState.fen();
+		// Check if the user got the position right
+		const newGameState = new Chess(gameRef.current.fen());
+		newGameState.move({
+			from:indexToAlgebraic(fromCol, fromRow),
+			to:indexToAlgebraic(toCol, toRow)
+		})
+		const isCorrect = newGameState.fen() === currentLine[currentLine.length - 1];
 
-			// 
-			//
-			// Two state updates in might lead to async errors?
-			//
-			//
-			setCurrentLine(prevLines => [...prevLines, newFen]);
-			setCurrentMove(prevMove => prevMove + 1);
-		} 
-		toggleCellHighlight(`${fromRow}-${fromCol}`)
+		// Update the React state
+		const newFen = isCorrect ? currentLine[currentLine.length - 1] : newGameState.fen();
+		setCurrentLine(prevLines => [...prevLines.slice(0, currentLine.length - 1), newFen]);
+		setCurrentMove(prevMove => prevMove + 1);
+
+		// Update cell highlight colors
+		toggleYellowHighlight(`${fromRow}-${fromCol}`);
+		const destinationColor = isCorrect ? 'bg-green-400' : 'bg-red-400';
+		const updatedMap = new Map(highlightMap);
+		console.log('Before updating map: ' + updatedMap.size);
+		updatedMap.set(`${toRow}-${toCol}`, destinationColor);
+		setHighlightMap(updatedMap);
+		console.log('After updating map: ' + updatedMap.size);
 	}; 
+
+	
+	const toggleYellowHighlight = (id: string) => {
+		if (highlightMap.has(id)) {
+			const highlightMapCopy = new Map(highlightMap);
+			highlightMapCopy.delete(id)
+			setHighlightMap(highlightMapCopy);
+		} else {
+			const highlightMapCopy = new Map(highlightMap);
+			highlightMapCopy.set(id, 'bg-amber-500')
+			setHighlightMap(highlightMapCopy);
+		}
+	};
 
 
 	const indexToAlgebraic = (col: number, row: number) => {
@@ -115,7 +136,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ currentLine, currentMove, setCu
 					row={i}
 					col={j}
 					handleClick={handleCellClick}
-					isHighlighted={highlightedCells.includes(`${i}-${j}`)}
+					highlight={highlightMap.get(`${i}-${j}`)}
 					>
 						{piece && (
 							<Piece
@@ -130,20 +151,8 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ currentLine, currentMove, setCu
 	};
 
 
-	const toggleCellHighlight = (id: string) => {
-		if (!highlightedCells.includes(id)) {
-			const updatedCells = [...highlightedCells]
-			updatedCells.push(id);
-			setHighlightedCells(updatedCells);
-		} else {
-			const updatedCells = [...highlightedCells].filter(item => item !== id);
-			setHighlightedCells(updatedCells);
-		}
-	}
-
-
 	const handleCellClick = (event: React.MouseEvent<HTMLDivElement>) => {
-		toggleCellHighlight(event.currentTarget.id);
+		toggleYellowHighlight(event.currentTarget.id);
 		if (prevClickedPiece == '') { 
 			setPrevClickedPiece(event.currentTarget.id); 
 		} else {
@@ -163,29 +172,29 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ currentLine, currentMove, setCu
 		const newBoard = Array.from({ length: 8 }, () => Array(8).fill(null));
 
 		for (const char of layout) {
-				if (char === "/") {
-						rankIndex--;
-						fileIndex = 0;
-						continue;
-				}
+			if (char === "/") {
+				rankIndex--;
+				fileIndex = 0;
+				continue;
+			}
 
-				if (isNaN(Number(char))) {
-						const piece = char.toLowerCase();
-						const color = char === char.toLowerCase() ? 'd' : 'l';
-						newBoard[7 - rankIndex][fileIndex] = { piece:piece, color:color };
-						fileIndex++;
-				} else {
-						fileIndex += Number(char);
-				}
+			if (isNaN(Number(char))) {
+				const piece = char.toLowerCase();
+				const color = char === char.toLowerCase() ? 'd' : 'l';
+				newBoard[7 - rankIndex][fileIndex] = { piece:piece, color:color };
+				fileIndex++;
+			} else {
+				fileIndex += Number(char);
+			}
 		}
 		return newBoard;
 	}
 
 
 	return (
-			<div className="grid grid-cols-8 w-[50vh] h-[50vh] aspect-[1]">
-				{renderBoard()}
-			</div>
+		<div className="grid grid-cols-8 w-[50vh] h-[50vh] aspect-[1]">
+			{renderBoard()}
+		</div>
 	)}
 
 export default ChessBoard;

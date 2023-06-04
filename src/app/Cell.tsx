@@ -4,20 +4,20 @@ interface CellProps {
 	row: number;
 	col: number;
 	children?: React.ReactNode;
-	handleClick: (event: React.MouseEvent<HTMLDivElement>, isHighlighted: boolean) => void;
-	isHighlighted: boolean
+	handleClick: (event: React.MouseEvent<HTMLDivElement>) => void;
+	highlight: string | undefined;
 }
 
-const Cell: React.FC<CellProps> = ({ row, col, handleClick, children, isHighlighted }) => {
+const Cell: React.FC<CellProps> = ({ row, col, handleClick, children, highlight }) => {
 	const isWhite = (row + col) % 2 === 0;
-	const cellStyle = `w-full h-full ${isHighlighted ? 'bg-red-400' : (isWhite ? 'bg-white' : 'bg-green-600')}`;
+	const cellStyle = `w-full h-full ${highlight !== undefined ? highlight : (isWhite ? 'bg-white' : 'bg-green-600')}`;
 
 	return (
 		<div
 			className={cellStyle}
 			style={{ position: 'relative' }}
 			onClick={(event) => {
-				handleClick(event, isHighlighted); 
+				handleClick(event); 
 			}}
 			id={`${row}-${col}`}
 		>

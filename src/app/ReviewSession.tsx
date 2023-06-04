@@ -5,7 +5,6 @@ import { supabaseClient } from '../../utils/supabaseClient';
 import ChessBoard from './ChessBoard';
 import { PostgrestResponse } from '@supabase/supabase-js';
 import Button from './Button';
-import { Piece, BoardState } from './ChessBoard';
 
 interface ChessMove {
 		id: number;
@@ -56,7 +55,7 @@ const ReviewSession: React.FC = () => {
 	}
 
 	const buttonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-		if (e.currentTarget.id === '>' && currentMove < currentLine.length - 1) {
+		if (e.currentTarget.id === '>' && currentMove < currentLine.length - 2) {
 			const newIndex = currentMove + 1;
 			setCurrentMove(newIndex);
 		}
