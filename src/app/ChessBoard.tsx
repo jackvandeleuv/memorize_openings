@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Cell from './Cell';
 import Piece from './Piece';
-import { Chess, Square, Move } from 'chess.js';
+import { Chess, Square } from 'chess.js';
 
 export interface Piece {
   piece: 'p' | 'r' | 'n' | 'b' | 'k' | 'q';
@@ -14,32 +14,29 @@ export type BoardState = (Piece | null)[][];
 
 interface ChessBoardProps {
   currentLine: Piece[][][];
+  currentMove: BoardState | undefined;
+  setCurrentMove: React.Dispatch<React.SetStateAction<BoardState>>;
+  lineIndex: number;
 }
 
-const ChessBoard: React.FC<ChessBoardProps> = ({ currentLine }) => {
-  const [boardState, setBoardState] = useState<BoardState>(currentLine[0]);
+const ChessBoard: React.FC<ChessBoardProps> = ({ currentLine, currentMove, setCurrentMove, lineIndex }) => {
   const [prevClickedPiece, setPrevClickedPiece] = useState('');
   const [highlightedCells, setHighlightedCells] = useState<string[]>([]);
 
   const [gameState, setGameState] = useState<Chess>(new Chess());
   const gameRef = useRef(gameState);
   useEffect(() => { gameRef.current = gameState }, [gameState]);
-
-  useEffect(() => {
-    setBoardState(currentLine[0]);
-  }, [currentLine]);
   
   const handlePieceMove = (fromRow: number, fromCol: number, toRow: number, toCol: number) => {
     // Validate the move and update the pieces state
-    if (isValidMove(fromRow, fromCol, toRow, toCol)) {
-      const updatedPieces: BoardState = [...boardState];
+    if (lineIndex === currentLine.length - 1 && isValidMove(fromRow, fromCol, toRow, toCol)) {
+      const updatedPieces: BoardState = [...currentMove!];
       const pieceToMove = updatedPieces[fromRow][fromCol];
       updatedPieces[fromRow][fromCol] = null;
       updatedPieces[toRow][toCol] = pieceToMove;
-      setBoardState(updatedPieces);
+      setCurrentMove(updatedPieces);
     } 
     toggleCellHighlight(`${fromRow}-${fromCol}`)
-    console.log('Board state: ' + boardState);
   }; 
 
   const validateSquare = (square: string): square is Square => {
@@ -83,7 +80,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ currentLine }) => {
     for (let i = 0; i < 8; i++) {
       for (let j = 0; j < 8; j++) {
         const key = `${i}-${j}`;
-        const piece = boardState[i][j];
+        const piece = currentMove![i][j];
         board.push(
           <Cell
             key={key}

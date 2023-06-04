@@ -12,9 +12,17 @@ interface ChessMove {
     order_in_line: number;
     fen: string;
     lines_id: number;
-  }
+}
 
 const ReviewSession: React.FC = () => {
+    const [lineIndex, setLineIndex] = useState<number>(0);
+    const [currentLine, setCurrentLine] = useState<Piece[][][]>([Array.from({ length: 8 }, () => Array(8).fill(null))]);
+    const [currentMove, setCurrentMove] = useState<BoardState>(currentLine[0]);
+    useEffect(() => {
+      setCurrentMove(currentLine[0]);
+    }, [currentLine]);
+
+
     const fenToBoard = (fen: string): Piece[][] => {
         const parts = fen.split(" ");
         const layout = parts[0];
@@ -40,8 +48,6 @@ const ReviewSession: React.FC = () => {
         }
         return newBoard;
     }
-
-    const [currentLine, setCurrentLine] = useState<Piece[][][]>([Array.from({ length: 8 }, () => Array(8).fill(null))]);
 
     useEffect(() => {
         const signIn = async () => {
@@ -80,21 +86,46 @@ const ReviewSession: React.FC = () => {
         setCurrentLine(updatedLine);
     }
 
-    useEffect(() => {
-        console.log('Current line from ReviewSession perspective: ', currentLine);
-    }, [currentLine]);
-    
+    const buttonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+      if (e.currentTarget.id === '>' && lineIndex < currentLine.length - 1) {
+        const newIndex = lineIndex + 1;
+        setLineIndex(newIndex);
+        const updatedPosition = currentLine[lineIndex];
+        setCurrentMove(updatedPosition);
+      }
+
+      if (e.currentTarget.id === '<' && lineIndex > 0) {
+        const newIndex = lineIndex - 1;
+        setLineIndex(newIndex);
+        const updatedPosition = currentLine[lineIndex];
+        setCurrentMove(updatedPosition);
+      }
+    }
+
 
     return (
         <div className="flex flex-col items-center">
           <div className="mb-4">
             <ChessBoard
             currentLine={currentLine}
+            currentMove={currentMove}
+            lineIndex={lineIndex}
+            setCurrentMove={setCurrentMove}
             />
           </div>
           <div className="flex justify-center space-x-4">
-            <Button>{'<'}</Button>
-            <Button>{'>'}</Button>
+            <Button
+            id='<'
+            handleClick={buttonClick}
+            >
+              {'<'}
+            </Button>
+            <Button
+            id='>'
+            handleClick={buttonClick}
+            >
+              {'>'}
+            </Button>
           </div>
         </div>
     )
