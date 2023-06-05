@@ -33,7 +33,6 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ currentLine, currentMove, setCu
 	
 
 	const handlePieceMove = (fromRow: number, fromCol: number, toRow: number, toCol: number) => {
-		console.log(highlightMap);
 		// Toggle and return if we're earlier in the line or move is invalid
 		if (currentMove >= currentLine.length - 1 || !isValidMove(fromRow, fromCol, toRow, toCol)) {
 			toggleYellowHighlight(`${fromRow}-${fromCol}`);
@@ -56,17 +55,19 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ currentLine, currentMove, setCu
 
 		// Update the React state
 		const newFen = isCorrect ? currentLine[currentLine.length - 1] : newGameState.fen();
-		setCurrentLine(prevLines => [...prevLines.slice(0, currentLine.length - 1), newFen]);
+		setCurrentLine(prevLines => [
+			...prevLines.slice(0, currentLine.length - 1), 
+			newFen, 
+			prevLines[prevLines.length - 1]
+		]);
 		setCurrentMove(prevMove => prevMove + 1);
 
 		// Update cell highlight colors
-		toggleYellowHighlight(`${fromRow}-${fromCol}`);
-		const destinationColor = isCorrect ? 'bg-green-400' : 'bg-red-400';
+		const destinationColor = isCorrect ? 'bg-green-600' : 'bg-red-600';
 		const updatedMap = new Map(highlightMap);
-		console.log('Before updating map: ' + updatedMap.size);
+		updatedMap.delete(`${fromRow}-${fromCol}`)
 		updatedMap.set(`${toRow}-${toCol}`, destinationColor);
 		setHighlightMap(updatedMap);
-		console.log('After updating map: ' + updatedMap.size);
 	}; 
 
 	
@@ -77,7 +78,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ currentLine, currentMove, setCu
 			setHighlightMap(highlightMapCopy);
 		} else {
 			const highlightMapCopy = new Map(highlightMap);
-			highlightMapCopy.set(id, 'bg-amber-500')
+			highlightMapCopy.set(id, 'bg-zinc-300')
 			setHighlightMap(highlightMapCopy);
 		}
 	};

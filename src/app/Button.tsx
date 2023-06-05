@@ -11,7 +11,7 @@ const Button: React.FC<ButtonProps> = ({ id, children, handleClick }) => {
 		<div>
 			<button
 			id={id}
-			className={`bg-green-400 hover:bg-green-800 text-white font-bold py-2 px-5 rounded-md`}
+			className={`bg-zinc-400 hover:bg-zinc-300 text-white font-bold py-2 px-5 rounded-md`}
 			onClick={(event) => {
 				handleClick(event)
 			}}

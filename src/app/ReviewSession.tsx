@@ -47,11 +47,12 @@ const ReviewSession: React.FC = () => {
 
 	
 	const unpackMoves = (moves: ChessMove[]) => {
-			const updatedLine = []
-			for (let move of moves) {
-					updatedLine.push(move.fen);
-			}
-			setCurrentLine(updatedLine);
+		const updatedLine = []
+		for (let move of moves) {
+				updatedLine.push(move.fen);
+		}
+		setCurrentLine(updatedLine);
+		setCurrentMove(updatedLine.length - 2);
 	}
 
 	const buttonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -79,7 +80,7 @@ const ReviewSession: React.FC = () => {
 					/>
 				}
 			</div>
-			<div className="flex justify-center space-x-4">
+			<div className="flex justify-center space-x-4 mb-4">
 				<Button
 				id='<'
 				handleClick={buttonClick}
@@ -91,6 +92,32 @@ const ReviewSession: React.FC = () => {
 				handleClick={buttonClick}
 				>
 					{'>'}
+				</Button>
+			</div>
+			<div className="flex justify-center space-x-4">
+				<Button
+				id='??'
+				handleClick={buttonClick}
+				>
+					{'??'}
+				</Button>
+				<Button
+				id='?!'
+				handleClick={buttonClick}
+				>
+					{'?!'}
+				</Button>
+				<Button
+				id='!?'
+				handleClick={buttonClick}
+				>
+					{'!?'}
+				</Button>
+				<Button
+				id='!!'
+				handleClick={buttonClick}
+				>
+					{'!!'}
 				</Button>
 			</div>
 		</div>
