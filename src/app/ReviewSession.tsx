@@ -7,10 +7,10 @@ import { PostgrestResponse } from '@supabase/supabase-js';
 import Button from './Button';
 
 interface ChessMove {
-		id: number;
-		order_in_line: number;
-		fen: string;
-		lines_id: number;
+	id: number;
+	order_in_line: number;
+	fen: string;
+	lines_id: number;
 }
 
 const ReviewSession: React.FC = () => {
@@ -34,25 +34,47 @@ const ReviewSession: React.FC = () => {
 	
 	useEffect(() => {
 			const fetchData = async () => {
-				const response: PostgrestResponse<ChessMove> = await supabaseClient
+				const { data, error } = await supabaseClient
 					.from('moves')
-					.select('fen')
-		
-				if (response.error) console.error('error', response.error)
-				else if (response.data) unpackMoves(response.data)
+					.select('*')
+					.or('lines_id.eq.407,lines_id.eq.515')
+
+				if (error) console.error('error', error)
+				else if (data) unpackMoves(data)
 			}
 			
 			fetchData()
 	}, [])
 
 	
-	const unpackMoves = (moves: ChessMove[]) => {
-		const updatedLine = []
-		for (let move of moves) {
-				updatedLine.push(move.fen);
+	function unpackMoves(moves: { [x: string]: any; }[]) {
+		const chessMoves: ChessMove[] = moves.map(move => ({
+		  id: move.id,
+		  order_in_line: move.order_in_line,
+		  fen: move.fen,
+		  lines_id: move.lines_id,
+		}));
+
+		const updatedLines: ChessMove[][] = []
+		let line: ChessMove[] = []
+		let currentLinesId: number = chessMoves[0]['lines_id']
+		for (let move of chessMoves) {
+			if (currentLinesId === move.lines_id) line.push(move);
+			else {
+				currentLinesId = move.lines_id;
+				updatedLines.push(line);
+				line = [move];
+			}
 		}
-		setCurrentLine(updatedLine);
-		setCurrentMove(updatedLine.length - 2);
+
+		// Temperarily set current line to the first set of moves
+		const currentLine: string[] = []
+		for (let move of updatedLines[0]) {
+			currentLine.push(move.fen);
+		}
+		console.log(currentLine)
+		setCurrentLine(currentLine);
+		setCurrentMove(currentLine.length - 2);
 	}
 
 	const buttonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -70,7 +92,7 @@ const ReviewSession: React.FC = () => {
 
 	return (
 		<div className="flex flex-col items-center">
-			<div className="mb-4">
+			<div className="mb-4 mt-4">
 				{currentLine && currentLine.length > 0 &&				
 					<ChessBoard
 					currentLine={currentLine}
