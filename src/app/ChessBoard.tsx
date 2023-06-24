@@ -52,12 +52,12 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ position, setPosition }) => {
 		const updatedMap = new Map<string, string>(highlightMap);
 		const cellId = `${answerToggle.row}-${answerToggle.col}`;
 
-		if (position.move < position.line.length - 1) updatedMap.delete(cellId);
+		if (position.move < position.line.length - 2) updatedMap.delete(cellId);
 		else updatedMap.set(cellId, answerToggle.color);
 
 		setHighlightMap(updatedMap);
 
-	}, [answerToggle, highlightMap, position]);
+	}, [answerToggle, position]);
 	
 
 	const handlePieceMove = (fromRow: number, fromCol: number, toRow: number, toCol: number) => {
@@ -85,7 +85,8 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ position, setPosition }) => {
 		const newFen = isCorrect ? position.line[position.line.length - 1] : newGameState.fen();
 		const updatedLine = [...position.line];
 		const updatedMove = position.move + 1;
-		updatedLine[updatedLine.length - 1] = newFen;
+		updatedLine.push(updatedLine[-1]);
+		updatedLine[updatedLine.length - 2] = newFen;
 		setPosition({move: updatedMove, line: updatedLine});
 
 		// Update cell highlight colors
@@ -95,7 +96,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ position, setPosition }) => {
 		updatedMap.set(`${toRow}-${toCol}`, destinationColor);
 		setHighlightMap(updatedMap);
 
-		// Update the answre color toggle
+		// Update the answer color toggle
 		setAnswerToggle({row: toRow.toString(), col: toCol.toString(), color: destinationColor})
 	}; 
 

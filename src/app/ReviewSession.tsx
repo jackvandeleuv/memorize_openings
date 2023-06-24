@@ -132,18 +132,19 @@ const ReviewSession: React.FC = () => {
 	  
 
 	const arrowButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-		console.log(position.line, position.move)
-		if (e.currentTarget.id === '>' && position.move < position.line.length - 1) {
+		console.log('Before arrow click: ' + position.move)
+		if (e.currentTarget.id === '>' && position.move < position.line.length - 2) {
 			const newIndex = position.move + 1;
 			const currentLine = [...position.line];
 			setPosition({line: currentLine, move: newIndex});
+			console.log('After arrow click: ' + newIndex);
 		}
 		if (e.currentTarget.id === '<' && position.move > 0) {
 			const newIndex = position.move - 1;
 			const currentLine = [...position.line];
 			setPosition({line: currentLine, move: newIndex});
-		}
-	}
+			console.log('After arrow click: ' + newIndex);
+		}	}
 
 
 	const ratingButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
