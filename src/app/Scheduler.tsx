@@ -1,5 +1,6 @@
 import { addMinutes, addDays, isAfter, formatDistanceToNow } from 'date-fns';
 import { Card } from './Card';
+import { scheduler } from 'timers/promises';
 
 const steps = new Map<number, number>();
 steps.set(1, 1);
@@ -8,11 +9,11 @@ steps.set(3, 10);
 steps.set(4, 24 * 60);
 
 export class Scheduler {
-    newCardLimit: number;
-    cards: Card[];
-    queue: Card[];
-    newCardRatio: number;
-    stepSize: number;
+    private newCardLimit: number;
+    private cards: Card[];
+    private queue: Card[];
+    private newCardRatio: number;
+    private stepSize: number;
 
     constructor() {
         this.newCardLimit = 20;
@@ -20,6 +21,16 @@ export class Scheduler {
         this.queue = [];
         this.newCardRatio = 5;
         this.stepSize = 3;
+    }
+
+    deepCopy(): Scheduler {
+        const schedulerCopy = new Scheduler();
+        schedulerCopy.newCardLimit = this.newCardLimit;
+        schedulerCopy.cards = this.cards;
+        schedulerCopy.queue = this.queue;
+        schedulerCopy.newCardRatio = this.newCardRatio;
+        schedulerCopy.stepSize = this.stepSize;
+        return schedulerCopy;
     }
 
     getNextCard(): Card | null {
@@ -97,6 +108,12 @@ export class Scheduler {
         console.log();
 
         this.updateQueue();
+
+        console.log('Queue updated to: ' );
+        for (let card of this.queue) {
+            if (!card) continue;
+            console.log(card.moves);
+        }
     }
 
     private updateReviewCard(grade: string, card: Card) {

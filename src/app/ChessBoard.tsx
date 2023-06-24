@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import Cell from './Cell';
 import Piece from './Piece';
 import { Chess, Square } from 'chess.js';
+import { Position } from './ReviewSession';
 
 export interface Piece {
 	piece: 'p' | 'r' | 'n' | 'b' | 'k' | 'q';
@@ -13,34 +14,61 @@ export interface Piece {
 export type BoardState = (Piece | null)[][];
 
 interface ChessBoardProps {
-	currentLine: string[];
-	setCurrentLine: React.Dispatch<React.SetStateAction<string[]>>;
-	currentMove: number;
-	setCurrentMove: React.Dispatch<React.SetStateAction<number>>;
+	position: Position;
+	setPosition: React.Dispatch<React.SetStateAction<Position>>;
 }
 
-const ChessBoard: React.FC<ChessBoardProps> = ({ currentLine, currentMove, setCurrentMove, setCurrentLine }) => {
+interface AnswerToggle {
+	row: string,
+	col: string,
+	color: string
+}
+
+const ChessBoard: React.FC<ChessBoardProps> = ({ position, setPosition }) => {
 	const [prevClickedPiece, setPrevClickedPiece] = useState('');
 	const [highlightMap, setHighlightMap] = useState(new Map<string, string>());
+	const [answerToggle, setAnswerToggle] = useState<AnswerToggle>();
+
 
 	const [gameState, setGameState] = useState<Chess>(() => {
 		const game: Chess = new Chess();
-		game.load(currentLine[currentLine.length - 2])
+		game.load(position.line[position.line.length - 2])
 		return game;
 	});
+
+
 	const gameRef = useRef(gameState);
-	useEffect(() => { gameRef.current = gameState }, [gameState]);
+
+
+	useEffect(() => { 
+		gameRef.current = gameState 
+	}, [gameState]);
+
+
+	// Toggle destination highlight if using arrow buttons
+	useEffect(() => {
+		if (!answerToggle) return;
+		
+		const updatedMap = new Map<string, string>(highlightMap);
+		const cellId = `${answerToggle.row}-${answerToggle.col}`;
+
+		if (position.move < position.line.length - 1) updatedMap.delete(cellId);
+		else updatedMap.set(cellId, answerToggle.color);
+
+		setHighlightMap(updatedMap);
+
+	}, [answerToggle, highlightMap, position]);
 	
 
 	const handlePieceMove = (fromRow: number, fromCol: number, toRow: number, toCol: number) => {
 		// Toggle and return if we're earlier in the line or move is invalid
-		if (currentMove >= currentLine.length - 1 || !isValidMove(fromRow, fromCol, toRow, toCol)) {
+		if (position.move >= position.line.length - 1 || !isValidMove(fromRow, fromCol, toRow, toCol)) {
 			toggleYellowHighlight(`${fromRow}-${fromCol}`);
 			return;
 		}
 
 		// Move the piece on the user's board
-		const updatedPieces: BoardState = [...fenToBoard(currentLine[currentMove])];
+		const updatedPieces: BoardState = [...fenToBoard(position.line[position.move])];
 		const pieceToMove = updatedPieces[fromRow][fromCol];
 		updatedPieces[fromRow][fromCol] = null;
 		updatedPieces[toRow][toCol] = pieceToMove;
@@ -51,16 +79,14 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ currentLine, currentMove, setCu
 			from:indexToAlgebraic(fromCol, fromRow),
 			to:indexToAlgebraic(toCol, toRow)
 		})
-		const isCorrect = newGameState.fen() === currentLine[currentLine.length - 1];
+		const isCorrect = newGameState.fen() === position.line[position.line.length - 1];
 
-		// Update the React state
-		const newFen = isCorrect ? currentLine[currentLine.length - 1] : newGameState.fen();
-		setCurrentLine(prevLines => [
-			...prevLines.slice(0, currentLine.length - 1), 
-			newFen, 
-			prevLines[prevLines.length - 1]
-		]);
-		setCurrentMove(prevMove => prevMove + 1);
+		// Update the position
+		const newFen = isCorrect ? position.line[position.line.length - 1] : newGameState.fen();
+		const updatedLine = [...position.line];
+		const updatedMove = position.move + 1;
+		updatedLine[updatedLine.length - 1] = newFen;
+		setPosition({move: updatedMove, line: updatedLine});
 
 		// Update cell highlight colors
 		const destinationColor = isCorrect ? 'bg-green-600' : 'bg-red-600';
@@ -68,6 +94,9 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ currentLine, currentMove, setCu
 		updatedMap.delete(`${fromRow}-${fromCol}`)
 		updatedMap.set(`${toRow}-${toCol}`, destinationColor);
 		setHighlightMap(updatedMap);
+
+		// Update the answre color toggle
+		setAnswerToggle({row: toRow.toString(), col: toCol.toString(), color: destinationColor})
 	}; 
 
 	
@@ -130,7 +159,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ currentLine, currentMove, setCu
 		for (let i = 0; i < 8; i++) {
 			for (let j = 0; j < 8; j++) {
 				const key = `${i}-${j}`;
-				const piece = fenToBoard(currentLine[currentMove])[i][j];
+				const piece = fenToBoard(position.line[position.move])[i][j];
 				board.push(
 					<Cell
 					key={key}

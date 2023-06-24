@@ -37,6 +37,7 @@ export class Card {
     }
     
     reviewTime(): string {
-        return formatDistanceToNow(this.reviewAt) + ' minutes';
+        return 'Placeholder for reviewTime()'
+        // return formatDistanceToNow(this.reviewAt) + ' minutes';
     }
 }

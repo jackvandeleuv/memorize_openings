@@ -7,6 +7,7 @@ import { PostgrestResponse } from '@supabase/supabase-js';
 import Button from './Button';
 import { Card } from './Card';
 import { Scheduler } from './Scheduler';
+import { setgroups } from 'process';
 
 export interface ChessMove {
 	order_in_line: number;
@@ -14,9 +15,13 @@ export interface ChessMove {
 	lines_id: number;
 }
 
+export interface Position {
+	move: number;
+	line: string[];
+}
+
 const ReviewSession: React.FC = () => {
-	const [currentLine, setCurrentLine] = useState<string[]>([]);
-	const [currentMove, setCurrentMove] = useState<number>(0);
+	const [position, setPosition] = useState<Position>({move: 0, line: []})
 	const [scheduler, setScheduler] = useState<Scheduler>();
 
 
@@ -78,14 +83,20 @@ const ReviewSession: React.FC = () => {
 				})
 				lines.set(row.cards_id, mappedMoves)
 			}
+
+			// Remove cards with no cooresponding moves
+			cards.forEach((value, key) => {
+				if (!lines.has(key)) cards.delete(key);
+			});
 	
+			// Update each card in cards with the moves from lines
 			for (let key of Array.from(lines.keys())) {
 				const card = cards.get(key);
 				let moves = lines.get(key);
 				moves = moves?.sort((a, b) => a.order_in_line - b.order_in_line)
 				card?.setMoves(moves!);
 			}
-			
+
 			if (cards == null) throw new Error('Cards should not be null!');
 			const scheduler = new Scheduler();
 			for (let key of Array.from(cards.keys())) {
@@ -99,87 +110,73 @@ const ReviewSession: React.FC = () => {
 	}, [])
 
 
-	const renderBoard = useCallback(() => {
+	const renderCards = useCallback(() => {
 		if (!scheduler) return;
 		const nextCard = scheduler.getNextCard();
 		if (!nextCard) return;
 		const nextMoves = nextCard?.moves || [];
 		const nextMoveFens = nextMoves.map(move => move.fen);
-		setCurrentLine(nextMoveFens);
-		setCurrentMove(Math.max(nextMoveFens.length - 2, 0));
-	  }, [scheduler]);
+		console.log('renderCards is setting position to: ' )
+		for (let move of nextMoveFens) console.log(move);
+		// console.log('Setting current move to: ' + position.line[position.move])
+		setPosition({
+			line: nextMoveFens, 
+			move: Math.max(nextMoveFens.length - 2, 0)
+		});
+	}, [scheduler]);
 	  
 
-	  useEffect(() => {
-		renderBoard();
-	  }, [renderBoard]);
+	useEffect(() => {
+		renderCards();
+	}, [renderCards]);
 	  
-	
-	// function unpackMoves(moves: { [x: string]: any; }[]) {
-	// 	const chessMoves: ChessMove[] = moves.map(move => ({
-	// 	  id: move.id,
-	// 	  order_in_line: move.order_in_line,
-	// 	  fen: move.fen,
-	// 	  lines_id: move.lines_id,
-	// 	}));
 
-	// 	const updatedLines: ChessMove[][] = []
-	// 	let line: ChessMove[] = []
-	// 	let currentLinesId: number = chessMoves[0]['lines_id']
-	// 	for (let move of chessMoves) {
-	// 		if (currentLinesId === move.lines_id) line.push(move);
-	// 		else {
-	// 			currentLinesId = move.lines_id;
-	// 			updatedLines.push(line);
-	// 			line = [move];
-	// 		}
-	// 	}
-
-	// 	// Temperarily set current line to the first set of moves
-	// 	const currentLine: string[] = []
-	// 	for (let move of updatedLines[0]) {
-	// 		currentLine.push(move.fen);
-	// 	}
-	// 	console.log(currentLine)
-	// 	setCurrentLine(currentLine);
-	// 	setCurrentMove(currentLine.length - 2);
-	// }
-
-	const buttonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-		if (e.currentTarget.id === '>' && currentMove < currentLine.length - 2) {
-			const newIndex = currentMove + 1;
-			setCurrentMove(newIndex);
+	const arrowButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+		console.log(position.line, position.move)
+		if (e.currentTarget.id === '>' && position.move < position.line.length - 1) {
+			const newIndex = position.move + 1;
+			const currentLine = [...position.line];
+			setPosition({line: currentLine, move: newIndex});
 		}
-
-		if (e.currentTarget.id === '<' && currentMove > 0) {
-			const newIndex = currentMove - 1;
-			setCurrentMove(newIndex);
+		if (e.currentTarget.id === '<' && position.move > 0) {
+			const newIndex = position.move - 1;
+			const currentLine = [...position.line];
+			setPosition({line: currentLine, move: newIndex});
 		}
+	}
+
+
+	const ratingButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+		if (!scheduler) return;
+		const updatedScheduler = scheduler.deepCopy();
+		if (e.currentTarget.id === '!!') updatedScheduler.answerCard('Easy');
+		if (e.currentTarget.id === '!?') updatedScheduler.answerCard('Good');
+		if (e.currentTarget.id === '?!') updatedScheduler.answerCard('Hard');
+		if (e.currentTarget.id === '??') updatedScheduler.answerCard('Again');
+		setScheduler(updatedScheduler);
 	}
 
 
 	return (
 		<div className="flex flex-col items-center">
 			<div className="mb-4 mt-4">
-				{currentLine && currentLine.length > 0 &&				
+				{position.line && position.line.length > 0 &&				
 					<ChessBoard
-					currentLine={currentLine}
-					setCurrentLine={setCurrentLine}
-					currentMove={currentMove}
-					setCurrentMove={setCurrentMove}
+					position={position}
+					setPosition={setPosition}
 					/>
 				}
 			</div>
 			<div className="flex justify-center space-x-4 mb-4">
 				<Button
 				id='<'
-				handleClick={buttonClick}
+				handleClick={arrowButtonClick}
 				>
 					{'<'}
 				</Button>
 				<Button
 				id='>'
-				handleClick={buttonClick}
+				handleClick={arrowButtonClick}
 				>
 					{'>'}
 				</Button>
@@ -187,25 +184,25 @@ const ReviewSession: React.FC = () => {
 			<div className="flex justify-center space-x-4">
 				<Button
 				id='??'
-				handleClick={buttonClick}
+				handleClick={ratingButtonClick}
 				>
 					{'??'}
 				</Button>
 				<Button
 				id='?!'
-				handleClick={buttonClick}
+				handleClick={ratingButtonClick}
 				>
 					{'?!'}
 				</Button>
 				<Button
 				id='!?'
-				handleClick={buttonClick}
+				handleClick={ratingButtonClick}
 				>
 					{'!?'}
 				</Button>
 				<Button
 				id='!!'
-				handleClick={buttonClick}
+				handleClick={ratingButtonClick}
 				>
 					{'!!'}
 				</Button>
