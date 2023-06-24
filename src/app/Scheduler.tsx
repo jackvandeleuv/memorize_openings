@@ -1,12 +1,8 @@
 import { addMinutes, addDays, isAfter, formatDistanceToNow } from 'date-fns';
 import { Card } from './Card';
 import { scheduler } from 'timers/promises';
+import { update } from 'plotly.js';
 
-const steps = new Map<number, number>();
-steps.set(1, 1);
-steps.set(2, 6);
-steps.set(3, 10);
-steps.set(4, 24 * 60);
 
 export class Scheduler {
     private newCardLimit: number;
@@ -14,6 +10,7 @@ export class Scheduler {
     queue: Card[];
     private newCardRatio: number;
     private stepSize: number;
+    private steps: number[];
 
     constructor() {
         this.newCardLimit = 20;
@@ -21,6 +18,7 @@ export class Scheduler {
         this.queue = [];
         this.newCardRatio = 5;
         this.stepSize = 3;
+        this.steps = [1, 6, 10, 24 * 60]
     }
 
     deepCopy(): Scheduler {
@@ -34,12 +32,8 @@ export class Scheduler {
     }
 
     getNextCard(): Card | null {
-        if (this.queue.length > 0) {console.log('Someone is getting this card: ');
-            for (let move of this.queue[0].moves!) {
-                console.log('Fen: ' + move.fen + '\n');
-                console.log('^Order in line ' + move.order_in_line);
-            }
-        };
+        if (this.queue.length > 0) console.log('getNextCard -> ' + this.queue[0]);
+        else console.log('getNextCard -> empty!');
 
         if (this.queue.length > 0) return this.queue[0];
         return null;
@@ -54,14 +48,9 @@ export class Scheduler {
         const newCards: Card[] = [];
         const revCards: Card[] = [];
         for (const card of this.cards) {
-            if (isAfter(new Date(), card.reviewAt)) {
-                continue;
-            }
-            if (card.isNew) {
-                newCards.push(card);
-            } else {
-                revCards.push(card);
-            }
+            // if (isAfter(new Date(), card.getReviewAt())) continue;
+            if (card.isNew) newCards.push(card);
+            if (!card.isNew) revCards.push(card);
         }
         newCards.sort((a, b) => b.step - a.step);
         revCards.sort((a, b) => b.interval - a.interval);
@@ -74,61 +63,54 @@ export class Scheduler {
                 i += 1;
                 continue;
             }
-            if (revCards.length) {
-                this.queue.push(revCards.pop() as Card);
-            }
+
+            if (revCards.length) this.queue.push(revCards.pop() as Card);
             i += 1;
         }
     }
 
+    
     answerCard(grade: string) {
         if (!this.queue.length) {
             console.log('Empty queue!');
-            return;
+            return null;
         }
+        this.gradeCard(grade, this.queue[0]);
+        this.updateQueue();
+    }
 
-        const card = this.queue[0];
-        this.newCardLimit -= 1;
-        
-        console.log();
-        console.log('Before:', card);
+    // Tests out a grade without changing the Cards in the queue
+    resultIfGrade(grade: string) {
+        return this.gradeCard(grade, this.queue[0].deepCopy());
+    }
 
-        if (!card.isNew) {
-            this.updateReviewCard(grade, card);
-        }
-
+    private gradeCard(grade: string, card: Card): Card {       
         if (card.isNew) {
             if (grade === 'Again') {
                 card.step = 1;
             } else if (grade === 'Good') {
                 card.step += 1;
+                if (card.step === this.steps.length) card.isNew = false;
             } else if (grade === 'Easy') {
                 card.isNew = false;
             } else if (grade !== 'Hard') {
                 throw new Error('Unexpected value received for grade');
             }
             
-            card.reviewAt = addMinutes(new Date(), steps.get(card.step)!);
+            card.setReviewAt(addMinutes(new Date(), this.steps[card.step - 1]));
         }
 
-        console.log('After:', card);
-        console.log();
+        if (!card.isNew) this.updateReviewCard(grade, card);
 
-        this.updateQueue();
-
-        console.log('Queue updated to: ' );
-        for (let card of this.queue) {
-            if (!card) continue;
-            console.log(card.moves);
-        }
+        return card;
     }
 
     private updateReviewCard(grade: string, card: Card) {
         if (grade === 'Again') {
-            card.ease = Math.max(card.ease * 0.8, 1.3);
+            card.ease = Math.max(card.ease * 0.8 / 1000, 1.3);
             card.isNew = true;
             card.step = 1;
-            card.reviewAt = addMinutes(new Date(), 1);
+            card.setReviewAt(addMinutes(new Date(), 1));
             return;
         }
 
@@ -139,7 +121,7 @@ export class Scheduler {
             card.ease = card.ease * 0.85;
         }
         
-        card.interval = card.interval * card.ease;
-        card.reviewAt = addDays(new Date(), card.interval);
+        card.interval = card.interval * card.ease / 1000;
+        card.setReviewAt(addDays(new Date(), card.interval));
     }
 }

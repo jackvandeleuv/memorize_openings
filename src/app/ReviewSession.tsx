@@ -60,7 +60,10 @@ const ReviewSession: React.FC = () => {
 
 			const cards = new Map<number, Card>();
 			for (let row of cardsData!) {
-				const card = new Card(row.ease, row.interval, row.is_new, row.step, row.review_at);
+				console.log('Manually setting review time to now!!!');
+				const dummyDate = new Date();
+				dummyDate.setTime(dummyDate.getTime() + 10000)
+				const card = new Card(row.ease, row.interval, row.is_new, row.step, dummyDate);
 				cards.set(row.id, card);
 			}
 
@@ -148,29 +151,24 @@ const ReviewSession: React.FC = () => {
 	  
 
 	const arrowButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-		console.log('Index before arrow click: ' + position.move)
-		console.log('Line on click: ' + position.line);
-		console.log('Cards -> fens in scheduler on arrow click: ')
 		if (!scheduler) return;
-		for (let card of scheduler.queue) {
-			console.log('Card:\n')
-			for (let move of card.moves!) {
-				console.log(move.fen + '\n');
-			}
-		}
+
+		console.log('\nEasy: ' + scheduler.resultIfGrade('Easy'));
+		console.log('Good: ' + scheduler.resultIfGrade('Good'));
+		console.log('Hard: ' + scheduler.resultIfGrade('Hard'));
+		console.log('Again: ' + scheduler.resultIfGrade('Again') + '\n');
 
 		if (e.currentTarget.id === '>' && position.move < position.line.length - 1) {
 			const newIndex = position.move + 1;
 			const currentLine = [...position.line];
 			setPosition({line: currentLine, move: newIndex, answer: position.answer, game: new Chess(position.game.fen())});
-			console.log('Index after arrow click: ' + newIndex);
 		}
 		if (e.currentTarget.id === '<' && position.move > 0) {
 			const newIndex = position.move - 1;
 			const currentLine = [...position.line];
 			setPosition({line: currentLine, move: newIndex, answer: position.answer, game: new Chess(position.game.fen())});
-			console.log('Index after arrow click: ' + newIndex);
-		}	}
+		}	
+	}
 
 
 	const ratingButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -182,7 +180,6 @@ const ReviewSession: React.FC = () => {
 		if (e.currentTarget.id === '??') updatedScheduler.answerCard('Again');
 		setScheduler(updatedScheduler);
 		setAnswerToggle({row: answerToggle.row, col: answerToggle.col, color: ''});
-		console.log('rating button click updated toggler!')
 	}
 
 

@@ -7,7 +7,8 @@ export class Card {
     interval: number;
     isNew: boolean;
     step: number;
-    reviewAt: Date;
+    private reviewAt: Date;
+    private id: number;
 
     constructor(ease: number, interval: number, isNew: boolean, step: number, reviewAt: Date) {
         this.ease = ease;
@@ -15,6 +16,27 @@ export class Card {
         this.isNew = isNew;
         this.step = step;
         this.reviewAt = reviewAt;
+        this.id = Math.floor(Math.random() * (10000 - 1) + 1);;
+    }
+
+    setReviewAt(newReviewAt: Date): void {
+        this.reviewAt = new Date(newReviewAt.getTime());
+    }
+
+    getReviewAt(): Date {
+        return new Date(this.reviewAt.getTime());
+    } 
+
+    deepCopy(): Card {
+        const cardCopy =  new Card(
+            this.ease,
+            this.interval,
+            this.isNew,
+            this.step,
+            new Date(this.reviewAt.getTime())
+        )
+        cardCopy.id = this.id;
+        return cardCopy;
     }
 
     hasMoves(): boolean {
@@ -27,17 +49,15 @@ export class Card {
 
     toString(): string {
         return (
-            'Data: ' + this.moves +
+            'Card: ' + this.id +
             ', Review: ' + this.reviewTime() +
             ', Ease: ' + this.ease +
-            ', Inter: ' + this.interval +
             ', New: ' + this.isNew +
             ', Step: ' + this.step
         );
     }
     
     reviewTime(): string {
-        return 'Placeholder for reviewTime()'
-        // return formatDistanceToNow(this.reviewAt) + ' minutes';
+        return formatDistanceToNow(this.reviewAt);
     }
 }

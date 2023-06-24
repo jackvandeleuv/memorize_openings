@@ -30,7 +30,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ position, setPosition, answerTo
 	useEffect(() => {
 		// If we have an empty toggler, return
 		if (answerToggle.color === '' && answerToggle.row === '' && answerToggle.col === '') return;
-		console.log('Called toggler with: ' + answerToggle.color + ' ' + answerToggle.row + ' '+ answerToggle.col + ' ');
+
 		// Otherwise, prepare highlight map for updating
 		const updatedMap = new Map<string, string>(highlightMap);
 		const cellId = `${answerToggle.row}-${answerToggle.col}`;
@@ -69,8 +69,6 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ position, setPosition, answerTo
 		const updatedLine = [...position.line];
 		updatedLine.push(newGameState.fen());
 		const updatedMove = updatedLine.length - 1;
-
-		console.log('handlePieceMove setting position to: ' + updatedMove + ' ' +  updatedLine);
 
 		setPosition({move: updatedMove, line: updatedLine, answer: position.answer, game: new Chess(position.game.fen())});
 
@@ -142,8 +140,6 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ position, setPosition, answerTo
 	const renderBoard = () => {
 		const board = [];
 
-		console.log('renderBoard is rendering: ' + position.line[position.move]);
-
 		for (let i = 0; i < 8; i++) {
 			for (let j = 0; j < 8; j++) {
 				const key = `${i}-${j}`;
@@ -183,7 +179,6 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ position, setPosition, answerTo
 
 
 	const fenToBoard = (fen: string): Piece[][] => {
-		console.log('fen: ' + fen)
 		const parts = fen.split(" ");
 		const layout = parts[0];
 		let rankIndex = 7;
