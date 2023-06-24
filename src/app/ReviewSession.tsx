@@ -24,9 +24,16 @@ export interface Position {
 	game: Chess
 }
 
+export interface AnswerToggle {
+	row: string,
+	col: string,
+	color: string
+}
+
 const ReviewSession: React.FC = () => {
 	const [position, setPosition] = useState<Position>({move: 0, line: [], answer: '', game: new Chess()})
 	const [scheduler, setScheduler] = useState<Scheduler>();
+	const [answerToggle, setAnswerToggle] = useState<AnswerToggle>({row: '', col: '', color: ''});
 
 
 	// useEffect(() => {
@@ -174,6 +181,8 @@ const ReviewSession: React.FC = () => {
 		if (e.currentTarget.id === '?!') updatedScheduler.answerCard('Hard');
 		if (e.currentTarget.id === '??') updatedScheduler.answerCard('Again');
 		setScheduler(updatedScheduler);
+		setAnswerToggle({row: answerToggle.row, col: answerToggle.col, color: ''});
+		console.log('rating button click updated toggler!')
 	}
 
 
@@ -184,6 +193,8 @@ const ReviewSession: React.FC = () => {
 					<ChessBoard
 					position={position}
 					setPosition={setPosition}
+					answerToggle={answerToggle}
+					setAnswerToggle={setAnswerToggle}
 					/>
 				}
 			</div>

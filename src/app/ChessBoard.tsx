@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import Cell from './Cell';
 import Piece from './Piece';
 import { Chess, Square } from 'chess.js';
-import { Position } from './ReviewSession';
+import { Position, AnswerToggle } from './ReviewSession';
 
 export interface Piece {
 	piece: 'p' | 'r' | 'n' | 'b' | 'k' | 'q';
@@ -16,29 +16,28 @@ export type BoardState = (Piece | null)[][];
 interface ChessBoardProps {
 	position: Position;
 	setPosition: React.Dispatch<React.SetStateAction<Position>>;
+	answerToggle: AnswerToggle;
+	setAnswerToggle: React.Dispatch<React.SetStateAction<AnswerToggle>>;
 }
 
-interface AnswerToggle {
-	row: string,
-	col: string,
-	color: string
-}
 
-const ChessBoard: React.FC<ChessBoardProps> = ({ position, setPosition }) => {
+const ChessBoard: React.FC<ChessBoardProps> = ({ position, setPosition, answerToggle, setAnswerToggle }) => {
 	const [prevClickedPiece, setPrevClickedPiece] = useState('');
 	const [highlightMap, setHighlightMap] = useState(new Map<string, string>());
-	const [answerToggle, setAnswerToggle] = useState<AnswerToggle>();
 
 
 	// Toggle destination highlight if using arrow buttons
 	useEffect(() => {
-		if (!answerToggle) return;
-		
+		// If we have an empty toggler, return
+		if (answerToggle.color === '' && answerToggle.row === '' && answerToggle.col === '') return;
+		console.log('Called toggler with: ' + answerToggle.color + ' ' + answerToggle.row + ' '+ answerToggle.col + ' ');
+		// Otherwise, prepare highlight map for updating
 		const updatedMap = new Map<string, string>(highlightMap);
 		const cellId = `${answerToggle.row}-${answerToggle.col}`;
 
-		if (position.move < position.line.length - 1) updatedMap.delete(cellId);
-		else updatedMap.set(cellId, answerToggle.color);
+		if (answerToggle.color === '' && answerToggle.row !== '' && answerToggle.col !== '') updatedMap.delete(cellId);
+		if (answerToggle.color !== '' && position.move < position.line.length - 1) updatedMap.delete(cellId);
+		if (answerToggle.color !== '' && position.move >= position.line.length - 1) updatedMap.set(cellId, answerToggle.color);
 
 		setHighlightMap(updatedMap);
 
