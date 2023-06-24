@@ -8,6 +8,8 @@ import Button from './Button';
 import { Card } from './Card';
 import { Scheduler } from './Scheduler';
 import { setgroups } from 'process';
+import { Chess, Square } from 'chess.js';
+
 
 export interface ChessMove {
 	order_in_line: number;
@@ -18,10 +20,12 @@ export interface ChessMove {
 export interface Position {
 	move: number;
 	line: string[];
+	answer: string;
+	game: Chess
 }
 
 const ReviewSession: React.FC = () => {
-	const [position, setPosition] = useState<Position>({move: 0, line: []})
+	const [position, setPosition] = useState<Position>({move: 0, line: [], answer: '', game: new Chess()})
 	const [scheduler, setScheduler] = useState<Scheduler>();
 
 
@@ -116,12 +120,17 @@ const ReviewSession: React.FC = () => {
 		if (!nextCard) return;
 		const nextMoves = nextCard?.moves || [];
 		const nextMoveFens = nextMoves.map(move => move.fen);
-		console.log('renderCards is setting position to: ' )
-		for (let move of nextMoveFens) console.log(move);
-		// console.log('Setting current move to: ' + position.line[position.move])
+		const nextAnswer = nextMoveFens[nextMoveFens.length - 1];
+		const nextMoveFensBlind = nextMoveFens.slice(0, nextMoveFens.length - 1)
+
+		const newGame = new Chess();
+		newGame.load(nextMoveFensBlind[nextMoveFensBlind.length - 1])
+
 		setPosition({
-			line: nextMoveFens, 
-			move: Math.max(nextMoveFens.length - 2, 0)
+			line: nextMoveFensBlind, 
+			move: nextMoveFensBlind.length - 1,
+			answer: nextAnswer,
+			game: newGame
 		});
 	}, [scheduler]);
 	  
@@ -132,18 +141,28 @@ const ReviewSession: React.FC = () => {
 	  
 
 	const arrowButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-		console.log('Before arrow click: ' + position.move)
-		if (e.currentTarget.id === '>' && position.move < position.line.length - 2) {
+		console.log('Index before arrow click: ' + position.move)
+		console.log('Line on click: ' + position.line);
+		console.log('Cards -> fens in scheduler on arrow click: ')
+		if (!scheduler) return;
+		for (let card of scheduler.queue) {
+			console.log('Card:\n')
+			for (let move of card.moves!) {
+				console.log(move.fen + '\n');
+			}
+		}
+
+		if (e.currentTarget.id === '>' && position.move < position.line.length - 1) {
 			const newIndex = position.move + 1;
 			const currentLine = [...position.line];
-			setPosition({line: currentLine, move: newIndex});
-			console.log('After arrow click: ' + newIndex);
+			setPosition({line: currentLine, move: newIndex, answer: position.answer, game: new Chess(position.game.fen())});
+			console.log('Index after arrow click: ' + newIndex);
 		}
 		if (e.currentTarget.id === '<' && position.move > 0) {
 			const newIndex = position.move - 1;
 			const currentLine = [...position.line];
-			setPosition({line: currentLine, move: newIndex});
-			console.log('After arrow click: ' + newIndex);
+			setPosition({line: currentLine, move: newIndex, answer: position.answer, game: new Chess(position.game.fen())});
+			console.log('Index after arrow click: ' + newIndex);
 		}	}
 
 

@@ -30,21 +30,6 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ position, setPosition }) => {
 	const [answerToggle, setAnswerToggle] = useState<AnswerToggle>();
 
 
-	const [gameState, setGameState] = useState<Chess>(() => {
-		const game: Chess = new Chess();
-		game.load(position.line[position.line.length - 2])
-		return game;
-	});
-
-
-	const gameRef = useRef(gameState);
-
-
-	useEffect(() => { 
-		gameRef.current = gameState 
-	}, [gameState]);
-
-
 	// Toggle destination highlight if using arrow buttons
 	useEffect(() => {
 		if (!answerToggle) return;
@@ -52,7 +37,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ position, setPosition }) => {
 		const updatedMap = new Map<string, string>(highlightMap);
 		const cellId = `${answerToggle.row}-${answerToggle.col}`;
 
-		if (position.move < position.line.length - 2) updatedMap.delete(cellId);
+		if (position.move < position.line.length - 1) updatedMap.delete(cellId);
 		else updatedMap.set(cellId, answerToggle.color);
 
 		setHighlightMap(updatedMap);
@@ -62,7 +47,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ position, setPosition }) => {
 
 	const handlePieceMove = (fromRow: number, fromCol: number, toRow: number, toCol: number) => {
 		// Toggle and return if we're earlier in the line or move is invalid
-		if (position.move >= position.line.length - 1 || !isValidMove(fromRow, fromCol, toRow, toCol)) {
+		if (position.move < position.line.length - 1 || !isValidMove(fromRow, fromCol, toRow, toCol)) {
 			toggleYellowHighlight(`${fromRow}-${fromCol}`);
 			return;
 		}
@@ -74,20 +59,21 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ position, setPosition }) => {
 		updatedPieces[toRow][toCol] = pieceToMove;
 
 		// Check if the user got the position right
-		const newGameState = new Chess(gameRef.current.fen());
+		const newGameState = new Chess(position.game.fen());
 		newGameState.move({
 			from:indexToAlgebraic(fromCol, fromRow),
 			to:indexToAlgebraic(toCol, toRow)
 		})
-		const isCorrect = newGameState.fen() === position.line[position.line.length - 1];
+		const isCorrect = newGameState.fen() === position.answer;
 
 		// Update the position
-		const newFen = isCorrect ? position.line[position.line.length - 1] : newGameState.fen();
 		const updatedLine = [...position.line];
-		const updatedMove = position.move + 1;
-		updatedLine.push(updatedLine[-1]);
-		updatedLine[updatedLine.length - 2] = newFen;
-		setPosition({move: updatedMove, line: updatedLine});
+		updatedLine.push(newGameState.fen());
+		const updatedMove = updatedLine.length - 1;
+
+		console.log('handlePieceMove setting position to: ' + updatedMove + ' ' +  updatedLine);
+
+		setPosition({move: updatedMove, line: updatedLine, answer: position.answer, game: new Chess(position.game.fen())});
 
 		// Update cell highlight colors
 		const destinationColor = isCorrect ? 'bg-green-600' : 'bg-red-600';
@@ -128,7 +114,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ position, setPosition }) => {
 
 
 	const isValidMove = (fromRow: number, fromCol: number, toRow: number, toCol: number): boolean => {
-		const gameStateCopy = new Chess(gameRef.current.fen());
+		const gameStateCopy = new Chess(position.game.fen());
 
 		// In algebraic notation
 		const fromString = indexToAlgebraic(fromCol, fromRow);
@@ -148,7 +134,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ position, setPosition }) => {
 		if (!isValid) return false;
 
 		gameStateCopy.move({from:fromString, to:toString})
-		setGameState(gameStateCopy); 
+		setPosition({line: position.line, move: position.move, answer: position.answer, game: gameStateCopy}); 
 
 		return true;
 	};
@@ -156,6 +142,8 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ position, setPosition }) => {
 
 	const renderBoard = () => {
 		const board = [];
+
+		console.log('renderBoard is rendering: ' + position.line[position.move]);
 
 		for (let i = 0; i < 8; i++) {
 			for (let j = 0; j < 8; j++) {
@@ -196,6 +184,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ position, setPosition }) => {
 
 
 	const fenToBoard = (fen: string): Piece[][] => {
+		console.log('fen: ' + fen)
 		const parts = fen.split(" ");
 		const layout = parts[0];
 		let rankIndex = 7;

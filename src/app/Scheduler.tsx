@@ -11,7 +11,7 @@ steps.set(4, 24 * 60);
 export class Scheduler {
     private newCardLimit: number;
     private cards: Card[];
-    private queue: Card[];
+    queue: Card[];
     private newCardRatio: number;
     private stepSize: number;
 
@@ -34,6 +34,13 @@ export class Scheduler {
     }
 
     getNextCard(): Card | null {
+        if (this.queue.length > 0) {console.log('Someone is getting this card: ');
+            for (let move of this.queue[0].moves!) {
+                console.log('Fen: ' + move.fen + '\n');
+                console.log('^Order in line ' + move.order_in_line);
+            }
+        };
+
         if (this.queue.length > 0) return this.queue[0];
         return null;
     }
@@ -97,8 +104,8 @@ export class Scheduler {
                 card.step += 1;
             } else if (grade === 'Easy') {
                 card.isNew = false;
-            } else {
-                throw new Error();
+            } else if (grade !== 'Hard') {
+                throw new Error('Unexpected value received for grade');
             }
             
             card.reviewAt = addMinutes(new Date(), steps.get(card.step)!);
