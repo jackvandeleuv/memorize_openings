@@ -3,25 +3,40 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { supabaseClient } from '../../utils/supabaseClient';
 import ChessBoard from './ChessBoard';
-import { PostgrestResponse } from '@supabase/supabase-js';
+import { PostgrestError, PostgrestResponse, SupabaseClient } from '@supabase/supabase-js';
 import Button from './Button';
 import { Card } from './Card';
 import { Scheduler } from './Scheduler';
-import { setgroups } from 'process';
-import { Chess, Square } from 'chess.js';
+import { Chess } from 'chess.js';
 
+interface CardsRow {
+    ease: number;       
+    interval: number;   
+    is_new: boolean;    
+    step: number;       
+    review_at: Date;
+	lines: LinesRow | LinesRow[] | null;
+}
 
 export interface ChessMove {
-	order_in_line: number;
-	fen: string;
 	lines_id: number;
+    order_in_line: number;
+    fen: string;
+}
+
+interface LinesRow {
+	name: string;
+	eco: string;
+	id: number;
 }
 
 export interface Position {
 	move: number;
 	line: string[];
 	answer: string;
-	game: Chess
+	game: Chess;
+	eco: string;
+	name: string;
 }
 
 export interface AnswerToggle {
@@ -31,8 +46,15 @@ export interface AnswerToggle {
 }
 
 const ReviewSession: React.FC = () => {
-	const [position, setPosition] = useState<Position>({move: 0, line: [], answer: '', game: new Chess()})
-	const [scheduler, setScheduler] = useState<Scheduler>();
+	const [position, setPosition] = useState<Position>({
+		move: 0, 
+		line: ['rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'], 
+		answer: '', 
+		game: new Chess(), 
+		name: 'No Cards Due', 
+		eco: ''
+	})
+	const [scheduler, setScheduler] = useState<Scheduler>(new Scheduler());
 	const [answerToggle, setAnswerToggle] = useState<AnswerToggle>({row: '', col: '', color: ''});
 
 
@@ -53,68 +75,88 @@ const ReviewSession: React.FC = () => {
 	
 	useEffect(() => {
 		const fetchCards = async () => {
-			const { data: cardsData, error: cardsError } = await supabaseClient
-				.from('cards')
-				.select(`ease, interval, is_new, step, review_at, id`)
-			if (cardsError) console.error('error', cardsData)
+			// Request all cards and lines data from the API
+			const cardsResponse = await supabaseClient.from('cards')
+				.select(`
+					ease, 
+					interval, 
+					is_new, 
+					step, 
+					review_at,
+					lines(id, name, eco)
+				`)
+			
+			// Unpack the data returned by the API
+			const data: CardsRow[] | null = cardsResponse.data;
+			const error: PostgrestError | null = cardsResponse.error;
+			if (error) { 
+				console.error('error', error);
+				throw new Error('Supabase returned error!');
+			};
+			console.log(data)
 
+			// Format the data so it can be inserted into Cards and the Scheduler
 			const cards = new Map<number, Card>();
-			for (let row of cardsData!) {
+			for (let cardsRow of data!) {
+				console.log('cardsRow:\n' + cardsRow.lines)
+				// Temporarily set date to current time plus 10,000 millis
 				console.log('Manually setting review time to now!!!');
 				const dummyDate = new Date();
 				dummyDate.setTime(dummyDate.getTime() + 10000)
-				const card = new Card(row.ease, row.interval, row.is_new, row.step, dummyDate);
-				cards.set(row.id, card);
-			}
 
-			const { data: movesData, error: movesError } = await supabaseClient
-			.from('cards_to_moves')
-			.select(`
-				cards_id,
-				moves (
-					order_in_line,
-					fen,
-					lines_id
-				)
-			`)
-			.in('cards_id', Array.from(cards!.keys()))
+				// If there are no associated moves, ignore this card.
+				if (!cardsRow.lines) {
+					console.log('Card had no associated line.');
+					continue;
+				}
 
-			if (movesError) console.error('error', movesError);
-		
-			const lines = new Map<number, ChessMove[]>();
-			for (let row of movesData!) {
-				let mappedMoves: ChessMove[] | undefined = lines.get(row.cards_id);
-				if (mappedMoves === undefined) mappedMoves = [];
-	
-				const rowData = row.moves!;
-
-				if (Array.isArray(rowData)) throw new Error ('Did not expect array!');
+				const card = new Card(
+					cardsRow.ease, 
+					cardsRow.interval, 
+					cardsRow.is_new, 
+					cardsRow.step, 
+					dummyDate);
 				
-				mappedMoves.push({
-					fen: rowData.fen, 
-					order_in_line: rowData.order_in_line, 
-					lines_id: rowData.lines_id
-				})
-				lines.set(row.cards_id, mappedMoves)
+				const lines = cardsRow.lines
+				// Cards and lines is one-to-many, so this case won't occur.
+				if (lines instanceof Array) throw new Error('Multiple lines returned for one card.')
+				card.setEco(lines.eco);
+				card.setName(lines.name)
+				card.setLinesId(lines.id)
+				cards.set(lines.id, card)
 			}
 
-			// Remove cards with no cooresponding moves
-			cards.forEach((value, key) => {
-				if (!lines.has(key)) cards.delete(key);
-			});
-	
-			// Update each card in cards with the moves from lines
-			for (let key of Array.from(lines.keys())) {
-				const card = cards.get(key);
-				let moves = lines.get(key);
-				moves = moves?.sort((a, b) => a.order_in_line - b.order_in_line)
-				card?.setMoves(moves!);
+			const movesResponse = await supabaseClient.from('moves')
+				.select('lines_id, fen, order_in_line')
+				.in('lines_id', Array.from(cards.keys()));
+			
+			// Unpack the data returned by the API
+			const movesData: ChessMove[] | null = movesResponse.data;
+			const movesError: PostgrestError | null = movesResponse.error;
+			if (movesError) { 
+				console.error('error', movesError);
+				return;
+			};
+			if (!movesData) {
+				console.log('No moves associated with cards.');
+				return;
+			};
+
+			for (let move of movesData) {
+				if (!move) continue;
+				const card = cards.get(move.lines_id);
+				if (card) card.addMove(move);
 			}
 
-			if (cards == null) throw new Error('Cards should not be null!');
+			console.log('Cards in map after fetch cards:')
+			for (let key of Array.from(cards.keys())) {
+				console.log(cards.get(key)!.toString())
+			}
+
+			// Add cards to scheduler
 			const scheduler = new Scheduler();
 			for (let key of Array.from(cards.keys())) {
-				scheduler.addCard(cards.get(key)!)
+				scheduler.addCard(cards.get(key)!);
 			}
 			scheduler.updateQueue();
 			setScheduler(scheduler);
@@ -126,21 +168,38 @@ const ReviewSession: React.FC = () => {
 
 	const renderCards = useCallback(() => {
 		if (!scheduler) return;
+		if (!scheduler.hasNextCard()) {
+			console.log('!scheduler.hasNextCard() -> return');
+			return;
+		}
 		const nextCard = scheduler.getNextCard();
-		if (!nextCard) return;
-		const nextMoves = nextCard?.moves || [];
+		if (!nextCard) {
+			console.log('No next card returned');
+			return;
+		};
+		if (!nextCard.hasMoves()) {
+			console.log('Next card has no moves. nextCard: ' + nextCard);
+			return;
+		}
+		console.log('Next card: ' + nextCard + ' Moves: ' + nextCard!.printMoves())
+
+
+		const nextMoves = nextCard.getMoves();
 		const nextMoveFens = nextMoves.map(move => move.fen);
 		const nextAnswer = nextMoveFens[nextMoveFens.length - 1];
 		const nextMoveFensBlind = nextMoveFens.slice(0, nextMoveFens.length - 1)
 
 		const newGame = new Chess();
+		console.log('nextMoveFensBlind: ' + nextMoveFensBlind)
 		newGame.load(nextMoveFensBlind[nextMoveFensBlind.length - 1])
 
 		setPosition({
 			line: nextMoveFensBlind, 
 			move: nextMoveFensBlind.length - 1,
 			answer: nextAnswer,
-			game: newGame
+			game: newGame,
+			eco: nextCard.eco,
+			name: nextCard.name
 		});
 	}, [scheduler]);
 	  
@@ -153,20 +212,34 @@ const ReviewSession: React.FC = () => {
 	const arrowButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
 		if (!scheduler) return;
 
-		console.log('\nEasy: ' + scheduler.resultIfGrade('Easy'));
-		console.log('Good: ' + scheduler.resultIfGrade('Good'));
-		console.log('Hard: ' + scheduler.resultIfGrade('Hard'));
-		console.log('Again: ' + scheduler.resultIfGrade('Again') + '\n');
+		console.log('In queue currently:\n')
+		for (let card of scheduler.getQueue()) {
+			console.log(card.toString())
+		}
 
 		if (e.currentTarget.id === '>' && position.move < position.line.length - 1) {
 			const newIndex = position.move + 1;
 			const currentLine = [...position.line];
-			setPosition({line: currentLine, move: newIndex, answer: position.answer, game: new Chess(position.game.fen())});
+			setPosition({
+				line: currentLine, 
+				move: newIndex, 
+				answer: position.answer, 
+				game: new Chess(position.game.fen()),
+				eco: position.eco,
+				name: position.name
+			});
 		}
 		if (e.currentTarget.id === '<' && position.move > 0) {
 			const newIndex = position.move - 1;
 			const currentLine = [...position.line];
-			setPosition({line: currentLine, move: newIndex, answer: position.answer, game: new Chess(position.game.fen())});
+			setPosition({
+				line: currentLine, 
+				move: newIndex, 
+				answer: position.answer, 
+				game: new Chess(position.game.fen()),
+				eco: position.eco,
+				name: position.name			
+			});
 		}	
 	}
 
@@ -184,59 +257,77 @@ const ReviewSession: React.FC = () => {
 
 
 	return (
-		<div className="flex flex-col items-center">
-			<div className="mb-4 mt-4">
-				{position.line && position.line.length > 0 &&				
+		<div className="flex flex-col items-center space-y-6">
+			<h2 className="text-2xl font-bold">
+				{position.eco + ' ' + position.name}
+			</h2>
+	
+			<h3 className="text-xl">
+				{position.game.turn() === 'w' ? 'White to Move' : 'Black to Move'}
+			</h3>
+	
+			{position.line && position.line.length > 0 &&				
+				<div className="flex justify-center p-4 border-2 border-gray-200 rounded-lg">
 					<ChessBoard
-					position={position}
-					setPosition={setPosition}
-					answerToggle={answerToggle}
-					setAnswerToggle={setAnswerToggle}
+						position={position}
+						setPosition={setPosition}
+						answerToggle={answerToggle}
+						setAnswerToggle={setAnswerToggle}
 					/>
-				}
-			</div>
-			<div className="flex justify-center space-x-4 mb-4">
+				</div>
+			}
+	
+			<div className="flex justify-center space-x-4">
 				<Button
-				id='<'
-				handleClick={arrowButtonClick}
+					id='<'
+					handleClick={arrowButtonClick}
 				>
 					{'<'}
 				</Button>
 				<Button
-				id='>'
-				handleClick={arrowButtonClick}
+					id='>'
+					handleClick={arrowButtonClick}
 				>
 					{'>'}
 				</Button>
 			</div>
-			<div className="flex justify-center space-x-4">
+	
+			<div className="flex justify-center space-x-4 p-4 bg-white shadow rounded-lg">
+				<div className="p-2">{scheduler.hasNextCard() ? scheduler.resultIfGrade('Again') : 'N/A'}</div>
+				<div className="p-2">{scheduler.hasNextCard() ? scheduler.resultIfGrade('Hard') : 'N/A'}</div>
+				<div className="p-2">{scheduler.hasNextCard() ? scheduler.resultIfGrade('Good') : 'N/A'}</div>
+				<div className="p-2">{scheduler.hasNextCard() ? scheduler.resultIfGrade('Easy') : 'N/A'}</div>
+			</div>
+	
+			<div className="flex justify-center space-x-4 p-4 bg-white shadow rounded-lg">
 				<Button
-				id='??'
-				handleClick={ratingButtonClick}
+					id='??'
+					handleClick={ratingButtonClick}
 				>
 					{'??'}
 				</Button>
 				<Button
-				id='?!'
-				handleClick={ratingButtonClick}
+					id='?!'
+					handleClick={ratingButtonClick}
 				>
 					{'?!'}
 				</Button>
 				<Button
-				id='!?'
-				handleClick={ratingButtonClick}
+					id='!?'
+					handleClick={ratingButtonClick}
 				>
 					{'!?'}
 				</Button>
 				<Button
-				id='!!'
-				handleClick={ratingButtonClick}
+					id='!!'
+					handleClick={ratingButtonClick}
 				>
 					{'!!'}
 				</Button>
 			</div>
 		</div>
-	)
+	);
+	
 }
 
 export default ReviewSession;

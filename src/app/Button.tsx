@@ -8,17 +8,13 @@ interface ButtonProps {
 
 const Button: React.FC<ButtonProps> = ({ id, children, handleClick }) => {
 	return (
-		<div>
-			<button
+		<button
 			id={id}
-			className={`bg-zinc-400 hover:bg-zinc-300 text-white font-bold py-2 px-5 rounded-md`}
-			onClick={(event) => {
-				handleClick(event)
-			}}
-			>
+			className="px-4 py-2 text-white font-bold rounded bg-blue-500 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50"
+			onClick={handleClick}
+		>
 			{children}
-			</button>
-		</div>
+		</button>
 	);
 };
 

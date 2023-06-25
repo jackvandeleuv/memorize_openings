@@ -70,7 +70,14 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ position, setPosition, answerTo
 		updatedLine.push(newGameState.fen());
 		const updatedMove = updatedLine.length - 1;
 
-		setPosition({move: updatedMove, line: updatedLine, answer: position.answer, game: new Chess(position.game.fen())});
+		setPosition({
+			move: updatedMove, 
+			line: updatedLine, 
+			answer: position.answer, 
+			game: new Chess(position.game.fen()),
+			name: position.name,
+			eco: position.eco
+		});
 
 		// Update cell highlight colors
 		const destinationColor = isCorrect ? 'bg-green-600' : 'bg-red-600';
@@ -131,7 +138,14 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ position, setPosition, answerTo
 		if (!isValid) return false;
 
 		gameStateCopy.move({from:fromString, to:toString})
-		setPosition({line: position.line, move: position.move, answer: position.answer, game: gameStateCopy}); 
+		setPosition({
+			line: position.line, 
+			move: position.move, 
+			answer: position.answer, 
+			game: gameStateCopy,
+			eco: position.eco,
+			name: position.name
+		}); 
 
 		return true;
 	};
