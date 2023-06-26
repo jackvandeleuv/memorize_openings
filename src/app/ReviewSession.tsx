@@ -45,7 +45,11 @@ export interface AnswerToggle {
 	color: string
 }
 
-const ReviewSession: React.FC = () => {
+interface ReviewSessionProps {
+	ids: number[];
+}
+
+const ReviewSession: React.FC<ReviewSessionProps> = ({ids}) => {
 	const [position, setPosition] = useState<Position>({
 		move: 0, 
 		line: ['rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'], 
@@ -56,23 +60,8 @@ const ReviewSession: React.FC = () => {
 	})
 	const [scheduler, setScheduler] = useState<Scheduler>(new Scheduler());
 	const [answerToggle, setAnswerToggle] = useState<AnswerToggle>({row: '', col: '', color: ''});
-
-
-	// useEffect(() => {
-	// 	const signIn = async () => {
-	// 		const { data, error } = await supabaseClient.auth.signInWithPassword({
-	// 			email: process.env.TEST_USERNAME!,
-	// 			password: process.env.TEST_PASSWORD!,
-	// 		})
 	
-	// 		if (error) {
-	// 			console.error('Error signing in:', error.message)
-	// 		}
-	// 	}
 
-	// 	signIn();
-	// }, [])
-	
 	useEffect(() => {
 		const fetchCards = async () => {
 			// Request all cards and lines data from the API
@@ -85,6 +74,7 @@ const ReviewSession: React.FC = () => {
 					review_at,
 					lines(id, name, eco)
 				`)
+				.in('decks_id', ids)
 			
 			// Unpack the data returned by the API
 			const data: CardsRow[] | null = cardsResponse.data;
