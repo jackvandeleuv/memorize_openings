@@ -31,10 +31,10 @@ const MenuBar: React.FC = () => {
             </button>
           </div>
           <nav className="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
-            <Link to='/learn' className="mx-5 cursor-pointer text-white hover:underline">Learn</Link>
-            <Link to='/about' className="mx-5 cursor-pointer text-white hover:underline">About</Link>
-            <Link to='/signin' className="mx-5 cursor-pointer text-white hover:underline">Sign In</Link>
-            <Link to='/signup' className="mx-5 cursor-pointer text-white hover:underline">Sign Up</Link>
+            <Link to='/learn' onClick={() => setIsOpen(!isOpen)} className="mx-5 cursor-pointer text-white hover:underline">Learn</Link>
+            <Link to='/about' onClick={() => setIsOpen(!isOpen)} className="mx-5 cursor-pointer text-white hover:underline">About</Link>
+            <Link to='/signin' onClick={() => setIsOpen(!isOpen)} className="mx-5 cursor-pointer text-white hover:underline">Sign In</Link>
+            <Link to='/signup' onClick={() => setIsOpen(!isOpen)} className="mx-5 cursor-pointer text-white hover:underline">Sign Up</Link>
           </nav>
         </div>
       </div>
@@ -63,10 +63,10 @@ const MenuBar: React.FC = () => {
               </div>
               <div className="mt-6">
                 <nav className="grid gap-y-8">
-                  <Link to='/learn' className="text-gray-900 hover:underline">Learn</Link>
-                  <Link to='/about' className="text-gray-900 hover:underline">About</Link>
-                  <Link to='/signin' className="text-gray-900 hover:underline">Sign In</Link>
-                  <Link to='/signup' className="text-gray-900 hover:underline">Sign Up</Link>
+                  <Link to='/learn' onClick={() => setIsOpen(!isOpen)} className="text-gray-900 hover:underline">Learn</Link>
+                  <Link to='/about' onClick={() => setIsOpen(!isOpen)} className="text-gray-900 hover:underline">About</Link>
+                  <Link to='/signin' onClick={() => setIsOpen(!isOpen)} className="text-gray-900 hover:underline">Sign In</Link>
+                  <Link to='/signup' onClick={() => setIsOpen(!isOpen)} className="text-gray-900 hover:underline">Sign Up</Link>
                 </nav>
               </div>
             </div>
