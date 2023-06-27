@@ -1,75 +1,30 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import DeckPicker from './DeckPicker';
-import { supabaseClient } from '../../utils/supabaseClient';
-import { Link } from 'react-router-dom';
-import ReviewSession from './ReviewSession';
-import { getRandomValues } from 'crypto';
-
-export enum PageOption {
-    DeckPicker,
-    Review
-}
-
-interface DecksRow {
-    id: number;
-    name: string;
-}
-
+import React from "react";
 
 const HomePage: React.FC = () => {
-    const [activePage, setActivePage] = useState<PageOption>(PageOption.DeckPicker);
-    const [deckChoice, setDeckChoice] = useState<number>(-1);
-    const [deckIdOptions, setDeckIdOptions] = useState<Map<number, string>>(new Map([[-1, 'Review all']]));
-
-    useEffect(() => {
-        const getAvailableDecks = async () =>{
-            const { data, error } = await supabaseClient.from('decks')
-                .select(`id, name`);
-
-            if (error) console.log(error);
-            if (!data) throw new Error('Supabase returned no data.');
-            const decksData: DecksRow[] = data;
-
-            const updatedOption = new Map<number, string>(deckIdOptions);
-            for (let row of decksData) updatedOption.set(row.id, row.name);
-            setDeckIdOptions(updatedOption);
-        }
-
-        getAvailableDecks();
-    }, [deckIdOptions])
-
-
-    const handleGoButton = () => {
-        setActivePage(PageOption.Review);
-    }
-
-
-    function processDeckChoice(): number[] {
-        if (deckChoice !== -1) return [deckChoice];
-        let choices = Array.from(deckIdOptions.keys());
-        choices = choices.filter(item => item !== -1);
-        return choices;
-    }
-
-    return (
-        <>
-        <div>
-            {activePage === PageOption.DeckPicker ? 
-                <DeckPicker 
-                    deckIdOptions={deckIdOptions}
-                    deckChoice={deckChoice}
-                    setDeckChoice={setDeckChoice}
-                    handleGoButton={handleGoButton}
-                /> : 
-                <ReviewSession 
-                    ids={processDeckChoice()}
-                />}
-        </div>
-
-        </>
-    )
-}
+	return (
+		<div className="min-h-screen flex items-center justify-center bg-blue-500 py-12 px-4 sm:px-6 lg:px-8">
+			<div className="max-w-md w-full space-y-8 bg-white p-10 rounded-xl">
+				<h2 className="text-3xl font-bold text-center">Welcome to Fried Liver</h2>
+				<p className="text-lg text-gray-700 mt-4 text-center">
+					Fried Liver is an application inspired by Anki, tailored for chess enthusiasts to review chess positions in various openings.
+				</p>
+				<h3 className="text-2xl font-bold text-center mt-6">Features</h3>
+				<p className="text-lg text-gray-700 mt-4 text-center">
+					With Fried Liver, you can practice and memorize your favorite chess openings, learn new ones, and test your knowledge with quizzes and puzzles.
+				</p>
+				<h3 className="text-2xl font-bold text-center mt-6">How it Works</h3>
+				<p className="text-lg text-gray-700 mt-4 text-center">
+					Just like Anki, Fried Liver uses spaced repetition to help you remember chess openings. The more you get a position right, the less you'll see it. But if you get it wrong, we'll show it again soon, until you know it by heart.
+				</p>
+				<h3 className="text-2xl font-bold text-center mt-6">Get Started</h3>
+				<p className="text-lg text-gray-700 mt-4 text-center">
+					Ready to level up your chess game? Sign up today and start mastering chess openings with Fried Liver.
+				</p>
+			</div>
+		</div>
+	);
+};
 
 export default HomePage;
