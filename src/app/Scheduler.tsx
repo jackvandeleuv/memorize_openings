@@ -10,6 +10,7 @@ export class Scheduler {
     private queue: Card[];
     private newCardRatio: number;
     private steps: number[];
+    private newCount: number = 0;
 
     constructor() {
         this.newCardLimit = 20;
@@ -25,7 +26,16 @@ export class Scheduler {
         schedulerCopy.cards = this.cards;
         schedulerCopy.queue = this.queue;
         schedulerCopy.newCardRatio = this.newCardRatio;
+        schedulerCopy.newCount = this.newCount;
         return schedulerCopy;
+    }
+
+    queueSize(): number {
+        return this.queue.length;
+    }
+
+    newQueueSize(): number {
+        return this.newCount;
     }
 
     hasNextCard(): boolean {
@@ -42,17 +52,20 @@ export class Scheduler {
     }
 
     addCard(card: Card): void {
-        console.log('Scheduler is adding: ' + card.toString());
         this.cards.push(card);
     }
 
     updateQueue(): void {
+        this.newCount = 0;
         this.queue = [];
         const newCards: Card[] = [];
         const revCards: Card[] = [];
         for (const card of this.cards) {
             // if (isAfter(new Date(), card.getReviewAt())) continue;
-            if (card.isNew) newCards.push(card);
+            if (card.isNew) {
+                newCards.push(card);
+                this.newCount++;
+            };
             if (!card.isNew) revCards.push(card);
         }
         newCards.sort((a, b) => b.step - a.step);
@@ -70,7 +83,6 @@ export class Scheduler {
             if (revCards.length) this.queue.push(revCards.pop() as Card);
             i += 1;
         }
-        console.log('queue after updateQUeue:' + this.queue)
     }
 
     
@@ -79,13 +91,16 @@ export class Scheduler {
             console.log('Empty queue!');
             return false;
         }
+        const gradingNewCard = this.queue[0].isNew;
         this.gradeCard(grade, this.queue[0]);
+        if (gradingNewCard && !this.queue[0].isNew) this.newCount--;
         this.updateQueue();
         return true;
     }
 
     // Tests out a grade without changing the Cards in the queue
     resultIfGrade(grade: string): string {
+        console.log('Calling resultIfGrade()');
         if (this.queue.length === 0) return 'Not found.';
         return this.gradeCard(grade, this.queue[0].deepCopy()).reviewTime();
     }
@@ -97,7 +112,9 @@ export class Scheduler {
                 card.step = 1;
             } else if (grade === 'Good') {
                 card.step = card.step + 1;
-                if (card.step === this.steps.length) card.isNew = false;
+                if (card.step === this.steps.length) {
+                    card.isNew = false;
+                };
             } else if (grade === 'Easy') {
                 card.isNew = false;
             } else if (grade !== 'Hard') {
@@ -109,13 +126,14 @@ export class Scheduler {
 
         if (!card.isNew) this.updateReviewCard(grade, card);
 
-        return card.deepCopy();
+        return card;
     }
 
     private updateReviewCard(grade: string, card: Card): void {
         if (grade === 'Again') {
             card.ease = Math.max(card.ease * 0.8 / 1000, 1.3);
             card.isNew = true;
+            this.newCount++;
             card.step = 1;
             card.setReviewAt(addMinutes(new Date(), 1));
             return;

@@ -8,6 +8,7 @@ import Button from './Button';
 import { Card } from './Card';
 import { Scheduler } from './Scheduler';
 import { Chess } from 'chess.js';
+import { addMinutes } from 'date-fns';
 
 interface CardsRow {
     ease: number;       
@@ -45,6 +46,13 @@ export interface AnswerToggle {
 	color: string
 }
 
+interface IfGradeTimes {
+	Easy: string;
+	Good: string;
+	Hard: string;
+	Again: string;
+}
+
 interface ReviewSessionProps {
 	ids: number[];
 }
@@ -60,7 +68,8 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids}) => {
 	})
 	const [scheduler, setScheduler] = useState<Scheduler>(new Scheduler());
 	const [answerToggle, setAnswerToggle] = useState<AnswerToggle>({row: '', col: '', color: ''});
-	
+	const [ifGradeTimes, setIfGradeTimes] = useState<IfGradeTimes>({Easy: '',  Good: '', Hard: '', Again: ''});
+
 
 	useEffect(() => {
 		const fetchCards = async () => {
@@ -162,17 +171,20 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids}) => {
 			console.log('!scheduler.hasNextCard() -> return');
 			return;
 		}
-		const nextCard = scheduler.getNextCard();
-		if (!nextCard) {
-			console.log('No next card returned');
-			return;
-		};
+		const nextCard = scheduler.getNextCard()!;
+
 		if (!nextCard.hasMoves()) {
 			console.log('Next card has no moves. nextCard: ' + nextCard);
 			return;
 		}
 		console.log('Next card: ' + nextCard + ' Moves: ' + nextCard!.printMoves())
 
+		setIfGradeTimes({
+			Easy: scheduler.resultIfGrade('Easy'),
+			Good: scheduler.resultIfGrade('Good'),
+			Hard: scheduler.resultIfGrade('Hard'),
+			Again: scheduler.resultIfGrade('Again')
+		})
 
 		const nextMoves = nextCard.getMoves();
 		const nextMoveFens = nextMoves.map(move => move.fen);
@@ -255,6 +267,10 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids}) => {
 			<h3 className="text-xl">
 				{position.game.turn() === 'w' ? 'White to Move' : 'Black to Move'}
 			</h3>
+
+			<h3>
+				{'To Learn:\nNew: ' + scheduler.newQueueSize() + '\nReview: ' + (scheduler.queueSize() - scheduler.newQueueSize())}
+			</h3>
 	
 			{position.line && position.line.length > 0 &&				
 				<div className="flex justify-center p-4 border-2 border-gray-200 rounded-lg">
@@ -283,10 +299,10 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids}) => {
 			</div>
 	
 			<div className="flex justify-center space-x-4 p-4 bg-white shadow rounded-lg">
-				<div className="p-2">{scheduler.hasNextCard() ? scheduler.resultIfGrade('Again') : 'N/A'}</div>
-				<div className="p-2">{scheduler.hasNextCard() ? scheduler.resultIfGrade('Hard') : 'N/A'}</div>
-				<div className="p-2">{scheduler.hasNextCard() ? scheduler.resultIfGrade('Good') : 'N/A'}</div>
-				<div className="p-2">{scheduler.hasNextCard() ? scheduler.resultIfGrade('Easy') : 'N/A'}</div>
+				<div className="p-2">{ifGradeTimes.Again}</div>
+				<div className="p-2">{ifGradeTimes.Hard}</div>
+				<div className="p-2">{ifGradeTimes.Good}</div>
+				<div className="p-2">{ifGradeTimes.Easy}</div>
 			</div>
 	
 			<div className="flex justify-center space-x-4 p-4 bg-white shadow rounded-lg">
