@@ -86,6 +86,7 @@ const DecksPage: React.FC = () => {
                 /> : 
                 <ReviewSession 
                     ids={processDeckChoice()}
+                    setActivePage={setActivePage}
                 />
             }
         </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, HtmlHTMLAttributes } from 'react';
 import { supabaseClient } from '../../utils/supabaseClient';
 import ChessBoard from './ChessBoard';
 import { PostgrestError, PostgrestResponse, SupabaseClient } from '@supabase/supabase-js';
@@ -9,6 +9,7 @@ import { Card } from './Card';
 import { Scheduler } from './Scheduler';
 import { Chess } from 'chess.js';
 import { addMinutes } from 'date-fns';
+import { PageOption } from './DecksPage';
 
 interface CardsRow {
     ease: number;       
@@ -55,9 +56,10 @@ interface IfGradeTimes {
 
 interface ReviewSessionProps {
 	ids: number[];
+	setActivePage: React.Dispatch<React.SetStateAction<PageOption>>;
 }
 
-const ReviewSession: React.FC<ReviewSessionProps> = ({ids}) => {
+const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage}) => {
 	const defaultPosition = {
 		move: 0, 
 		line: ['rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'], 
@@ -222,6 +224,11 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids}) => {
 	}
 
 
+	const backButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+		setActivePage(PageOption.DeckPicker);
+	};
+
+
 	const ratingButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
 		if (!scheduler) return;
 		const updatedScheduler = scheduler.deepCopy();
@@ -305,6 +312,12 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids}) => {
 					handleClick={ratingButtonClick}
 				>
 					{'!!'}
+				</Button>
+				<Button 
+					id='back'
+					handleClick={backButtonClick}
+				>
+					{'Back'}
 				</Button>
 			</div>
 		</div>
