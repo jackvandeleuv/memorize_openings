@@ -63,12 +63,13 @@ export class Scheduler {
         const newCards: Card[] = [];
         const revCards: Card[] = [];
         for (const card of this.cards) {
-            if (isAfter(card.getReviewAt(), new Date())) continue;
             if (card.isNew) {
                 newCards.push(card);
                 this.newCount++;
             };
-            if (!card.isNew) revCards.push(card);
+            if (!card.isNew && isAfter(new Date(), card.getReviewAt())) {
+                revCards.push(card)
+            };
         }
         newCards.sort((a, b) => b.reviewAt.getTime() - a.reviewAt.getTime());
         revCards.sort((a, b) => b.reviewAt.getTime() - a.reviewAt.getTime());
@@ -80,7 +81,7 @@ export class Scheduler {
                 limit--;
                 i++;
                 continue;
-            }
+            };
 
             if (revCards.length) this.queue.push(revCards.pop()!);
             i++;
@@ -94,10 +95,17 @@ export class Scheduler {
             console.log('Empty queue!');
             return false;
         }
+        console.log('Before grade:\n' + this.queue[0].toString())
         const gradingNewCard = this.queue[0].isNew;
         this.gradeCard(grade, this.queue[0]);
         if (gradingNewCard && !this.queue[0].isNew) this.newCount--;
+        console.log('After grade:\n' + this.queue[0].toString())
+
+        console.log('Queue before update:\n');
+        console.log(this.queue);
         this.updateQueue();
+        console.log('Queue after update:\n');
+        console.log(this.queue);
         return true;
     }
 
@@ -110,7 +118,11 @@ export class Scheduler {
     // Modify card and return it
     private gradeCard(grade: string, card: Card): Card {     
         if (card.isNew) {
-            if (grade === 'Again') {
+            if (card.step === 1 && grade === 'Hard') {
+                card.step = 2;
+            } else if (card.step === 1 && grade === 'Good') {
+                card.step = 3;
+            } else if (grade === 'Again') {
                 card.step = 1;
             } else if (grade === 'Good') {
                 card.step = card.step + 1;
@@ -142,7 +154,6 @@ export class Scheduler {
             card.setReviewAt(addMinutes(new Date(), 1));
             return;
         }
-
         if (grade === 'Easy') {
             card.ease = card.ease * 1.15;
         }

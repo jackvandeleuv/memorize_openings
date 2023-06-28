@@ -92,20 +92,12 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids}) => {
 				console.error('error', error);
 				throw new Error('Supabase returned error!');
 			};
-			console.log(data)
 
 			// Format the data so it can be inserted into Cards and the Scheduler
 			const cards = new Map<number, Card>();
 			for (let cardsRow of data!) {
-				console.log('cardsRow:\n' + cardsRow.lines)
-				// Temporarily set date to current time plus 10,000 millis
-				console.log('Manually setting review time to now!!!');
-				const dummyDate = new Date();
-				dummyDate.setTime(dummyDate.getTime() + 10000)
-
 				// If there are no associated moves, ignore this card.
 				if (!cardsRow.lines) {
-					console.log('Card had no associated line.');
 					continue;
 				}
 
@@ -114,7 +106,7 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids}) => {
 					cardsRow.interval, 
 					cardsRow.is_new === 1, 
 					cardsRow.step, 
-					dummyDate);
+					new Date(cardsRow.review_at));
 				
 				const lines = cardsRow.lines
 				// Cards and lines is one-to-many, so this case won't occur.
@@ -136,20 +128,12 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids}) => {
 				console.error('error', movesError);
 				return;
 			};
-			if (!movesData) {
-				console.log('No moves associated with cards.');
-				return;
-			};
+			if (!movesData) return;
 
 			for (let move of movesData) {
 				if (!move) continue;
 				const card = cards.get(move.lines_id);
 				if (card) card.addMove(move);
-			}
-
-			console.log('Cards in map after fetch cards:')
-			for (let key of Array.from(cards.keys())) {
-				console.log(cards.get(key)!.toString())
 			}
 
 			// Add cards to scheduler
@@ -167,17 +151,9 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids}) => {
 
 	const renderCards = useCallback(() => {
 		if (!scheduler) return;
-		if (!scheduler.hasNextCard()) {
-			console.log('!scheduler.hasNextCard() -> return');
-			return;
-		}
+		if (!scheduler.hasNextCard()) return;
 		const nextCard = scheduler.getNextCard()!;
-
-		if (!nextCard.hasMoves()) {
-			console.log('Next card has no moves. nextCard: ' + nextCard);
-			return;
-		}
-		console.log('Next card: ' + nextCard + ' Moves: ' + nextCard!.printMoves())
+		if (!nextCard.hasMoves()) return;
 
 		setIfGradeTimes({
 			Easy: scheduler.resultIfGrade('Easy'),
@@ -192,7 +168,6 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids}) => {
 		const nextMoveFensBlind = nextMoveFens.slice(0, nextMoveFens.length - 1)
 
 		const newGame = new Chess();
-		console.log('nextMoveFensBlind: ' + nextMoveFensBlind)
 		newGame.load(nextMoveFensBlind[nextMoveFensBlind.length - 1])
 
 		setPosition({
@@ -213,11 +188,6 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids}) => {
 
 	const arrowButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
 		if (!scheduler) return;
-
-		console.log('In queue currently:\n')
-		for (let card of scheduler.getQueue()) {
-			console.log(card.toString())
-		}
 
 		if (e.currentTarget.id === '>' && position.move < position.line.length - 1) {
 			const newIndex = position.move + 1;
