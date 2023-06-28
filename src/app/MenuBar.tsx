@@ -1,12 +1,40 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { supabaseClient } from '../../utils/supabaseClient';
 
 const MenuBar: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isSignedIn, setIsSignedIn] = useState<boolean>(false);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
-  }
+  };
+
+
+  useEffect(() => {
+    const { data: authListener } = supabaseClient.auth.onAuthStateChange(async (event) => {
+      if (event !== "SIGNED_OUT") {
+        setIsSignedIn(true);
+      } else {
+        setIsSignedIn(false);
+      }
+    });
+
+    return () => {
+      authListener?.subscription.unsubscribe();
+    };
+  }, []); 
+
+  async function signUserOut() {
+    console.log('clicked sign user out');
+    try {
+      await supabaseClient.auth.signOut();
+      setIsSignedIn(false);
+      console.log('Signout successful');
+    } catch (error) {
+      console.error('Signout failed', error);
+    }
+  };
 
   return (
     <div className="relative bg-white">
@@ -33,8 +61,16 @@ const MenuBar: React.FC = () => {
           <nav className="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
             <Link to='/learn' onClick={() => setIsOpen(!isOpen)} className="mx-5 cursor-pointer text-white hover:underline">Learn</Link>
             <Link to='/about' onClick={() => setIsOpen(!isOpen)} className="mx-5 cursor-pointer text-white hover:underline">About</Link>
-            <Link to='/signin' onClick={() => setIsOpen(!isOpen)} className="mx-5 cursor-pointer text-white hover:underline">Sign In</Link>
-            <Link to='/signup' onClick={() => setIsOpen(!isOpen)} className="mx-5 cursor-pointer text-white hover:underline">Sign Up</Link>
+            {isSignedIn ? 
+                <>
+                <Link to='/account' onClick={() => setIsOpen(!isOpen)} className="mx-5 cursor-pointer text-white hover:underline">Account</Link>
+                <Link to='/' onClick={() => {signUserOut();}} className="mx-5 cursor-pointer text-white hover:underline">Sign Out</Link> 
+              </> :
+              <>
+                <Link to='/signin' onClick={() => setIsOpen(!isOpen)} className="mx-5 cursor-pointer text-white hover:underline">Sign In</Link>
+                <Link to='/signup' onClick={() => setIsOpen(!isOpen)} className="mx-5 cursor-pointer text-white hover:underline">Sign Up</Link>
+              </>
+            }
           </nav>
         </div>
       </div>
@@ -65,8 +101,16 @@ const MenuBar: React.FC = () => {
                 <nav className="grid gap-y-8">
                   <Link to='/learn' onClick={() => setIsOpen(!isOpen)} className="text-gray-900 hover:underline">Learn</Link>
                   <Link to='/about' onClick={() => setIsOpen(!isOpen)} className="text-gray-900 hover:underline">About</Link>
-                  <Link to='/signin' onClick={() => setIsOpen(!isOpen)} className="text-gray-900 hover:underline">Sign In</Link>
-                  <Link to='/signup' onClick={() => setIsOpen(!isOpen)} className="text-gray-900 hover:underline">Sign Up</Link>
+                  {isSignedIn ? 
+                    <>
+                      <Link to='/account' onClick={() => setIsOpen(!isOpen)} className="mx-5 cursor-pointer text-white hover:underline">Account</Link>
+                      <Link to='/' onClick={() => {signUserOut();}} className="mx-5 cursor-pointer text-white hover:underline">Sign Out</Link> 
+                    </> :
+                    <>
+                      <Link to='/signin' onClick={() => setIsOpen(!isOpen)} className="mx-5 cursor-pointer text-white hover:underline">Sign In</Link>
+                      <Link to='/signup' onClick={() => setIsOpen(!isOpen)} className="mx-5 cursor-pointer text-white hover:underline">Sign Up</Link>
+                    </>
+                  }
                 </nav>
               </div>
             </div>
