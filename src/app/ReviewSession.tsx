@@ -67,13 +67,15 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage}) => {
 		game: new Chess(), 
 		name: 'No Cards Due', 
 		eco: ''
-	}
+	};
 
 	const [position, setPosition] = useState<Position>(defaultPosition);
 	const [scheduler, setScheduler] = useState<Scheduler>(new Scheduler());
 	const [answerToggle, setAnswerToggle] = useState<AnswerToggle>({row: '', col: '', color: ''});
 	const [ifGradeTimes, setIfGradeTimes] = useState<IfGradeTimes>({Easy: 'N/A',  Good: 'N/A', Hard: 'N/A', Again: 'N/A'});
-
+	const [ratingHelpMessage, setRatingHelpMessage] = useState<string>('');
+	const [storedPosition, setStoredPosition] = useState<Position>();
+	const [solutionToggled, setSolutionToggled] = useState<boolean>(false);
 
 	useEffect(() => {
 		const fetchCards = async () => {
@@ -186,6 +188,7 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage}) => {
 			eco: nextCard.eco,
 			name: nextCard.name
 		});
+		setStoredPosition(undefined);
 	}, [scheduler]);
 	  
 
@@ -195,7 +198,7 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage}) => {
 	  
 
 	const arrowButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-		if (!scheduler) return;
+		if (!scheduler || solutionToggled) return;
 
 		if (e.currentTarget.id === '>' && position.move < position.line.length - 1) {
 			const newIndex = position.move + 1;
@@ -231,6 +234,12 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage}) => {
 
 	const ratingButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
 		if (!scheduler) return;
+		if (answerToggle.col === '' && answerToggle.row === '' && answerToggle.color === '') {
+			setRatingHelpMessage('Make a move to see the answer!');
+			return;
+		} else {
+			setRatingHelpMessage('');
+		}
 		const updatedScheduler = scheduler.deepCopy();
 		if (e.currentTarget.id === '!!') updatedScheduler.answerCard('Easy');
 		if (e.currentTarget.id === '!?') updatedScheduler.answerCard('Good');
@@ -239,6 +248,47 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage}) => {
 		setScheduler(updatedScheduler);
 		setAnswerToggle({row: answerToggle.row, col: answerToggle.col, color: ''});
 	}
+
+
+	function deepCopyPosition(original: Position): Position {
+		return {
+			move: original.move,
+			line: [...original.line],
+			answer: original.answer,
+			game: new Chess(original.game.fen()),
+			name: original.name,
+			eco: original.eco
+		};
+	};
+
+
+	const handleShowSolution = (e: React.MouseEvent<HTMLButtonElement>) => {
+		if (solutionToggled) {
+			const storedPositionCopy = deepCopyPosition(storedPosition!);
+			setPosition(storedPositionCopy);
+			setStoredPosition(undefined);
+			setSolutionToggled(!solutionToggled);
+			return;
+		};
+	
+		// Store current position in solution toggle
+		const positionCopy = deepCopyPosition(position);
+		setStoredPosition(positionCopy);
+
+		const positionCopy2 = deepCopyPosition(position);
+
+		// If user hasn't guessed yet
+		if (answerToggle.col === '' && 
+			answerToggle.row === '' && 
+			answerToggle.color === '') {
+			positionCopy2.line = positionCopy2.line.slice(0, positionCopy2.line.length - 1);
+		}
+		positionCopy2.line.push(positionCopy2.answer);
+		positionCopy2.game.load(positionCopy2.answer);
+		positionCopy2.move = positionCopy2.line.length - 1;
+		setPosition(positionCopy2);
+		setSolutionToggled(!solutionToggled);
+	};
 
 
 	return (
@@ -313,11 +363,18 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage}) => {
 				>
 					{'!!'}
 				</Button>
+				{ratingHelpMessage}
 				<Button 
 					id='back'
 					handleClick={backButtonClick}
 				>
 					{'Back'}
+				</Button>
+				<Button
+					id='solution'
+					handleClick={handleShowSolution}
+				>
+					{solutionToggled ? 'Hide Solution' : 'Show Solution'}
 				</Button>
 			</div>
 		</div>
