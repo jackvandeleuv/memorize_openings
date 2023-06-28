@@ -6,7 +6,7 @@ import { update } from 'plotly.js';
 
 export class Scheduler {
     private newCardLimit: number;
-    private cards: Card[];
+    cards: Card[];
     private queue: Card[];
     private newCardRatio: number;
     private steps: number[];
@@ -51,8 +51,10 @@ export class Scheduler {
         return [...this.queue];
     }
 
-    addCard(card: Card): void {
-        this.cards.push(card);
+    addCard(card: Card): boolean {
+        if (!card.hasMoves()) return false;
+        this.cards.push(card.deepCopy());
+        return true;
     }
 
     updateQueue(): void {
@@ -61,28 +63,29 @@ export class Scheduler {
         const newCards: Card[] = [];
         const revCards: Card[] = [];
         for (const card of this.cards) {
-            // if (isAfter(new Date(), card.getReviewAt())) continue;
+            if (isAfter(card.getReviewAt(), new Date())) continue;
             if (card.isNew) {
                 newCards.push(card);
                 this.newCount++;
             };
             if (!card.isNew) revCards.push(card);
         }
-        newCards.sort((a, b) => b.step - a.step);
-        revCards.sort((a, b) => b.interval - a.interval);
+        newCards.sort((a, b) => b.reviewAt.getTime() - a.reviewAt.getTime());
+        revCards.sort((a, b) => b.reviewAt.getTime() - a.reviewAt.getTime());
         let limit = this.newCardLimit;
         let i = 0;
         while (revCards.length || (limit && newCards.length)) {
             if (limit && newCards.length && i % this.newCardRatio === 0) {
-                this.queue.push(newCards.pop() as Card);
-                limit -= 1;
-                i += 1;
+                this.queue.push(newCards.pop()!);
+                limit--;
+                i++;
                 continue;
             }
 
-            if (revCards.length) this.queue.push(revCards.pop() as Card);
-            i += 1;
+            if (revCards.length) this.queue.push(revCards.pop()!);
+            i++;
         }
+        this.queue = this.queue.concat(newCards);
     }
 
     
@@ -100,7 +103,6 @@ export class Scheduler {
 
     // Tests out a grade without changing the Cards in the queue
     resultIfGrade(grade: string): string {
-        console.log('Calling resultIfGrade()');
         if (this.queue.length === 0) return 'Not found.';
         return this.gradeCard(grade, this.queue[0].deepCopy()).reviewTime();
     }
@@ -114,18 +116,20 @@ export class Scheduler {
                 card.step = card.step + 1;
                 if (card.step === this.steps.length) {
                     card.isNew = false;
+                    card.setReviewAt(addDays(new Date(), card.interval));
                 };
             } else if (grade === 'Easy') {
                 card.isNew = false;
+                card.setReviewAt(addDays(new Date(), card.interval * 4));
             } else if (grade !== 'Hard') {
                 throw new Error('Unexpected value received for grade');
             }
 
-            card.setReviewAt(addMinutes(new Date(), this.steps[card.step - 1]));
+            if (card.isNew) card.setReviewAt(addMinutes(new Date(), this.steps[card.step - 1]));
+            return card;
         }
-
-        if (!card.isNew) this.updateReviewCard(grade, card);
-
+        
+        this.updateReviewCard(grade, card);
         return card;
     }
 

@@ -7,7 +7,7 @@ export class Card {
     interval: number;
     isNew: boolean;
     step: number;
-    private reviewAt: Date;
+    reviewAt: Date;
     lines_id: number = -1;
     id: number;
     name: string = '';

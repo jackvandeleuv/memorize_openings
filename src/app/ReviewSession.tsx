@@ -13,7 +13,7 @@ import { addMinutes } from 'date-fns';
 interface CardsRow {
     ease: number;       
     interval: number;   
-    is_new: boolean;    
+    is_new: number;    
     step: number;       
     review_at: Date;
 	lines: LinesRow | LinesRow[] | null;
@@ -112,7 +112,7 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids}) => {
 				const card = new Card(
 					cardsRow.ease, 
 					cardsRow.interval, 
-					cardsRow.is_new, 
+					cardsRow.is_new === 1, 
 					cardsRow.step, 
 					dummyDate);
 				

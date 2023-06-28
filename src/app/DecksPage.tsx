@@ -13,32 +13,54 @@ export enum PageOption {
 }
 
 interface DecksRow {
-    id: number;
+    deck_id: number;
     name: string;
+    total: number;
+    new_cards: number;
+}
+
+export interface DeckInfo {
+    name: string;
+    newDue: number;
+    reviewDue: number;
 }
 
 
 const DecksPage: React.FC = () => {
     const [activePage, setActivePage] = useState<PageOption>(PageOption.DeckPicker);
     const [deckChoice, setDeckChoice] = useState<number>(-1);
-    const [deckIdOptions, setDeckIdOptions] = useState<Map<number, string>>(new Map([[-1, 'Review all']]));
+    const [deckIdOptions, setDeckIdOptions] = useState<Map<number, DeckInfo>>(new Map());
 
     useEffect(() => {
         const getAvailableDecks = async () =>{
-            const { data, error } = await supabaseClient.from('decks')
-                .select(`id, name`);
+            const { data, error } = await supabaseClient.rpc('get_due_cards_counts');
 
             if (error) console.log(error);
-            if (!data) throw new Error('Supabase returned no data.');
             const decksData: DecksRow[] = data;
-
-            const updatedOption = new Map<number, string>(deckIdOptions);
-            for (let row of decksData) updatedOption.set(row.id, row.name);
+            console.log('Data:');
+            console.log(data)
+            console.log('Decks data:')
+            console.log(decksData);
+            const updatedOption = new Map<number, DeckInfo>();
+            let newAllDecks = 0;
+            let reviewAllDecks = 0;
+            for (let row of decksData) {
+                updatedOption.set(row.deck_id, {
+                    name: row.name, 
+                    newDue: row.new_cards, 
+                    reviewDue: row.total - row.new_cards
+                });
+                newAllDecks = newAllDecks + row.new_cards;
+                reviewAllDecks = reviewAllDecks + (row.total - row.new_cards);
+            };
+            updatedOption.set(-1, {name: 'Review All', newDue: newAllDecks, reviewDue: reviewAllDecks});
+            console.log('Completed map:');
+            console.log(updatedOption);
             setDeckIdOptions(updatedOption);
         }
 
         getAvailableDecks();
-    }, [deckIdOptions])
+    }, [])
 
 
     const handleGoButton = () => {

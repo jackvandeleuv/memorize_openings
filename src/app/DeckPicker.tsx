@@ -2,10 +2,10 @@
 
 import React, { useState, ChangeEvent, MouseEventHandler } from 'react';
 import { Link } from 'react-router-dom';
-import { PageOption } from './DecksPage';
+import { PageOption, DeckInfo } from './DecksPage';
 
 interface DeckPickerProps {
-    deckIdOptions: Map<number, string>;
+    deckIdOptions: Map<number, DeckInfo>;
     deckChoice: number;
     setDeckChoice: React.Dispatch<React.SetStateAction<number>>;
     handleGoButton: MouseEventHandler<HTMLButtonElement>;
@@ -25,15 +25,17 @@ const DeckPicker: React.FC<DeckPickerProps> = ({deckIdOptions, deckChoice, setDe
                 Pick an opening
                 </h2>
                 <div className="relative">
+
                 <select 
                     className="block w-full p-2 border border-gray-300 rounded shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                     value={deckChoice.toString()} 
                     onChange={handleSelection}
                 >
-                    {Array.from(deckIdOptions.entries()).map(([key, value]) => 
-                    <option key={key} value={key}>{value}</option>
+                    {Array.from(deckIdOptions.entries()).map(([key, val]) => 
+                    <option key={key} value={key}>{val.name + ' (New: ' + val.newDue + ' | Review: ' + val.reviewDue + ')'}</option>
                     )}
                 </select>
+
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                     <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                     <path d="M9.293 12.95l.707.707 4-4-4-4-.707.707L12.586 10H2v1h10.586l-3.293 1.95z" />
