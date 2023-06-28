@@ -58,17 +58,19 @@ interface ReviewSessionProps {
 }
 
 const ReviewSession: React.FC<ReviewSessionProps> = ({ids}) => {
-	const [position, setPosition] = useState<Position>({
+	const defaultPosition = {
 		move: 0, 
 		line: ['rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'], 
 		answer: '', 
 		game: new Chess(), 
 		name: 'No Cards Due', 
 		eco: ''
-	})
+	}
+
+	const [position, setPosition] = useState<Position>(defaultPosition);
 	const [scheduler, setScheduler] = useState<Scheduler>(new Scheduler());
 	const [answerToggle, setAnswerToggle] = useState<AnswerToggle>({row: '', col: '', color: ''});
-	const [ifGradeTimes, setIfGradeTimes] = useState<IfGradeTimes>({Easy: '',  Good: '', Hard: '', Again: ''});
+	const [ifGradeTimes, setIfGradeTimes] = useState<IfGradeTimes>({Easy: 'N/A',  Good: 'N/A', Hard: 'N/A', Again: 'N/A'});
 
 
 	useEffect(() => {
@@ -151,7 +153,11 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids}) => {
 
 	const renderCards = useCallback(() => {
 		if (!scheduler) return;
-		if (!scheduler.hasNextCard()) return;
+		if (!scheduler.hasNextCard()) {
+			setPosition(defaultPosition);
+			setIfGradeTimes({Easy: 'N/A',  Good: 'N/A', Hard: 'N/A', Again: 'N/A'});
+			return;
+		};
 		const nextCard = scheduler.getNextCard()!;
 		if (!nextCard.hasMoves()) return;
 
