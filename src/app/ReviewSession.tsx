@@ -9,7 +9,7 @@ import { Card } from './Card';
 import { Scheduler } from './Scheduler';
 import { Chess } from 'chess.js';
 import { addMinutes } from 'date-fns';
-import { PageOption } from './DecksPage';
+import { PageOption } from './learn';
 
 interface CardsRow {
     ease: number;       

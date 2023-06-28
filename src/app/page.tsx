@@ -2,7 +2,7 @@
 
 import MenuBar from './MenuBar';
 import Footer from './Footer';
-import DecksPage from './DecksPage';
+import DecksPage from './learn';
 import HomePage from './HomePage';
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
@@ -12,8 +12,6 @@ import SignUp from './SignUp';
 import Account from './Account';
 
 export default function Home() {
-    const [userSignedIn, setUserSignedIn] = useState<boolean>(false);
-
   return (
       <div className="flex flex-col min-h-screen">
           <Router>

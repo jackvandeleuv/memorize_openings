@@ -30,6 +30,7 @@ const DecksPage: React.FC = () => {
     const [activePage, setActivePage] = useState<PageOption>(PageOption.DeckPicker);
     const [deckChoice, setDeckChoice] = useState<number>(-1);
     const [deckIdOptions, setDeckIdOptions] = useState<Map<number, DeckInfo>>(new Map());
+    const [isSignedIn, setIsSignedIn] = useState<boolean>(false);
 
     useEffect(() => {
         const getAvailableDecks = async () =>{
@@ -60,7 +61,22 @@ const DecksPage: React.FC = () => {
         }
 
         getAvailableDecks();
-    }, [])
+    }, []);
+
+
+    useEffect(() => {
+        const { data: authListener } = supabaseClient.auth.onAuthStateChange(async (event) => {
+          if (event !== "SIGNED_OUT") {
+            setIsSignedIn(true);
+          } else {
+            setIsSignedIn(false);
+          }
+        });
+        
+        return () => {
+          authListener?.subscription.unsubscribe();
+        };
+      }, []); 
 
 
     const handleGoButton = () => {
@@ -77,7 +93,7 @@ const DecksPage: React.FC = () => {
 
     return (
         <div className="flex items-center justify-center min-h-screen p-6">
-            {activePage === PageOption.DeckPicker ? 
+            {!isSignedIn ? <></> : activePage === PageOption.DeckPicker ? 
                 <DeckPicker 
                     deckIdOptions={deckIdOptions}
                     deckChoice={deckChoice}

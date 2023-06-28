@@ -2,7 +2,7 @@
 
 import React, { useState, ChangeEvent, MouseEventHandler } from 'react';
 import { Link } from 'react-router-dom';
-import { PageOption, DeckInfo } from './DecksPage';
+import { PageOption, DeckInfo } from './learn';
 
 interface DeckPickerProps {
     deckIdOptions: Map<number, DeckInfo>;

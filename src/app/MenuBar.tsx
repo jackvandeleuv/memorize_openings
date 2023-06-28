@@ -59,10 +59,10 @@ const MenuBar: React.FC = () => {
             </button>
           </div>
           <nav className="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
-            <Link to='/learn' onClick={() => setIsOpen(!isOpen)} className="mx-5 cursor-pointer text-white hover:underline">Learn</Link>
             <Link to='/about' onClick={() => setIsOpen(!isOpen)} className="mx-5 cursor-pointer text-white hover:underline">About</Link>
             {isSignedIn ? 
                 <>
+                <Link to='/learn' onClick={() => setIsOpen(!isOpen)} className="mx-5 cursor-pointer text-white hover:underline">Learn</Link>
                 <Link to='/account' onClick={() => setIsOpen(!isOpen)} className="mx-5 cursor-pointer text-white hover:underline">Account</Link>
                 <Link to='/' onClick={() => {signUserOut();}} className="mx-5 cursor-pointer text-white hover:underline">Sign Out</Link> 
               </> :
@@ -99,10 +99,10 @@ const MenuBar: React.FC = () => {
               </div>
               <div className="mt-6">
                 <nav className="grid gap-y-8">
-                  <Link to='/learn' onClick={() => setIsOpen(!isOpen)} className="text-gray-900 hover:underline">Learn</Link>
                   <Link to='/about' onClick={() => setIsOpen(!isOpen)} className="text-gray-900 hover:underline">About</Link>
                   {isSignedIn ? 
                     <>
+                      <Link to='/learn' onClick={() => setIsOpen(!isOpen)} className="text-gray-900 hover:underline">Learn</Link>
                       <Link to='/account' onClick={() => setIsOpen(!isOpen)} className="mx-5 cursor-pointer text-white hover:underline">Account</Link>
                       <Link to='/' onClick={() => {signUserOut();}} className="mx-5 cursor-pointer text-white hover:underline">Sign Out</Link> 
                     </> :
