@@ -11,6 +11,8 @@ export class Scheduler {
     private newCardRatio: number;
     private steps: number[];
     private newCount: number = 0;
+    private reviewCount: number = 0;
+
 
     constructor() {
         this.newCardLimit = 20;
@@ -19,6 +21,7 @@ export class Scheduler {
         this.newCardRatio = 5;
         this.steps = [1, 6, 10, 24 * 60]
     }
+
 
     deepCopy(): Scheduler {
         const schedulerCopy = new Scheduler();
@@ -30,45 +33,73 @@ export class Scheduler {
         return schedulerCopy;
     }
 
-    queueSize(): number {
-        return this.queue.length;
+
+    getReviewQueueSize(): number {
+        return this.reviewCount;
     }
 
-    newQueueSize(): number {
+
+    setReviewQueueSize(newReview: number): void {
+        this.reviewCount = newReview;
+    }
+
+
+    getNewQueueSize(): number {
         return this.newCount;
     }
+
+
+    setNewQueueSize(newSize: number): void {
+        console.log('setting new queue size: ' + newSize);
+        this.newCount = newSize;
+    }
+
 
     hasNextCard(): boolean {
         return this.queue.length > 0;
     }
+
 
     getNextCard(): Card | null {
         if (this.queue.length > 0) return this.queue[0].deepCopy();
         return null;
     }
 
+
     getQueue(): Card[] {
         return [...this.queue];
     }
 
+
     addCard(card: Card): boolean {
         if (!card.hasMoves()) return false;
+
+        // Make sure cards moves go from 1-n in order
+        const moves = card.getMoves();
+        let i = 1;
+        for (let move of moves) {
+            if (move.order_in_line !== i) {
+                console.error('Tried to add card with incomplete moves to scheduler.');
+                return false;
+            };
+            i++;
+        };
+
         this.cards.push(card.deepCopy());
         return true;
     }
 
+
     updateQueue(): void {
-        this.newCount = 0;
         this.queue = [];
         const newCards: Card[] = [];
         const revCards: Card[] = [];
         for (const card of this.cards) {
             if (card.isNew) {
                 newCards.push(card);
-                this.newCount++;
             };
             if (!card.isNew && isAfter(new Date(), card.getReviewAt())) {
-                revCards.push(card)
+                revCards.push(card);
             };
         }
         newCards.sort((a, b) => b.reviewAt.getTime() - a.reviewAt.getTime());
@@ -86,7 +117,7 @@ export class Scheduler {
             if (revCards.length) this.queue.push(revCards.pop()!);
             i++;
         }
-        this.queue = this.queue.concat(newCards);
+        this.queue.push(...newCards);
     }
 
     
@@ -95,25 +126,26 @@ export class Scheduler {
             console.log('Empty queue!');
             return false;
         }
-        console.log('Before grade:\n' + this.queue[0].toString())
+
         const gradingNewCard = this.queue[0].isNew;
         this.gradeCard(grade, this.queue[0]);
-        if (gradingNewCard && !this.queue[0].isNew) this.newCount--;
-        console.log('After grade:\n' + this.queue[0].toString())
+        if (gradingNewCard && !this.queue[0].isNew) {
+            this.newCount--; 
+            console.log('newCount--');
+        };
 
-        console.log('Queue before update:\n');
-        console.log(this.queue);
         this.updateQueue();
-        console.log('Queue after update:\n');
-        console.log(this.queue);
+
         return true;
     }
+
 
     // Tests out a grade without changing the Cards in the queue
     resultIfGrade(grade: string): string {
         if (this.queue.length === 0) return 'Not found.';
         return this.gradeCard(grade, this.queue[0].deepCopy()).reviewTime();
     }
+
 
     // Modify card and return it
     private gradeCard(grade: string, card: Card): Card {     
@@ -144,6 +176,7 @@ export class Scheduler {
         this.updateReviewCard(grade, card);
         return card;
     }
+
 
     private updateReviewCard(grade: string, card: Card): void {
         if (grade === 'Again') {

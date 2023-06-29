@@ -9,7 +9,7 @@ import { Card } from './Card';
 import { Scheduler } from './Scheduler';
 import { Chess } from 'chess.js';
 import { addMinutes } from 'date-fns';
-import { PageOption } from './learn';
+import { DeckInfo, PageOption } from './learn';
 
 interface CardsRow {
     ease: number;       
@@ -58,9 +58,11 @@ interface IfGradeTimes {
 interface ReviewSessionProps {
 	ids: number[];
 	setActivePage: React.Dispatch<React.SetStateAction<PageOption>>;
+	deckIdOptions: Map<number, DeckInfo>;
+	setDeckIdOptions: React.Dispatch<React.SetStateAction<Map<number, DeckInfo>>>;
 }
 
-const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage}) => {
+const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckIdOptions, setDeckIdOptions}) => {
 	const defaultPosition = {
 		move: 0, 
 		line: ['rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'], 
@@ -91,7 +93,6 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage}) => {
 					lines(id, name, eco)
 				`)
 				.in('decks_id', ids)
-				.limit(250)
 			
 			// Unpack the data returned by the API
 			const data: CardsRow[] | null = cardsResponse.data;
@@ -125,21 +126,18 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage}) => {
 				cards.set(lines.id, card)
 			}
 
-			const movesResponse = await supabaseClient.from('moves')
-				.select('lines_id, fen, order_in_line')
-				.in('lines_id', Array.from(cards.keys()));
-			
-			// Unpack the data returned by the API
-			const movesData: ChessMove[] | null = movesResponse.data;
-			const movesError: PostgrestError | null = movesResponse.error;
-			if (movesError) { 
-				console.error('error', movesError);
-				return;
+			const movesData: ChessMove[] = [];
+			const lineIds: number[] = Array.from(cards.keys());
+			for (let i = 0; i < lineIds.length; i = i + 50) {
+				const movesResult = await getMovesData(lineIds.slice(i, Math.min(i + 50, lineIds.length)));
+				if (movesResult) movesData.push(...movesResult);
 			};
-			if (!movesData) return;
 
 			for (let move of movesData) {
-				if (!move) continue;
+				if (!move) {
+					console.error('Moves row from db was null!');
+					continue;
+				};
 				const card = cards.get(move.lines_id);
 				if (card) card.addMove(move);
 			}
@@ -150,11 +148,51 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage}) => {
 				scheduler.addCard(cards.get(key)!);
 			}
 			scheduler.updateQueue();
+			scheduler.setReviewQueueSize(getReviewCards());
+			scheduler.setNewQueueSize(getNewCards());
 			setScheduler(scheduler);
 		}
 		
 		fetchCards();
-	}, [])
+	}, []);
+
+
+	async function getMovesData(lineIds: number[]): Promise<ChessMove[] | null> {
+		const movesResponse = await supabaseClient
+		  .from('moves')
+		  .select('lines_id, fen, order_in_line')
+		  .in('lines_id', lineIds);
+		console.log('moves api response:\n');
+		console.log(movesResponse)
+		const movesData: ChessMove[] | null = movesResponse.data;
+		const movesError: PostgrestError | null = movesResponse.error;
+		if (movesError) { 
+		  console.error('error', movesError);
+		  return null;
+		};
+		return movesData!;
+	  };
+	  
+
+
+	function getNewCards(): number {
+		let newCards = 0;
+		for (let id of ids) {
+			const deck = deckIdOptions.get(id)!;
+			newCards = newCards + deck.newDue;
+		}
+		return newCards;
+	}
+
+
+	function getReviewCards(): number {
+		let reviewCards = 0;
+		for (let id of ids) {
+			const deck = deckIdOptions.get(id)!;
+			reviewCards = reviewCards + deck.reviewDue;
+		}
+		return reviewCards;
+	}
 
 
 	const renderCards = useCallback(() => {
@@ -180,7 +218,6 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage}) => {
 		const nextMoveFensBlind = nextMoveFens.slice(0, nextMoveFens.length - 1)
 
 		const newGame = new Chess();
-		console.log('nextMoveFensBlind length: ' + nextMoveFensBlind.length);
 		newGame.load(nextMoveFensBlind[nextMoveFensBlind.length - 1])
 
 		setPosition({
@@ -250,10 +287,13 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage}) => {
 		setSolutionToggled(false);
 
 		const updatedScheduler = scheduler.deepCopy();
+		console.log('scheduler new count before grade: ' + scheduler.getNewQueueSize());
 		if (e.currentTarget.id === '!!') updatedScheduler.answerCard('Easy');
 		if (e.currentTarget.id === '!?') updatedScheduler.answerCard('Good');
 		if (e.currentTarget.id === '?!') updatedScheduler.answerCard('Hard');
-		if (e.currentTarget.id === '??') updatedScheduler.answerCard('Again');		
+		if (e.currentTarget.id === '??') updatedScheduler.answerCard('Again');
+		console.log('scheduler new count after grade: ' + scheduler.getNewQueueSize());
+		
 		setScheduler(updatedScheduler);
 	}
 
@@ -298,6 +338,27 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage}) => {
 	};
 
 
+	useEffect(() => {
+		const setSchedulerCardCounts = () => {
+			let newCards = 0;
+			for (let id of ids) {
+				const deck = deckIdOptions.get(id)!;
+				newCards = newCards + deck.newDue;
+			}
+			let reviewCards = 0;
+			for (let id of ids) {
+				const deck = deckIdOptions.get(id)!;
+				reviewCards = reviewCards + deck.reviewDue;
+			};
+			const updatedScheduler = scheduler.deepCopy();
+			updatedScheduler.setNewQueueSize(newCards);
+			updatedScheduler.setReviewQueueSize(reviewCards);
+			setScheduler(updatedScheduler);
+		};
+		setSchedulerCardCounts();
+	}, [deckIdOptions, ids]);
+	
+
 	return (
 		<div className="flex flex-col items-center space-y-6">
 			<h2 className="text-2xl font-bold">
@@ -309,8 +370,9 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage}) => {
 			</h3>
 
 			<h3>
-				{'To Learn:\nNew: ' + scheduler.newQueueSize() + '\nReview: ' + (scheduler.queueSize() - scheduler.newQueueSize())}
+				{`To Learn:\nNew: ${scheduler.getNewQueueSize()}\nReview: ${scheduler.getReviewQueueSize()}`}
 			</h3>
+
 	
 			{position.line && position.line.length > 0 &&				
 				<div className="flex justify-center p-4 border-2 border-gray-200 rounded-lg">

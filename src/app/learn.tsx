@@ -38,10 +38,6 @@ const DecksPage: React.FC = () => {
 
             if (error) console.log(error);
             const decksData: DecksRow[] = data;
-            console.log('Data:');
-            console.log(data)
-            console.log('Decks data:')
-            console.log(decksData);
             const updatedOption = new Map<number, DeckInfo>();
             let newAllDecks = 0;
             let reviewAllDecks = 0;
@@ -55,8 +51,6 @@ const DecksPage: React.FC = () => {
                 reviewAllDecks = reviewAllDecks + (row.total - row.new_cards);
             };
             updatedOption.set(-1, {name: 'Review All', newDue: newAllDecks, reviewDue: reviewAllDecks});
-            console.log('Completed map:');
-            console.log(updatedOption);
             setDeckIdOptions(updatedOption);
         }
 
@@ -103,6 +97,8 @@ const DecksPage: React.FC = () => {
                 <ReviewSession 
                     ids={processDeckChoice()}
                     setActivePage={setActivePage}
+                    deckIdOptions={deckIdOptions}
+                    setDeckIdOptions={setDeckIdOptions}
                 />
             }
         </div>

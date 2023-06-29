@@ -13,6 +13,7 @@ export class Card {
     name: string = '';
     eco: string = '';
 
+
     constructor(ease: number, interval: number, isNew: boolean, step: number, reviewAt: Date) {
         this.ease = ease;
         this.interval = interval;
@@ -22,9 +23,16 @@ export class Card {
         this.id = Math.floor(Math.random() * (10000 - 1) + 1);
     }
 
+
     setLinesId(lines_id: number) {
         this.lines_id = lines_id;
     }
+
+
+    getMaxOrderInLine(): number {
+        return this.moves[this.moves.length - 1].order_in_line;
+    }
+
 
     printMoves(): void {
         if (this.moves.length === 0) console.log('No moves to print.')
@@ -62,7 +70,7 @@ export class Card {
             new Date(this.reviewAt.getTime())
         )
         cardCopy.id = this.id;
-        cardCopy.moves = this.moves;
+        cardCopy.moves = [...this.moves];
         cardCopy.lines_id = this.lines_id;
         cardCopy.name = this.name;
         cardCopy.eco = this.eco;
@@ -95,14 +103,14 @@ export class Card {
     }
 
     toString(): string {
-        const moveFens = this.moves.map(move => move.fen) 
+        const moveData = this.moves.map(move => '\n' + move.order_in_line + ': ' + move.fen) 
         return (
             'Card: ' + this.id +
             ', Review: ' + this.reviewTime() +
             ', Ease: ' + this.ease +
             ', New: ' + this.isNew +
             ', Step: ' + this.step + 
-            ', Moves: ' + moveFens
+            ', Moves: ' + moveData
         );
     }
     

@@ -3,13 +3,13 @@
 import MenuBar from './MenuBar';
 import Footer from './Footer';
 import DecksPage from './learn';
-import HomePage from './HomePage';
+import HomePage from './home';
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import About from './About';
-import SignIn from './SignIn';
-import SignUp from './SignUp';
-import Account from './Account';
+import About from './about';
+import SignIn from './signin';
+import SignUp from './signup';
+import Account from './account';
 
 export default function Home() {
   return (
