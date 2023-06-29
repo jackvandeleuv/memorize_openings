@@ -91,6 +91,7 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage}) => {
 					lines(id, name, eco)
 				`)
 				.in('decks_id', ids)
+				.limit(250)
 			
 			// Unpack the data returned by the API
 			const data: CardsRow[] | null = cardsResponse.data;
@@ -179,6 +180,7 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage}) => {
 		const nextMoveFensBlind = nextMoveFens.slice(0, nextMoveFens.length - 1)
 
 		const newGame = new Chess();
+		console.log('nextMoveFensBlind length: ' + nextMoveFensBlind.length);
 		newGame.load(nextMoveFensBlind[nextMoveFensBlind.length - 1])
 
 		setPosition({

@@ -70,7 +70,7 @@ export class Card {
     }
 
     hasMoves(): boolean {
-        return this.moves.length > 0;
+        return this.moves.length > 1;
     }
 
     // Add move using insertion sort
@@ -88,7 +88,7 @@ export class Card {
             this.moves[i + 1] = this.moves[i];
             i--;
         }
-        if (this.moves[i].order_in_line == newMove.order_in_line) {
+        if (i >= 0 && this.moves[i].order_in_line == newMove.order_in_line) {
             throw new Error('Card got two moves with same order_in_line');
         }
         this.moves[i + 1] = newMove;
