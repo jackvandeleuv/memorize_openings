@@ -39,9 +39,10 @@ export interface Position {
 	game: Chess;
 	eco: string;
 	name: string;
+	guess: Guess;
 }
 
-export interface AnswerToggle {
+export interface Guess {
 	row: string,
 	col: string,
 	color: string
@@ -63,15 +64,15 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage}) => {
 	const defaultPosition = {
 		move: 0, 
 		line: ['rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'], 
-		answer: '', 
+		answer: 'rnbqkbnr/pppppppp/8/8/P7/8/1PPPPPPP/RNBQKBNR w KQkq - 0 1', 
 		game: new Chess(), 
 		name: 'No Cards Due', 
-		eco: ''
+		eco: '',
+		guess: {row: '', col: '', color: ''}
 	};
 
 	const [position, setPosition] = useState<Position>(defaultPosition);
 	const [scheduler, setScheduler] = useState<Scheduler>(new Scheduler());
-	const [answerToggle, setAnswerToggle] = useState<AnswerToggle>({row: '', col: '', color: ''});
 	const [ifGradeTimes, setIfGradeTimes] = useState<IfGradeTimes>({Easy: 'N/A',  Good: 'N/A', Hard: 'N/A', Again: 'N/A'});
 	const [ratingHelpMessage, setRatingHelpMessage] = useState<string>('');
 	const [storedPosition, setStoredPosition] = useState<Position>();
@@ -186,7 +187,8 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage}) => {
 			answer: nextAnswer,
 			game: newGame,
 			eco: nextCard.eco,
-			name: nextCard.name
+			name: nextCard.name,
+			guess: {row: '', col: '', color: ''}
 		});
 		setStoredPosition(undefined);
 	}, [scheduler]);
@@ -200,28 +202,26 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage}) => {
 	const arrowButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
 		if (!scheduler || solutionToggled) return;
 
-		if (e.currentTarget.id === '>' && position.move < position.line.length - 1) {
-			const newIndex = position.move + 1;
-			const currentLine = [...position.line];
+		if (e.currentTarget.id === '>' && position.move < position.line.length - 1) {; 
 			setPosition({
-				line: currentLine, 
-				move: newIndex, 
+				line: [...position.line], 
+				move: position.move + 1, 
 				answer: position.answer, 
 				game: new Chess(position.game.fen()),
 				eco: position.eco,
-				name: position.name
+				name: position.name,
+				guess: position.guess
 			});
 		}
 		if (e.currentTarget.id === '<' && position.move > 0) {
-			const newIndex = position.move - 1;
-			const currentLine = [...position.line];
 			setPosition({
-				line: currentLine, 
-				move: newIndex, 
+				line: [...position.line], 
+				move: position.move - 1, 
 				answer: position.answer, 
 				game: new Chess(position.game.fen()),
 				eco: position.eco,
-				name: position.name			
+				name: position.name,
+				guess: position.guess
 			});
 		}	
 	}
@@ -234,19 +234,25 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage}) => {
 
 	const ratingButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
 		if (!scheduler) return;
-		if (answerToggle.col === '' && answerToggle.row === '' && answerToggle.color === '') {
+		if (position.guess.color === '') {
 			setRatingHelpMessage('Make a move to see the answer!');
 			return;
 		} else {
 			setRatingHelpMessage('');
 		}
+
+		// Remove the guess highlight
+		const positionCopy = deepCopyPosition(position);
+		positionCopy.guess.color = '';
+		setPosition(positionCopy);
+		setSolutionToggled(false);
+
 		const updatedScheduler = scheduler.deepCopy();
 		if (e.currentTarget.id === '!!') updatedScheduler.answerCard('Easy');
 		if (e.currentTarget.id === '!?') updatedScheduler.answerCard('Good');
 		if (e.currentTarget.id === '?!') updatedScheduler.answerCard('Hard');
-		if (e.currentTarget.id === '??') updatedScheduler.answerCard('Again');
+		if (e.currentTarget.id === '??') updatedScheduler.answerCard('Again');		
 		setScheduler(updatedScheduler);
-		setAnswerToggle({row: answerToggle.row, col: answerToggle.col, color: ''});
 	}
 
 
@@ -257,7 +263,12 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage}) => {
 			answer: original.answer,
 			game: new Chess(original.game.fen()),
 			name: original.name,
-			eco: original.eco
+			eco: original.eco,
+			guess: {
+				row:position.guess.row, 
+				col:position.guess.col, 
+				color:position.guess.color
+			}
 		};
 	};
 
@@ -277,12 +288,6 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage}) => {
 
 		const positionCopy2 = deepCopyPosition(position);
 
-		// If user hasn't guessed yet
-		if (answerToggle.col === '' && 
-			answerToggle.row === '' && 
-			answerToggle.color === '') {
-			positionCopy2.line = positionCopy2.line.slice(0, positionCopy2.line.length - 1);
-		}
 		positionCopy2.line.push(positionCopy2.answer);
 		positionCopy2.game.load(positionCopy2.answer);
 		positionCopy2.move = positionCopy2.line.length - 1;
@@ -308,10 +313,9 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage}) => {
 			{position.line && position.line.length > 0 &&				
 				<div className="flex justify-center p-4 border-2 border-gray-200 rounded-lg">
 					<ChessBoard
+						solutionToggled={solutionToggled}
 						position={position}
 						setPosition={setPosition}
-						answerToggle={answerToggle}
-						setAnswerToggle={setAnswerToggle}
 					/>
 				</div>
 			}

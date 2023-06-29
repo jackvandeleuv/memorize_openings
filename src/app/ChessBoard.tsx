@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import Cell from './Cell';
 import Piece from './Piece';
 import { Chess, Square } from 'chess.js';
-import { Position, AnswerToggle } from './ReviewSession';
+import { Position, Guess } from './ReviewSession';
 
 export interface Piece {
 	piece: 'p' | 'r' | 'n' | 'b' | 'k' | 'q';
@@ -14,39 +14,60 @@ export interface Piece {
 export type BoardState = (Piece | null)[][];
 
 interface ChessBoardProps {
+	solutionToggled: boolean;
 	position: Position;
 	setPosition: React.Dispatch<React.SetStateAction<Position>>;
-	answerToggle: AnswerToggle;
-	setAnswerToggle: React.Dispatch<React.SetStateAction<AnswerToggle>>;
 }
 
 
-const ChessBoard: React.FC<ChessBoardProps> = ({ position, setPosition, answerToggle, setAnswerToggle }) => {
+const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setPosition }) => {
 	const [prevClickedPiece, setPrevClickedPiece] = useState('');
 	const [highlightMap, setHighlightMap] = useState(new Map<string, string>());
+	const [reversed, setReversed] = useState<boolean>(false);
+
+
+	// When the position changes, figure out if the board should be from black's perspective
+	useEffect(() => {
+		setReversed(new Chess(position.answer).turn() === 'b')
+	}, [position]);
 
 
 	// Toggle destination highlight if using arrow buttons
 	useEffect(() => {
-		// If we have an empty toggler, return
-		if (answerToggle.color === '' && answerToggle.row === '' && answerToggle.col === '') return;
+		const toggleDestinationHighlight = () => {
+			const updatedMap = new Map<string, string>(highlightMap);
+			const cellId = `${position.guess.row}-${position.guess.col}`
 
-		// Otherwise, prepare highlight map for updating
-		const updatedMap = new Map<string, string>(highlightMap);
-		const cellId = `${answerToggle.row}-${answerToggle.col}`;
+			// If we have a color to add and move is at the end of line, 
+			// and show solution isn't on, add the highlight
+			if (
+				position.guess.color !== '' && 
+				position.move >= position.line.length - 1 &&
+				!solutionToggled
+			) {
+				updatedMap.set(cellId, position.guess.color);
+			};
 
-		if (answerToggle.color === '' && answerToggle.row !== '' && answerToggle.col !== '') updatedMap.delete(cellId);
-		if (answerToggle.color !== '' && position.move < position.line.length - 1) updatedMap.delete(cellId);
-		if (answerToggle.color !== '' && position.move >= position.line.length - 1) updatedMap.set(cellId, answerToggle.color);
+			// Delete highlight if no color, not at the end of line, or no solution
+			if (
+				position.guess.color === '' ||
+				position.move < position.line.length - 1 ||
+				solutionToggled
+			) updatedMap.delete(cellId);
 
-		setHighlightMap(updatedMap);
+			setHighlightMap(updatedMap);
+		};
 
-	}, [answerToggle, position]);
+		toggleDestinationHighlight();
+	}, [position, solutionToggled]);
 	
 
 	const handlePieceMove = (fromRow: number, fromCol: number, toRow: number, toCol: number) => {
-		// Toggle and return if we're earlier in the line or move is invalid
-		if (position.move < position.line.length - 1 || !isValidMove(fromRow, fromCol, toRow, toCol)) {
+		// Toggle and return if not at the end of the line, invalid move, or if showing the solution
+		if (position.move < position.line.length - 1 || 
+			!isValidMove(fromRow, fromCol, toRow, toCol) ||
+			solutionToggled
+		) {
 			toggleYellowHighlight(`${fromRow}-${fromCol}`);
 			return;
 		}
@@ -70,24 +91,23 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ position, setPosition, answerTo
 		updatedLine.push(newGameState.fen());
 		const updatedMove = updatedLine.length - 1;
 
+		// Update cell highlight colors
+		const destinationColor = isCorrect ? 'bg-green-600' : 'bg-red-600';
+
 		setPosition({
 			move: updatedMove, 
 			line: updatedLine, 
 			answer: position.answer, 
 			game: new Chess(position.game.fen()),
 			name: position.name,
-			eco: position.eco
+			eco: position.eco,
+			guess: {
+				row: toRow.toString(), 
+				col: toCol.toString(), 
+				color: destinationColor
+			}
 		});
-
-		// Update cell highlight colors
-		const destinationColor = isCorrect ? 'bg-green-600' : 'bg-red-600';
-		const updatedMap = new Map(highlightMap);
-		updatedMap.delete(`${fromRow}-${fromCol}`)
-		updatedMap.set(`${toRow}-${toCol}`, destinationColor);
-		setHighlightMap(updatedMap);
-
-		// Update the answer color toggle
-		setAnswerToggle({row: toRow.toString(), col: toCol.toString(), color: destinationColor})
+		toggleYellowHighlight(`${fromRow}-${fromCol}`);
 	}; 
 
 	
@@ -139,12 +159,17 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ position, setPosition, answerTo
 
 		gameStateCopy.move({from:fromString, to:toString})
 		setPosition({
-			line: position.line, 
+			line: [...position.line], 
 			move: position.move, 
 			answer: position.answer, 
 			game: gameStateCopy,
 			eco: position.eco,
-			name: position.name
+			name: position.name,
+			guess: {
+				row: position.guess.row,
+				col: position.guess.col,
+				color: position.guess.color
+			}
 		}); 
 
 		return true;
@@ -153,7 +178,33 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ position, setPosition, answerTo
 
 	const renderBoard = () => {
 		const board = [];
+		// If it's black's turn, render everything backwards
+		if (!reversed) {
+			for (let i = 7; i >= 0; i--) {
+				for (let j = 7; j >= 0; j--) {
+					const key = `${i}-${j}`;
+					const piece = fenToBoard(position.line[position.move])[i][j];
+					board.push(
+						<Cell
+						key={key}
+						row={i}
+						col={j}
+						handleClick={handleCellClick}
+						highlight={highlightMap.get(`${i}-${j}`)}
+						>
+							{piece && (
+								<Piece
+								piece={piece.piece}
+								color={piece.color}
+							/>)}
+						</Cell>
+					);
+				}
+			}
+			return board;
+		};
 
+		// If it's white's turn, render everything forwards
 		for (let i = 0; i < 8; i++) {
 			for (let j = 0; j < 8; j++) {
 				const key = `${i}-${j}`;

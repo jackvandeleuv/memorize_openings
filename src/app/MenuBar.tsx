@@ -103,8 +103,8 @@ const MenuBar: React.FC = () => {
                   {isSignedIn ? 
                     <>
                       <Link to='/learn' onClick={() => setIsOpen(!isOpen)} className="text-gray-900 hover:underline">Learn</Link>
-                      <Link to='/account' onClick={() => setIsOpen(!isOpen)} className="mx-5 cursor-pointer text-white hover:underline">Account</Link>
-                      <Link to='/' onClick={() => {signUserOut();}} className="mx-5 cursor-pointer text-white hover:underline">Sign Out</Link> 
+                      <Link to='/account' onClick={() => setIsOpen(!isOpen)} className="text-gray-900 hover:underline">Account</Link>
+                      <Link to='/' onClick={() => {signUserOut();}} className="text-gray-900 hover:underline">Sign Out</Link> 
                     </> :
                     <>
                       <Link to='/signin' onClick={() => setIsOpen(!isOpen)} className="mx-5 cursor-pointer text-white hover:underline">Sign In</Link>
