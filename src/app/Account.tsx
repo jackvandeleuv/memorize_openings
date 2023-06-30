@@ -25,7 +25,7 @@ const Account: React.FC = () => {
     }, []);
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-blue-500 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen flex items-center justify-center bg-indigo-400 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-xl">
                 <h2 className="text-3xl font-bold text-center">Account: {userDetails?.email}</h2>
                 <p className="text-lg text-gray-700 mt-4 text-center">
@@ -33,14 +33,14 @@ const Account: React.FC = () => {
                 </p>
                 <div className="flex flex-col items-center mt-6">
                     <button 
-                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" 
+                        className="bg-rose-500 hover:bg-rose-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" 
                         type="button"
                         onClick={deleteAccount}
                     >
                         Delete Account
                     </button>
                     <button 
-                        className="mt-4 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" 
+                        className="mt-4 bg-rose-500 hover:bg-rose-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" 
                         type="button"
                         onClick={resetDatabase}
                     >

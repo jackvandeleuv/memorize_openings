@@ -40,15 +40,15 @@ const MenuBar: React.FC = () => {
 
   return (
     <div className="relative bg-white">
-      <div className="bg-blue-500 max-w-7xl mx-auto px-4 sm:px-6">
+      <div className="bg-indigo-400 max-w-full mx-auto px-4 sm:px-6">
         <div className="flex justify-between items-center border-b-2 border-gray-100 py-6 md:justify-start md:space-x-10">
           <div className="flex justify-start lg:w-0 lg:flex-1">
             <Link to='/' className="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0">
-              <img
+              {/* <img
                 className="h-14 w-auto sm:h-12"
                 src="/blue-queen.png"
                 alt="logo"
-              />
+              /> */}
               <span className="ml-3 text-xl text-white font-bold">Fried Liver</span>
             </Link>
           </div>
@@ -60,18 +60,18 @@ const MenuBar: React.FC = () => {
               </svg>
             </button>
           </div>
-          <nav className="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
-            <Link to='/about' onClick={() => setIsOpen(!isOpen)} className="mx-5 cursor-pointer text-white hover:underline">About</Link>
+          <nav className="hidden md:flex items-center justify-end md:flex-1 lg:w-0 space-x-5">
+            <Link to='/about' onClick={() => setIsOpen(!isOpen)} className="text-white hover:underline">About</Link>
             {isSignedIn ? 
                 <>
-                <Link to='/learn' onClick={() => setIsOpen(!isOpen)} className="mx-5 cursor-pointer text-white hover:underline">Learn</Link>
-                <Link to='/account' onClick={() => setIsOpen(!isOpen)} className="mx-5 cursor-pointer text-white hover:underline">Account</Link>
-                <Link to='/' onClick={() => {signUserOut();}} className="mx-5 cursor-pointer text-white hover:underline">Sign Out</Link> 
-              </> :
-              <>
-                <Link to='/signin' onClick={() => setIsOpen(!isOpen)} className="mx-5 cursor-pointer text-white hover:underline">Sign In</Link>
-                <Link to='/signup' onClick={() => setIsOpen(!isOpen)} className="mx-5 cursor-pointer text-white hover:underline">Sign Up</Link>
-              </>
+                <Link to='/learn' onClick={() => setIsOpen(!isOpen)} className="text-white hover:underline">Learn</Link>
+                <Link to='/account' onClick={() => setIsOpen(!isOpen)} className="text-white hover:underline">Account</Link>
+                <Link to='/' onClick={() => {signUserOut();}} className="text-white hover:underline">Sign Out</Link> 
+                </> :
+                <>
+                <Link to='/signin' onClick={() => setIsOpen(!isOpen)} className="text-white hover:underline">Sign In</Link>
+                <Link to='/signup' onClick={() => setIsOpen(!isOpen)} className="text-white hover:underline">Sign Up</Link>
+                </>
             }
           </nav>
         </div>
@@ -80,7 +80,7 @@ const MenuBar: React.FC = () => {
       {/* Mobile menu, show/hide based on menu state. */}
       {isOpen && (
         <div className="absolute top-0 inset-x-0 p-2 transition transform origin-top-right md:hidden z-50">
-          <div className="bg-blue-500 rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 bg-white divide-y-2 divide-gray-50">
+          <div className="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 bg-white divide-y-2 divide-gray-50">
             <div className="pt-5 pb-6 px-5">
               <div className="flex items-center justify-between">
                 <div>
@@ -100,7 +100,7 @@ const MenuBar: React.FC = () => {
                 </div>
               </div>
               <div className="mt-6">
-                <nav className="grid gap-y-8">
+                <nav className="grid gap-y-4">
                   <Link to='/about' onClick={() => setIsOpen(!isOpen)} className="text-gray-900 hover:underline">About</Link>
                   {isSignedIn ? 
                     <>
@@ -109,8 +109,8 @@ const MenuBar: React.FC = () => {
                       <Link to='/' onClick={() => {signUserOut();}} className="text-gray-900 hover:underline">Sign Out</Link> 
                     </> :
                     <>
-                      <Link to='/signin' onClick={() => setIsOpen(!isOpen)} className="mx-5 cursor-pointer text-white hover:underline">Sign In</Link>
-                      <Link to='/signup' onClick={() => setIsOpen(!isOpen)} className="mx-5 cursor-pointer text-white hover:underline">Sign Up</Link>
+                      <Link to='/signin' onClick={() => setIsOpen(!isOpen)} className="text-gray-900 hover:underline">Sign In</Link>
+                      <Link to='/signup' onClick={() => setIsOpen(!isOpen)} className="text-gray-900 hover:underline">Sign Up</Link>
                     </>
                   }
                 </nav>
@@ -121,6 +121,7 @@ const MenuBar: React.FC = () => {
       )}
     </div>
   );
-}
+};
+
 
 export default MenuBar;

@@ -13,10 +13,9 @@ import Account from './account';
 
 export default function Home() {
   return (
-      <div className="flex flex-col min-h-screen">
+      <>
           <Router>
               <MenuBar />
-              <div className="flex-grow p-6">
                   <Routes>
                       <Route path='/' element={<HomePage />} />
                       <Route path='/learn' element={<DecksPage />} />
@@ -25,9 +24,8 @@ export default function Home() {
                       <Route path='/signup' element={<SignUp />} />
                       <Route path='/account' element={<Account />} />
                   </Routes>
-              </div>
               <Footer />
           </Router>
-      </div>
+      </>
   );
 }

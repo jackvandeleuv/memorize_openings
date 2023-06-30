@@ -92,7 +92,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 		const updatedMove = updatedLine.length - 1;
 
 		// Update cell highlight colors
-		const destinationColor = isCorrect ? 'bg-green-600' : 'bg-red-600';
+		const destinationColor = isCorrect ? 'bg-green-400' : 'bg-rose-300';
 
 		setPosition({
 			move: updatedMove, 
@@ -118,7 +118,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 			setHighlightMap(highlightMapCopy);
 		} else {
 			const highlightMapCopy = new Map(highlightMap);
-			highlightMapCopy.set(id, 'bg-zinc-300')
+			highlightMapCopy.set(id, 'bg-orange-200')
 			setHighlightMap(highlightMapCopy);
 		}
 	};

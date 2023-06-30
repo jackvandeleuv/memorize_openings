@@ -43,7 +43,7 @@ const DeckPicker: React.FC<DeckPickerProps> = ({deckIdOptions, deckChoice, setDe
                 </div>
                 </div>
                 <button 
-                    className="w-full p-2 mt-4 text-white bg-blue-500 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 hover:bg-blue-600"
+                    className="w-full p-2 mt-4 text-white bg-indigo-400 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 hover:bg-blue-600"
                     onClick={handleGoButton}
                 >
                     Go
