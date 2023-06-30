@@ -18,6 +18,7 @@ interface CardsRow {
     step: number;       
     review_at: Date;
 	lines: LinesRow | LinesRow[] | null;
+	id: number;
 }
 
 export interface ChessMove {
@@ -85,6 +86,7 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 			// Request all cards and lines data from the API
 			const cardsResponse = await supabaseClient.from('cards')
 				.select(`
+					id,
 					ease, 
 					interval, 
 					is_new, 
@@ -93,7 +95,9 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 					lines(id, name, eco)
 				`)
 				.in('decks_id', ids)
-			
+				.or(`review_at.gt.${new Date().toISOString()}, is_new.eq.1`);
+			console.log('API Data:')
+			console.log(cardsResponse);
 			// Unpack the data returned by the API
 			const data: CardsRow[] | null = cardsResponse.data;
 			const error: PostgrestError | null = cardsResponse.error;
@@ -115,7 +119,8 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 					cardsRow.interval, 
 					cardsRow.is_new === 1, 
 					cardsRow.step, 
-					new Date(cardsRow.review_at));
+					new Date(cardsRow.review_at),
+					cardsRow.id);
 				
 				const lines = cardsRow.lines
 				// Cards and lines is one-to-many, so this case won't occur.
@@ -271,7 +276,7 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 	};
 
 
-	const ratingButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+	const ratingButtonClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
 		if (!scheduler) return;
 		if (position.guess.color === '') {
 			setRatingHelpMessage('Make a move to see the answer!');
@@ -287,12 +292,21 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 		setSolutionToggled(false);
 
 		const updatedScheduler = scheduler.deepCopy();
-		console.log('scheduler new count before grade: ' + scheduler.getNewQueueSize());
-		if (e.currentTarget.id === '!!') updatedScheduler.answerCard('Easy');
-		if (e.currentTarget.id === '!?') updatedScheduler.answerCard('Good');
-		if (e.currentTarget.id === '?!') updatedScheduler.answerCard('Hard');
-		if (e.currentTarget.id === '??') updatedScheduler.answerCard('Again');
-		console.log('scheduler new count after grade: ' + scheduler.getNewQueueSize());
+
+		// Update the db with updated card info.
+		let result: boolean;
+		if (e.currentTarget.id === '!!') {
+			result = await updatedScheduler.answerCard('Easy');
+		} else if (e.currentTarget.id === '!?') {
+			result = await updatedScheduler.answerCard('Good')
+		} else if (e.currentTarget.id === '?!') {
+			result = await updatedScheduler.answerCard('Hard')
+		} else if (e.currentTarget.id === '??') {
+			result = await updatedScheduler.answerCard('Again')
+		} else {
+			throw new Error('Unknown rating button id');
+		}
+		if (!result) console.error('Rating card failed to write to database.');
 		
 		setScheduler(updatedScheduler);
 	}

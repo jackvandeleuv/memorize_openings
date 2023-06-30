@@ -13,17 +13,19 @@ const MenuBar: React.FC = () => {
 
   useEffect(() => {
     const { data: authListener } = supabaseClient.auth.onAuthStateChange(async (event) => {
-      if (event !== "SIGNED_OUT") {
-        setIsSignedIn(true);
-      } else {
-        setIsSignedIn(false);
-      }
+        const { data, error } = await supabaseClient.auth.getSession();
+        if (error) {
+            setIsSignedIn(false);
+            return
+        }
+        setIsSignedIn(data.session != null);
     });
-
+    
     return () => {
       authListener?.subscription.unsubscribe();
     };
   }, []); 
+
 
   async function signUserOut() {
     console.log('clicked sign user out');

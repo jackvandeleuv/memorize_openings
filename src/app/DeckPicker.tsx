@@ -32,7 +32,7 @@ const DeckPicker: React.FC<DeckPickerProps> = ({deckIdOptions, deckChoice, setDe
                     onChange={handleSelection}
                 >
                     {Array.from(deckIdOptions.entries()).map(([key, val]) => 
-                    <option key={key} value={key}>{val.name + ' (New: ' + val.newDue + ' | Review: ' + val.reviewDue + ')'}</option>
+                    <option key={key} value={key}>{val.name + ' (New: ' + val.newDue + ' | Review: ' + val.reviewDue + ' | Total: ' + val.totalCards + ')'}</option>
                     )}
                 </select>
 

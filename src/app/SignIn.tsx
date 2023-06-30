@@ -9,7 +9,7 @@ const SignIn: React.FC = () => {
 	const [password, setPassword] = useState<string>('');
 	const [userMessage, setUserMessage] = useState<string>('');
 
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
 	const handleSubmit = async (event: React.FormEvent) => {
 		event.preventDefault();
@@ -21,15 +21,24 @@ const SignIn: React.FC = () => {
 		if (error) {
 			console.error('Error signing in:', error.message);
 			setUserMessage('Email or Password Incorrect');
+      setEmail('');
+      setPassword('');
+      return;
 		}
 
-		if (!error) {
-			setUserMessage('Success!');
-			setEmail('');
-			setPassword('');
-			navigate('/');
-		}
-	}
+    setEmail('');
+    setPassword('');
+
+    // Update the cards in the user database if necessary.
+    const { data: data2, error: error2 } = await supabaseClient.rpc('insert_default_user_cards');
+    if (error2) {
+      console.error('Error updating database: ', error2.message);
+      setUserMessage(error2.message);
+      return;
+    };
+    setUserMessage('Success!');
+    navigate('/');
+	};
 
 	
   return (

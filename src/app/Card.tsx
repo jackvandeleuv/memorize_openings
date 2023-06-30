@@ -14,13 +14,13 @@ export class Card {
     eco: string = '';
 
 
-    constructor(ease: number, interval: number, isNew: boolean, step: number, reviewAt: Date) {
+    constructor(ease: number, interval: number, isNew: boolean, step: number, reviewAt: Date, newId: number) {
         this.ease = ease;
         this.interval = interval;
         this.isNew = isNew;
         this.step = step;
         this.reviewAt = reviewAt;
-        this.id = Math.floor(Math.random() * (10000 - 1) + 1);
+        this.id = newId;
     }
 
 
@@ -67,9 +67,9 @@ export class Card {
             this.interval,
             this.isNew,
             this.step,
-            new Date(this.reviewAt.getTime())
-        )
-        cardCopy.id = this.id;
+            new Date(this.reviewAt.getTime()),
+            this.id
+        );
         cardCopy.moves = [...this.moves];
         cardCopy.lines_id = this.lines_id;
         cardCopy.name = this.name;

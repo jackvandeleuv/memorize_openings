@@ -2,6 +2,7 @@ import { addMinutes, addDays, isAfter, formatDistanceToNow } from 'date-fns';
 import { Card } from './Card';
 import { scheduler } from 'timers/promises';
 import { update } from 'plotly.js';
+import { supabaseClient } from '../../utils/supabaseClient';
 
 
 export class Scheduler {
@@ -102,12 +103,16 @@ export class Scheduler {
                 revCards.push(card);
             };
         }
+        console.log('new cards pre sort: ')
+        console.log(newCards)
         newCards.sort((a, b) => b.reviewAt.getTime() - a.reviewAt.getTime());
         revCards.sort((a, b) => b.reviewAt.getTime() - a.reviewAt.getTime());
         let limit = this.newCardLimit;
         let i = 0;
+        console.log('(limit && newCards.length)' + (limit && newCards.length))
         while (revCards.length || (limit && newCards.length)) {
             if (limit && newCards.length && i % this.newCardRatio === 0) {
+                console.log('pushing newCards.pop()')
                 this.queue.push(newCards.pop()!);
                 limit--;
                 i++;
@@ -118,10 +123,32 @@ export class Scheduler {
             i++;
         }
         this.queue.push(...newCards);
+        console.log('Queue after build: ')
+        console.log(this.queue)
+        console.log('Cards after build:')
+        console.log(this.cards)
+    }
+
+
+    private async updateDbCard(card: Card): Promise<boolean> {
+        const { data, error } = await supabaseClient.from('cards')
+            .update({
+                'step': card.step,
+                'is_new': card.isNew ? 1 : 0,
+                'review_at': card.reviewAt,
+                'interval': card.interval,
+                'ease': card.ease
+            })
+            .match({'id': card.id});
+        if (error) {
+            console.error(error); 
+            return false;
+        };
+        return true;
     }
 
     
-    answerCard(grade: string): boolean {
+    async answerCard(grade: string): Promise<boolean> {
         if (!this.queue.length) {
             console.log('Empty queue!');
             return false;
@@ -131,9 +158,10 @@ export class Scheduler {
         this.gradeCard(grade, this.queue[0]);
         if (gradingNewCard && !this.queue[0].isNew) {
             this.newCount--; 
-            console.log('newCount--');
         };
 
+        const updateSuccess = await this.updateDbCard(this.queue[0]);
+        if (!updateSuccess) throw new Error('Db update failed.');
         this.updateQueue();
 
         return true;

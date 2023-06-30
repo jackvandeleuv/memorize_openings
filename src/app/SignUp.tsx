@@ -14,19 +14,17 @@ const SignUp: React.FC = () => {
 		const { data, error } = await supabaseClient.auth.signUp({
 			email: email,
 			password: password,
-		})
+		});
+
+    setEmail('');
+		setPassword('');
 
 		if (error) {
-			console.error('Error signing in:', error.message);
-			setUserMessage(error.message);
-		}
+      return;
+		};
 
-		if (!error) {
-			setEmail('');
-			setPassword('');
-			setUserMessage('Success! Check the email you signed up with to sign in.');
-		}
-	}
+		setUserMessage('Success! Check the email you signed up with to sign in.');
+	};
 
 	
   return (
