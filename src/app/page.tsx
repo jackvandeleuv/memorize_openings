@@ -13,19 +13,21 @@ import Account from './account';
 
 export default function Home() {
   return (
-      <>
-          <Router>
-              <MenuBar />
-                  <Routes>
-                      <Route path='/' element={<HomePage />} />
-                      <Route path='/learn' element={<DecksPage />} />
-                      <Route path='/about' element={<About />} />
-                      <Route path='/signin' element={<SignIn />} />
-                      <Route path='/signup' element={<SignUp />} />
-                      <Route path='/account' element={<Account />} />
-                  </Routes>
-              <Footer />
-          </Router>
-      </>
+    <Router>
+        <div className="flex flex-col min-h-screen">
+            <MenuBar />
+                <div className="flex-grow">
+                    <Routes>
+                        <Route path='/' element={<HomePage />} />
+                        <Route path='/learn' element={<DecksPage />} />
+                        <Route path='/about' element={<About />} />
+                        <Route path='/signin' element={<SignIn />} />
+                        <Route path='/signup' element={<SignUp />} />
+                        <Route path='/account' element={<Account />} />
+                    </Routes>
+                </div>
+            <Footer />
+        </div>
+    </Router>
   );
 }

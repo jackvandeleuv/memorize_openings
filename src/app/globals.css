@@ -18,5 +18,5 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: #818cf8; /* This is the approximate equivalent of bg-indigo-400 in Tailwind CSS */
+  background: #6366f1; /* This is the approximate equivalent of bg-indigo-400 in Tailwind CSS */
 }

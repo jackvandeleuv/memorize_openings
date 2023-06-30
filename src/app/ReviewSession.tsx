@@ -10,6 +10,7 @@ import { Scheduler } from './Scheduler';
 import { Chess } from 'chess.js';
 import { addMinutes } from 'date-fns';
 import { DeckInfo, PageOption } from './learn';
+import RatingButton from './RatingButton';
 
 interface CardsRow {
     ease: number;       
@@ -295,13 +296,13 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 
 		// Update the db with updated card info.
 		let result: boolean;
-		if (e.currentTarget.id === '!!') {
+		if (e.currentTarget.id === 'Easy!!') {
 			result = await updatedScheduler.answerCard('Easy');
-		} else if (e.currentTarget.id === '!?') {
+		} else if (e.currentTarget.id === 'Good!?') {
 			result = await updatedScheduler.answerCard('Good')
-		} else if (e.currentTarget.id === '?!') {
+		} else if (e.currentTarget.id === 'Hard?!') {
 			result = await updatedScheduler.answerCard('Hard')
-		} else if (e.currentTarget.id === '??') {
+		} else if (e.currentTarget.id === 'Again??') {
 			result = await updatedScheduler.answerCard('Again')
 		} else {
 			throw new Error('Unknown rating button id');
@@ -374,93 +375,114 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 	
 
 	return (
-		<div className="flex flex-col items-center space-y-6">
-			<h2 className="text-2xl font-bold">
-				{position.eco + ' ' + position.name}
-			</h2>
+		<div className="w-full bg-indigo-400 p-4 md:p-8">
+			<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+				<div className="flex flex-col items-center space-y-4">			
+					{position.line && position.line.length > 0 &&				
+						<div className="w-full flex justify-center p-4 rounded-lg">
+							<ChessBoard
+								solutionToggled={solutionToggled}
+								position={position}
+								setPosition={setPosition}
+							/>
+						</div>
+					}
+			
+					<div className="w-full flex flex-row items-center justify-between">
+						<RatingButton
+							id="Again??"
+							time={ifGradeTimes.Again}
+							handleClick={ratingButtonClick}
+						>
+							{'Again??'}
+						</RatingButton>
 	
-			<h3 className="text-xl">
-				{position.game.turn() === 'w' ? 'White to Move' : 'Black to Move'}
-			</h3>
-
-			<h3>
-				{`To Learn:\nNew: ${scheduler.getNewQueueSize()}\nReview: ${scheduler.getReviewQueueSize()}`}
-			</h3>
-
+						<RatingButton
+							id="Hard?!"
+							time={ifGradeTimes.Hard}
+							handleClick={ratingButtonClick}
+						>
+							{'Hard?!'}
+						</RatingButton>
 	
-			{position.line && position.line.length > 0 &&				
-				<div className="flex justify-center p-4 border-2 border-gray-200 rounded-lg">
-					<ChessBoard
-						solutionToggled={solutionToggled}
-						position={position}
-						setPosition={setPosition}
-					/>
+						<RatingButton
+							id="Good!?"
+							time={ifGradeTimes.Good}
+							handleClick={ratingButtonClick}
+						>
+							{'Good!?'}
+						</RatingButton>
+	
+						<RatingButton
+							id="Easy!!"
+							time={ifGradeTimes.Easy}
+							handleClick={ratingButtonClick}
+						>
+							{'Easy!!'}
+						</RatingButton>
+					</div>
 				</div>
-			}
 	
-			<div className="flex justify-center space-x-4">
-				<Button
-					id='<'
-					handleClick={arrowButtonClick}
-				>
-					{'<'}
-				</Button>
-				<Button
-					id='>'
-					handleClick={arrowButtonClick}
-				>
-					{'>'}
-				</Button>
-			</div>
+				<div className="flex flex-col items-center space-y-4 p-4 bg-indigo-500 rounded-lg">
+					<div className="text-center text-2xl font-bold text-black bg-orange-200">
+						{position.name}
+					</div>
+			
+					<div className="text-center text-xl font-bold text-white">
+						{position.game.turn() === 'w' && !solutionToggled ? 'White to Move' : 'Black to Move'}
+					</div>
 	
-			<div className="flex justify-center space-x-4 p-4 bg-white shadow rounded-lg">
-				<div className="p-2">{ifGradeTimes.Again}</div>
-				<div className="p-2">{ifGradeTimes.Hard}</div>
-				<div className="p-2">{ifGradeTimes.Good}</div>
-				<div className="p-2">{ifGradeTimes.Easy}</div>
-			</div>
+					<div className="flex flex-col w-full">
+						<div className="p-1 text-center text-xl font-bold text-white">
+							{`New: ${scheduler.getNewQueueSize()}`}
+						</div>
+						<div className="p-1 text-center text-xl font-bold text-white">
+							{`Review: ${scheduler.getReviewQueueSize()}`}
+						</div>
+					</div>
+					
+					<div className="flex justify-center space-x-4 p-4rounded-lg">
+						<Button
+							id='<'
+							handleClick={arrowButtonClick}
+							color={'bg-indigo-300'}
+						>
+							{'<'}
+						</Button>
+						<Button
+							id='>'
+							handleClick={arrowButtonClick}
+							color={'bg-indigo-300'}
+						>
+							{'>'}
+						</Button>
+					</div>
 	
-			<div className="flex justify-center space-x-4 p-4 bg-white shadow rounded-lg">
-				<Button
-					id='??'
-					handleClick={ratingButtonClick}
-				>
-					{'??'}
-				</Button>
-				<Button
-					id='?!'
-					handleClick={ratingButtonClick}
-				>
-					{'?!'}
-				</Button>
-				<Button
-					id='!?'
-					handleClick={ratingButtonClick}
-				>
-					{'!?'}
-				</Button>
-				<Button
-					id='!!'
-					handleClick={ratingButtonClick}
-				>
-					{'!!'}
-				</Button>
-				{ratingHelpMessage}
-				<Button 
-					id='back'
-					handleClick={backButtonClick}
-				>
-					{'Back'}
-				</Button>
-				<Button
-					id='solution'
-					handleClick={handleShowSolution}
-				>
-					{solutionToggled ? 'Hide Solution' : 'Show Solution'}
-				</Button>
+					<div className="flex justify-center space-x-4 p-4 rounded-lg">
+						{ratingHelpMessage}
+						<Button
+							id='solution'
+							handleClick={handleShowSolution}
+							color={'bg-indigo-300'}
+						>
+							{solutionToggled ? 'Hide Solution' : 'Show Solution'}
+						</Button>
+					</div>
+	
+					<div className="flex justify-center space-x-4 p-4 rounded-lg">
+						<Button 
+							id='back'
+							handleClick={backButtonClick}
+							color={'bg-indigo-300'}
+						>
+							{'Back'}
+						</Button>
+					</div>
+				</div>
 			</div>
 		</div>
 	);
+	
 	
 }
 

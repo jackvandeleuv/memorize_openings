@@ -21,6 +21,7 @@ interface DecksRow {
 
 interface TotalsRow {
     id: number;
+    name: string;
     total: number;
 }
 
@@ -73,8 +74,9 @@ const DecksPage: React.FC = () => {
                 console.log('Unpacking second query:')
                 console.log(row)
                 console.log(updatedOption.get(row.id))
-                const deck = updatedOption.get(row.id)!
-                deck.totalCards = row.total;
+                const deck = updatedOption.get(row.id)
+                if (!deck) updatedOption.set(row.id, {name: row.name, newDue: 0, reviewDue: 0, totalCards: row.total});
+                else deck.totalCards = row.total;
                 totalAllDecks = totalAllDecks + row.total;
             }
             updatedOption.set(-1, {name: 'Review All', newDue: newAllDecks, reviewDue: reviewAllDecks, totalCards: totalAllDecks});
@@ -114,7 +116,7 @@ const DecksPage: React.FC = () => {
     }
 
     return (
-        <div className="flex items-center justify-center min-h-screen p-6">
+        <>
             {!isSignedIn ? <></> : activePage === PageOption.DeckPicker ? 
                 <DeckPicker 
                     deckIdOptions={deckIdOptions}
@@ -129,7 +131,7 @@ const DecksPage: React.FC = () => {
                     setDeckIdOptions={setDeckIdOptions}
                 />
             }
-        </div>
+        </>
     );
 }
 
