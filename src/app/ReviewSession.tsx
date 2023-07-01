@@ -440,8 +440,12 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 							{`Review: ${scheduler.getReviewQueueSize()}`}
 						</div>
 					</div>
+
+					<div className="text-black text-1xl p-3 flex justify-center font-bold rounded-lg">
+						{ratingHelpMessage}
+					</div>
 					
-					<div className="flex justify-center space-x-4 p-4rounded-lg">
+					<div className="flex justify-center space-x-4 p-4 rounded-lg">
 						<Button
 							id='<'
 							handleClick={arrowButtonClick}
@@ -459,7 +463,6 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 					</div>
 	
 					<div className="flex justify-center space-x-4 p-4 rounded-lg">
-						{ratingHelpMessage}
 						<Button
 							id='solution'
 							handleClick={handleShowSolution}
