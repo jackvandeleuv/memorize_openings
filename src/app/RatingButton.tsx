@@ -12,11 +12,11 @@ const RatingButton: React.FC<RatingButtonProps> = ({ id, time, handleClick, chil
   return (
     <button 
         id={id}
-        className="mx-1 mb-4 md:w-24 lg:w-28 bg-indigo-400 hover:bg-indigo-300 text-white font-bold py-2 rounded-lg"
+        className="mx-1 my-4 md:my-0 md:mb-4 md:w-24 lg:w-28 py-2 px-2 bg-indigo-400 hover:bg-indigo-300 text-white font-bold rounded-lg"
         onClick={handleClick}
     >
-      <div className="text-lg">{children}</div>
-      <div className="text-sm">{time}</div>
+      <div className="text-md sm:text-lg">{children}</div>
+      <div className="text-xs sm:text-sm">{time}</div>
     </button>
   );
 };

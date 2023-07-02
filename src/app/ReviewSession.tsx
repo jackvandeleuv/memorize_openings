@@ -296,13 +296,13 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 
 		// Update the db with updated card info.
 		let result: boolean;
-		if (e.currentTarget.id === 'Easy!!') {
+		if (e.currentTarget.id === 'Easy') {
 			result = await updatedScheduler.answerCard('Easy');
-		} else if (e.currentTarget.id === 'Good!?') {
+		} else if (e.currentTarget.id === 'Good') {
 			result = await updatedScheduler.answerCard('Good')
-		} else if (e.currentTarget.id === 'Hard?!') {
+		} else if (e.currentTarget.id === 'Hard') {
 			result = await updatedScheduler.answerCard('Hard')
-		} else if (e.currentTarget.id === 'Again??') {
+		} else if (e.currentTarget.id === 'Again') {
 			result = await updatedScheduler.answerCard('Again')
 		} else {
 			throw new Error('Unknown rating button id');
@@ -375,15 +375,15 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 	
 
 	return (
-		<div className="w-full bg-indigo-400 md:p-8">
-			<div className="flex flex-col md:flex-row justify-center gap-4">
-				<div className="p-4 flex flex-col bg-indigo-500 md:rounded-lg">	
+		<div className="w-full bg-indigo-400">
+			<div className="w-full flex flex-col md:flex-row md:pb-10 justify-center gap-4">
+				<div className="w-full h-full md:ml-64 md:px-8 flex flex-col bg-indigo-500 md:rounded-lg">	
 					
-					<div className="md:pt-6 md:px-6 text-center text-md md:text-2xl font-bold text-white">
+					<div className="py-4 md:pt-6 px-1 md:px-6 text-center text-xl md:text-2xl font-bold text-white">
 						{position.name}
 					</div>		
 					
-					<div className="flex flex-grow w-full justify-center items-center md:p-4">
+					<div className="flex justify-center items-center sm:px-16 md:px-4 md:pb-4">
 						{position.line && position.line.length > 0 &&				
 							<ChessBoard
 								solutionToggled={solutionToggled}
@@ -395,96 +395,101 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 			
 					<div className="flex flex-row justify-center items-center">
 						<RatingButton
-							id="Again??"
+							id="Again"
 							time={ifGradeTimes.Again}
 							handleClick={ratingButtonClick}
 						>
-							{'Again??'}
+							{'Again'}
 						</RatingButton>
 	
 						<RatingButton
-							id="Hard?!"
+							id="Hard"
 							time={ifGradeTimes.Hard}
 							handleClick={ratingButtonClick}
 						>
-							{'Hard?!'}
+							{'Hard'}
 						</RatingButton>
 	
 						<RatingButton
-							id="Good!?"
+							id="Good"
 							time={ifGradeTimes.Good}
 							handleClick={ratingButtonClick}
 						>
-							{'Good!?'}
+							{'Good'}
 						</RatingButton>
 	
 						<RatingButton
-							id="Easy!!"
+							id="Easy"
 							time={ifGradeTimes.Easy}
 							handleClick={ratingButtonClick}
 						>
-							{'Easy!!'}
+							{'Easy'}
 						</RatingButton>
 					</div>
 				</div>
 
 	
-				<div className="flex flex-col pt-10 pb-4 px-4 items-center space-y-4 bg-indigo-500 rounded-lg">
-					
-					<div className="text-center text-2xl font-bold text-white">
-						{position.game.turn() === 'w' && !solutionToggled ? 'White to Move' : 'Black to Move'}
-					</div>
-					
-					<div className="flex flex-col w-full">
-						<div className="p-1 text-center text-xl font-bold text-white bg-indigo-300">
-							{`New: ${scheduler.getNewQueueSize()}`}
+				<div className="flex flex-col md:mr-64 pb-4 sm:px-4 items-center space-y-4">
+					<div className="w-full pt-2 bg-indigo-500 sm:rounded-lg">
+						<div className="flex justify-center p-1 sm:px-8 rounded-lg">
+							<Button
+								id='solution'
+								handleClick={handleShowSolution}
+								color={'bg-indigo-400'}
+							>
+								{solutionToggled ? 'Hide Solution' : 'Show Solution'}
+							</Button>
 						</div>
-						<div className="p-1 text-center text-xl font-bold text-white bg-indigo-400">
-							{`Review: ${scheduler.getReviewQueueSize()}`}
+
+						<div className="flex justify-center py-2 space-x-4 rounded-lg">
+							<Button
+								id='<'
+								handleClick={arrowButtonClick}
+								color={'bg-indigo-400'}
+							>
+								{'<'}
+							</Button>
+							<Button
+								id='>'
+								handleClick={arrowButtonClick}
+								color={'bg-indigo-400'}
+							>
+								{'>'}
+							</Button>
+						</div>
+		
+						<div className="flex justify-center pb-4 rounded-lg">
+							<Button 
+								id='back'
+								handleClick={backButtonClick}
+								color={'bg-indigo-400'}
+							>
+								{'Back'}
+							</Button>
 						</div>
 					</div>
 
-					<div className="text-white text-1xl pb-3 flex justify-center font-bold rounded-lg">
-						{ratingHelpMessage}
+					<div className="w-full py-4 px-16 md:px-8 bg-indigo-500 sm:rounded-lg">
+						<div className="text-center text-xl font-bold text-white">
+							{position.game.turn() === 'w' && !solutionToggled ? 'White to Move' : 'Black to Move'}
+						</div>
+						
+						<div className="flex flex-col py-4 w-full">
+							<div className="p-1 text-center text-lg font-bold text-white bg-indigo-300">
+								{`New: ${scheduler.getNewQueueSize()}`}
+							</div>
+							<div className="p-1 text-center text-lg font-bold text-white bg-indigo-400">
+								{`Review: ${scheduler.getReviewQueueSize()}`}
+							</div>
+						</div>
+
+						<div className="text-white text-1xl pb-3 flex justify-center font-bold rounded-lg">
+							{ratingHelpMessage}
+						</div>
 					</div>
 					
-					<div className="flex justify-center p-1 rounded-lg">
-						<Button
-							id='solution'
-							handleClick={handleShowSolution}
-							color={'bg-indigo-400'}
-						>
-							{solutionToggled ? 'Hide Solution' : 'Show Solution'}
-						</Button>
-					</div>
-
-					<div className="flex justify-center space-x-4 rounded-lg">
-						<Button
-							id='<'
-							handleClick={arrowButtonClick}
-							color={'bg-indigo-400'}
-						>
-							{'<'}
-						</Button>
-						<Button
-							id='>'
-							handleClick={arrowButtonClick}
-							color={'bg-indigo-400'}
-						>
-							{'>'}
-						</Button>
-					</div>
-	
-					<div className="flex justify-center pb-4 rounded-lg">
-						<Button 
-							id='back'
-							handleClick={backButtonClick}
-							color={'bg-indigo-400'}
-						>
-							{'Back'}
-						</Button>
-					</div>
 				</div>
+
 			</div>
 		</div>
 	);
