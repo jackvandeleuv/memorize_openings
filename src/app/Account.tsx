@@ -25,13 +25,15 @@ const Account: React.FC = () => {
     }, []);
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-indigo-400 py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-xl">
-                <h2 className="text-3xl font-bold text-center">Account: {userDetails?.email}</h2>
-                <p className="text-lg text-gray-700 mt-4 text-center">
-                    Here you can manage your account settings and data.
+        <div className="flex items-center justify-center py-16 bg-indigo-400">
+            <div className="max-w-md w-full bg-white rounded-lg">
+                
+                <h2 className="p-6 flex items-center justify-center text-xl font-bold text-center">Account email: {userDetails?.email}</h2>
+                <p className="px-2 text-lg text-gray-700 text-center">
+                    Delete or reset your account. These actions cannot be un-done!
                 </p>
-                <div className="flex flex-col items-center mt-6">
+
+                <div className="flex flex-col items-center py-8">
                     <button 
                         className="bg-rose-500 hover:bg-rose-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" 
                         type="button"
@@ -47,6 +49,8 @@ const Account: React.FC = () => {
                         Reset Database
                     </button>
                 </div>
+
+
             </div>
         </div>
     );

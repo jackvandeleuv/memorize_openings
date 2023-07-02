@@ -19,15 +19,15 @@ const DeckPicker: React.FC<DeckPickerProps> = ({deckIdOptions, deckChoice, setDe
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-indigo-400 p-6">
-            <div className="bg-white rounded shadow-md max-w-md w-full p-6">
+        <div className="flex items-center justify-center py-16 bg-indigo-400">
+            <div className="bg-white rounded-lg shadow-md max-w-md w-full p-6">
                 <h2 className="mb-4 text-xl font-bold text-center text-gray-700">
                 Pick an opening
                 </h2>
                 <div className="relative">
 
                 <select 
-                    className="block w-full p-2 border border-gray-300 rounded shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="block w-full p-2 border border-gray-300 rounded shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-700"
                     value={deckChoice.toString()} 
                     onChange={handleSelection}
                 >
@@ -43,7 +43,7 @@ const DeckPicker: React.FC<DeckPickerProps> = ({deckIdOptions, deckChoice, setDe
                 </div>
                 </div>
                 <button 
-                    className="w-full p-2 mt-4 text-white bg-indigo-400 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 hover:bg-indigo-600"
+                    className="w-full p-2 mt-4 text-white bg-indigo-500 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 hover:bg-indigo-600"
                     onClick={handleGoButton}
                 >
                     Go

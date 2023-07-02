@@ -375,20 +375,25 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 	
 
 	return (
-		<div className="w-full bg-indigo-400 p-4 md:p-8">
-			<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-				<div className="flex flex-col items-center space-y-4">			
-					{position.line && position.line.length > 0 &&				
-						<div className="w-full flex justify-center p-4 rounded-lg">
+		<div className="w-full bg-indigo-400 md:p-8">
+			<div className="flex flex-col md:flex-row justify-center gap-4">
+				<div className="p-4 flex flex-col bg-indigo-500 md:rounded-lg">	
+					
+					<div className="md:pt-6 md:px-6 text-center text-md md:text-2xl font-bold text-white">
+						{position.name}
+					</div>		
+					
+					<div className="flex flex-grow w-full justify-center items-center md:p-4">
+						{position.line && position.line.length > 0 &&				
 							<ChessBoard
 								solutionToggled={solutionToggled}
 								position={position}
 								setPosition={setPosition}
 							/>
-						</div>
-					}
+						}
+					</div>
 			
-					<div className="w-full flex flex-row items-center justify-between">
+					<div className="flex flex-row justify-center items-center">
 						<RatingButton
 							id="Again??"
 							time={ifGradeTimes.Again}
@@ -422,61 +427,59 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 						</RatingButton>
 					</div>
 				</div>
+
 	
-				<div className="flex flex-col items-center space-y-4 p-4 bg-indigo-500 rounded-lg">
-					<div className="text-center text-2xl font-bold text-black bg-orange-200">
-						{position.name}
-					</div>
-			
-					<div className="text-center text-xl font-bold text-white">
+				<div className="flex flex-col pt-10 pb-4 px-4 items-center space-y-4 bg-indigo-500 rounded-lg">
+					
+					<div className="text-center text-2xl font-bold text-white">
 						{position.game.turn() === 'w' && !solutionToggled ? 'White to Move' : 'Black to Move'}
 					</div>
-	
+					
 					<div className="flex flex-col w-full">
-						<div className="p-1 text-center text-xl font-bold text-white">
+						<div className="p-1 text-center text-xl font-bold text-white bg-indigo-300">
 							{`New: ${scheduler.getNewQueueSize()}`}
 						</div>
-						<div className="p-1 text-center text-xl font-bold text-white">
+						<div className="p-1 text-center text-xl font-bold text-white bg-indigo-400">
 							{`Review: ${scheduler.getReviewQueueSize()}`}
 						</div>
 					</div>
 
-					<div className="text-black text-1xl p-3 flex justify-center font-bold rounded-lg">
+					<div className="text-white text-1xl pb-3 flex justify-center font-bold rounded-lg">
 						{ratingHelpMessage}
 					</div>
 					
-					<div className="flex justify-center space-x-4 p-4 rounded-lg">
+					<div className="flex justify-center p-1 rounded-lg">
+						<Button
+							id='solution'
+							handleClick={handleShowSolution}
+							color={'bg-indigo-400'}
+						>
+							{solutionToggled ? 'Hide Solution' : 'Show Solution'}
+						</Button>
+					</div>
+
+					<div className="flex justify-center space-x-4 rounded-lg">
 						<Button
 							id='<'
 							handleClick={arrowButtonClick}
-							color={'bg-indigo-300'}
+							color={'bg-indigo-400'}
 						>
 							{'<'}
 						</Button>
 						<Button
 							id='>'
 							handleClick={arrowButtonClick}
-							color={'bg-indigo-300'}
+							color={'bg-indigo-400'}
 						>
 							{'>'}
 						</Button>
 					</div>
 	
-					<div className="flex justify-center space-x-4 p-4 rounded-lg">
-						<Button
-							id='solution'
-							handleClick={handleShowSolution}
-							color={'bg-indigo-300'}
-						>
-							{solutionToggled ? 'Hide Solution' : 'Show Solution'}
-						</Button>
-					</div>
-	
-					<div className="flex justify-center space-x-4 p-4 rounded-lg">
+					<div className="flex justify-center pb-4 rounded-lg">
 						<Button 
 							id='back'
 							handleClick={backButtonClick}
-							color={'bg-indigo-300'}
+							color={'bg-indigo-400'}
 						>
 							{'Back'}
 						</Button>
