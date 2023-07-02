@@ -20,6 +20,7 @@ interface CardsRow {
     review_at: Date;
 	lines: LinesRow | LinesRow[] | null;
 	id: number;
+	decks_id: number;
 }
 
 export interface ChessMove {
@@ -32,6 +33,11 @@ interface LinesRow {
 	name: string;
 	eco: string;
 	id: number;
+}
+
+interface ResetResponseRow {
+	id: number;
+	last_reset: Date;
 }
 
 export interface Position {
@@ -76,7 +82,7 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 	};
 
 	const [position, setPosition] = useState<Position>(defaultPosition);
-	const [scheduler, setScheduler] = useState<Scheduler>(new Scheduler());
+	const [scheduler, setScheduler] = useState<Scheduler>(new Scheduler(20));
 	const [ifGradeTimes, setIfGradeTimes] = useState<IfGradeTimes>({Easy: 'N/A',  Good: 'N/A', Hard: 'N/A', Again: 'N/A'});
 	const [ratingHelpMessage, setRatingHelpMessage] = useState<string>('');
 	const [storedPosition, setStoredPosition] = useState<Position>();
@@ -84,8 +90,29 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 
 	useEffect(() => {
 		const fetchCards = async () => {
-			// Request all cards and lines data from the API
-			const cardsResponse = await supabaseClient.from('cards')
+			const { data: updateData, error: updateError } = await supabaseClient
+				.rpc('update_new_card_limit');
+			if (updateError) {
+				console.error(updateError);
+				return;
+			};
+
+			const { data: limitData, error: limitError } = await supabaseClient
+				.from('new_card_limits')
+				.select('remaining_cards')
+				.in('decks_id', ids);
+			if (limitError) {
+				console.error(limitError);
+				return;
+			};
+			let totalNew = 0
+			for (let row of limitData) {
+				totalNew = totalNew + row.remaining_cards;
+			}
+
+			// Request all new cards data from the API
+			const { data: newCardData, error: newCardError} = await supabaseClient
+				.from('cards')
 				.select(`
 					id,
 					ease, 
@@ -93,27 +120,47 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 					is_new, 
 					step, 
 					review_at,
-					lines(id, name, eco)
+					lines(id, name, eco),
+					decks_id
 				`)
 				.in('decks_id', ids)
-				.or(`review_at.gt.${new Date().toISOString()}, is_new.eq.1`);
-			console.log('API Data:')
-			console.log(cardsResponse);
-			// Unpack the data returned by the API
-			const data: CardsRow[] | null = cardsResponse.data;
-			const error: PostgrestError | null = cardsResponse.error;
-			if (error) { 
-				console.error('error', error);
+				.eq('is_new', 1)
+				.limit(totalNew);
+			if (newCardError) { 
+				console.error('error', newCardError);
+				throw new Error('Supabase returned error!');
+			};
+
+			// Request all review cards data from the API
+			const { data: revCardData, error: revCardError} = await supabaseClient
+				.from('cards')
+				.select(`
+					id,
+					ease, 
+					interval, 
+					is_new, 
+					step, 
+					review_at,
+					lines(id, name, eco),
+					decks_id
+				`)
+				.in('decks_id', ids)
+				.gte('review_at', new Date().toISOString());
+			if (revCardError) { 
+				console.error('error', newCardError);
 				throw new Error('Supabase returned error!');
 			};
 
 			// Format the data so it can be inserted into Cards and the Scheduler
 			const cards = new Map<number, Card>();
-			for (let cardsRow of data!) {
+
+			while (newCardData.length > 0 || revCardData.length > 0) {
+				let cardsRow: CardsRow;
+				if (newCardData.length > 0) cardsRow = newCardData.pop()!;
+				else cardsRow = revCardData.pop()!;
+
 				// If there are no associated moves, ignore this card.
-				if (!cardsRow.lines) {
-					continue;
-				}
+				if (!cardsRow.lines) continue;
 
 				const card = new Card(
 					cardsRow.ease, 
@@ -121,11 +168,15 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 					cardsRow.is_new === 1, 
 					cardsRow.step, 
 					new Date(cardsRow.review_at),
-					cardsRow.id);
+					cardsRow.id,
+					cardsRow.decks_id
+				);
 				
 				const lines = cardsRow.lines
 				// Cards and lines is one-to-many, so this case won't occur.
-				if (lines instanceof Array) throw new Error('Multiple lines returned for one card.')
+				if (lines instanceof Array) {
+					throw new Error('Multiple lines returned for one card.');
+				};
 				card.setEco(lines.eco);
 				card.setName(lines.name)
 				card.setLinesId(lines.id)
@@ -149,7 +200,7 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 			}
 
 			// Add cards to scheduler
-			const scheduler = new Scheduler();
+			const scheduler = new Scheduler(totalNew);
 			for (let key of Array.from(cards.keys())) {
 				scheduler.addCard(cards.get(key)!);
 			}
@@ -160,7 +211,7 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 		}
 		
 		fetchCards();
-	}, []);
+	}, [ids]);
 
 
 	async function getMovesData(lineIds: number[]): Promise<ChessMove[] | null> {
@@ -168,8 +219,7 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 		  .from('moves')
 		  .select('lines_id, fen, order_in_line')
 		  .in('lines_id', lineIds);
-		console.log('moves api response:\n');
-		console.log(movesResponse)
+		  
 		const movesData: ChessMove[] | null = movesResponse.data;
 		const movesError: PostgrestError | null = movesResponse.error;
 		if (movesError) { 

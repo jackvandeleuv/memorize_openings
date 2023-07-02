@@ -65,16 +65,16 @@ const MenuBar: React.FC = () => {
           </div>
 
           <nav className="hidden md:flex items-center justify-end md:flex-1 lg:w-0 space-x-5">
-            <Link to='/about' onClick={() => setIsOpen(!isOpen)} className="bg-orange-200 text-black hover:underline">About</Link>
+            <Link to='/about' onClick={() => setIsOpen(!isOpen)} className="bg-orange-200 text-black hover:bg-orange-100">About</Link>
             {isSignedIn ? 
                 <>
-                <Link to='/learn' onClick={() => setIsOpen(!isOpen)} className="bg-orange-200 text-black hover:underline">Learn</Link>
-                <Link to='/account' onClick={() => setIsOpen(!isOpen)} className="bg-orange-200 text-black hover:underline">Account</Link>
-                <Link to='/' onClick={() => {signUserOut();}} className="bg-orange-200 text-black hover:underline">Sign Out</Link> 
+                <Link to='/learn' onClick={() => setIsOpen(!isOpen)} className="bg-orange-200 text-black hover:bg-orange-100">Learn</Link>
+                <Link to='/account' onClick={() => setIsOpen(!isOpen)} className="bg-orange-200 text-black hover:bg-orange-100">Account</Link>
+                <Link to='/' onClick={() => {signUserOut();}} className="bg-orange-200 text-black hover:bg-orange-100">Sign Out</Link> 
                 </> :
                 <>
-                <Link to='/signin' onClick={() => setIsOpen(!isOpen)} className="bg-orange-200 text-black hover:underline">Sign In</Link>
-                <Link to='/signup' onClick={() => setIsOpen(!isOpen)} className="bg-orange-200 text-black hover:underline">Sign Up</Link>
+                <Link to='/signin' onClick={() => setIsOpen(!isOpen)} className="bg-orange-200 text-black hover:bg-orange-100">Sign In</Link>
+                <Link to='/signup' onClick={() => setIsOpen(!isOpen)} className="bg-orange-200 text-black hover:bg-orange-100">Sign Up</Link>
                 </>
             }
           </nav>
@@ -103,16 +103,16 @@ const MenuBar: React.FC = () => {
               </div>
               <div className="mt-6">
                 <nav className="grid gap-y-4">
-                  <Link to='/about' onClick={() => setIsOpen(!isOpen)} className="text-gray-900 hover:underline">About</Link>
+                  <Link to='/about' onClick={() => setIsOpen(!isOpen)} className="text-gray-900 hover:bg-orange-100">About</Link>
                   {isSignedIn ? 
                     <>
-                      <Link to='/learn' onClick={() => setIsOpen(!isOpen)} className="text-gray-900 hover:underline">Learn</Link>
-                      <Link to='/account' onClick={() => setIsOpen(!isOpen)} className="text-gray-900 hover:underline">Account</Link>
-                      <Link to='/' onClick={() => {signUserOut();}} className="text-gray-900 hover:underline">Sign Out</Link> 
+                      <Link to='/learn' onClick={() => setIsOpen(!isOpen)} className="text-gray-900 hover:bg-orange-100">Learn</Link>
+                      <Link to='/account' onClick={() => setIsOpen(!isOpen)} className="text-gray-900 hover:bg-orange-100">Account</Link>
+                      <Link to='/' onClick={() => {signUserOut();}} className="text-gray-900 hover:bg-orange-100">Sign Out</Link> 
                     </> :
                     <>
-                      <Link to='/signin' onClick={() => setIsOpen(!isOpen)} className="text-gray-900 hover:underline">Sign In</Link>
-                      <Link to='/signup' onClick={() => setIsOpen(!isOpen)} className="text-gray-900 hover:underline">Sign Up</Link>
+                      <Link to='/signin' onClick={() => setIsOpen(!isOpen)} className="text-gray-900 hover:bg-orange-100">Sign In</Link>
+                      <Link to='/signup' onClick={() => setIsOpen(!isOpen)} className="text-gray-900 hover:undbg-orange-100">Sign Up</Link>
                     </>
                   }
                 </nav>

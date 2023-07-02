@@ -15,8 +15,8 @@ export class Scheduler {
     private reviewCount: number = 0;
 
 
-    constructor() {
-        this.newCardLimit = 20;
+    constructor(newCardLimit: number) {
+        this.newCardLimit = newCardLimit;
         this.cards = [];
         this.queue = [];
         this.newCardRatio = 5;
@@ -25,8 +25,7 @@ export class Scheduler {
 
 
     deepCopy(): Scheduler {
-        const schedulerCopy = new Scheduler();
-        schedulerCopy.newCardLimit = this.newCardLimit;
+        const schedulerCopy = new Scheduler(this.newCardLimit);
         schedulerCopy.cards = this.cards;
         schedulerCopy.queue = this.queue;
         schedulerCopy.newCardRatio = this.newCardRatio;
@@ -103,11 +102,23 @@ export class Scheduler {
                 revCards.push(card);
             };
         }
-        console.log('new cards pre sort: ')
-        console.log(newCards)
-        newCards.sort((a, b) => b.reviewAt.getTime() - a.reviewAt.getTime());
-        revCards.sort((a, b) => b.reviewAt.getTime() - a.reviewAt.getTime());
+
+        newCards.sort((a, b) => {
+            if (a.reviewAt.getTime() === b.reviewAt.getTime()) {
+                return b.getMaxOrderInLine() - a.getMaxOrderInLine();
+            }
+            return b.reviewAt.getTime() - a.reviewAt.getTime();
+        });
+        
+        revCards.sort((a, b) => {
+            if (a.reviewAt.getTime() === b.reviewAt.getTime()) {
+                return b.getMaxOrderInLine() - a.getMaxOrderInLine();
+            }
+            return b.reviewAt.getTime() - a.reviewAt.getTime();
+        });
+
         let limit = this.newCardLimit;
+        console.log('new cards left: ' + limit);
         let i = 0;
         console.log('(limit && newCards.length)' + (limit && newCards.length))
         while (revCards.length || (limit && newCards.length)) {
@@ -131,7 +142,8 @@ export class Scheduler {
 
 
     private async updateDbCard(card: Card): Promise<boolean> {
-        const { data, error } = await supabaseClient.from('cards')
+        const { data: cardData, error: cardError } = await supabaseClient
+            .from('cards')
             .update({
                 'step': card.step,
                 'is_new': card.isNew ? 1 : 0,
@@ -140,10 +152,20 @@ export class Scheduler {
                 'ease': card.ease
             })
             .match({'id': card.id});
-        if (error) {
-            console.error(error); 
+        if (cardError) {
+            console.error(cardError); 
             return false;
         };
+
+        const { data: limitData, error: limitError } = await supabaseClient
+            .from('new_card_limits')
+            .update({'remaining_cards': this.newCardLimit})
+            .in('decks_id', [card.decks_id])
+        if (limitError) {
+            console.error(limitError); 
+            return false;
+        };
+
         return true;
     }
 
@@ -160,6 +182,7 @@ export class Scheduler {
             this.newCount--; 
         };
 
+        this.newCardLimit = this.newCardLimit - 1;
         const updateSuccess = await this.updateDbCard(this.queue[0]);
         if (!updateSuccess) throw new Error('Db update failed.');
         this.updateQueue();

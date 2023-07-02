@@ -42,18 +42,12 @@ const DecksPage: React.FC = () => {
     useEffect(() => {
         const getAvailableDecks = async () =>{
             const { data, error } = await supabaseClient.rpc('get_due_cards_counts');
-            if (error) {console.log(error); return;};
+            if (error) { console.log(error); return; };
             const { data: data2, error: error2 } = await supabaseClient.rpc('get_total_card_counts');
-            if (error2) {console.log(error2); return;};
-
-            console.log('Second query data:')
-            console.log(data2)
+            if (error2) { console.log(error2); return; };
 
             const newAndReviewData: DecksRow[] = data;
             const totalsData: TotalsRow[] = data2;
-
-            console.log('Totals data')
-            console.log(totalsData)
 
             const updatedOption = new Map<number, DeckInfo>();
             let newAllDecks = 0;
@@ -70,10 +64,6 @@ const DecksPage: React.FC = () => {
                 reviewAllDecks = reviewAllDecks + (row.total - row.new_cards);
             };
             for (let row of totalsData) {
-                console.log(totalsData)
-                console.log('Unpacking second query:')
-                console.log(row)
-                console.log(updatedOption.get(row.id))
                 const deck = updatedOption.get(row.id)
                 if (!deck) updatedOption.set(row.id, {name: row.name, newDue: 0, reviewDue: 0, totalCards: row.total});
                 else deck.totalCards = row.total;
@@ -92,7 +82,7 @@ const DecksPage: React.FC = () => {
             const { data, error } = await supabaseClient.auth.getSession();
             if (error) {
                 setIsSignedIn(false);
-                return
+                return;
             }
             setIsSignedIn(data.session != null);
         });

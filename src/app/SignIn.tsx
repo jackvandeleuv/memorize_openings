@@ -36,6 +36,15 @@ const SignIn: React.FC = () => {
       setUserMessage(error2.message);
       return;
     };
+
+    // Update the card limits in the user database if necessary.
+    const { data: data3, error: error3 } = await supabaseClient.rpc('insert_default_user_limits');
+    if (error3) {
+      console.error('Error updating database: ', error3.message);
+      setUserMessage(error3.message);
+      return;
+    };
+
     setUserMessage('Success!');
     navigate('/');
 	};
