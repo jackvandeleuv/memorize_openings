@@ -19,41 +19,38 @@ const DeckPicker: React.FC<DeckPickerProps> = ({deckIdOptions, deckChoice, setDe
     };
 
     return (
-        <div className="flex items-center justify-center py-16 bg-indigo-400">
-            <div className="bg-white rounded-lg shadow-md max-w-md w-full p-6">
-                <h2 className="mb-4 text-xl font-bold text-center text-gray-700">
-                Pick an opening
+        <div className="flex items-center justify-center py-20 bg-indigo-400">
+            <div className="bg-white rounded-lg shadow-md max-w-lg w-full p-4 sm:p-8 mx-2 sm:mx-0">
+                <h2 className="mb-8 text-2xl font-semibold text-center text-gray-700">
+                    Pick an opening
                 </h2>
-                <div className="relative">
-
-                <select 
-                    className="block w-full p-2 border border-gray-300 rounded shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-700"
-                    value={deckChoice.toString()} 
-                    onChange={handleSelection}
-                >
-                    {Array.from(deckIdOptions.entries()).map(([key, val]) => 
-                    <option key={key} value={key}>{val.name + ' (New: ' + val.newDue + ' | Review: ' + val.reviewDue + ' | Total: ' + val.totalCards + ')'}</option>
-                    )}
-                </select>
-
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                    <path d="M9.293 12.95l.707.707 4-4-4-4-.707.707L12.586 10H2v1h10.586l-3.293 1.95z" />
-                    </svg>
-                </div>
+                <div className="relative mb-8">
+    
+                    <select 
+                        className="block w-full p-3 border border-gray-300 rounded shadow-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-700 text-gray-700 font-sans text-xs sm:text-lg"
+                        value={deckChoice.toString()} 
+                        onChange={handleSelection}
+                    >
+                        {Array.from(deckIdOptions.entries()).map(([key, val]) => 
+                        <option key={key} value={key}>{val.name + ' (New: ' + val.newDue + ' | Review: ' + val.reviewDue + ' | Total: ' + val.totalCards + ')'}</option>
+                        )}
+                    </select>
+    
                 </div>
                 <button 
-                    className="w-full p-2 mt-4 text-white bg-indigo-500 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 hover:bg-indigo-600"
+                    className="w-full p-3 mt-4 text-lg text-white bg-indigo-500 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 hover:bg-indigo-600"
                     onClick={handleGoButton}
                 >
                     Go
                 </button>
-                <p className="mt-6 text-sm text-center text-gray-600">
+                <p className="mt-8 text-sm text-center text-gray-600">
                     Review all shows the cards from all active openings.
                 </p>
             </div>
         </div>
     );
+    
+    
 }
 
 export default DeckPicker;

@@ -21,7 +21,7 @@ export class Card {
         step: number, 
         reviewAt: Date, 
         newId: number,
-        decks_id: number
+        decks_id: number,
     ) {
         this.ease = ease;
         this.interval = interval;
@@ -39,6 +39,7 @@ export class Card {
 
 
     getMaxOrderInLine(): number {
+        if (this.moves.length === 0) return 0;
         return this.moves[this.moves.length - 1].order_in_line;
     }
 

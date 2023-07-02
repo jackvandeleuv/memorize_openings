@@ -11,6 +11,7 @@ import { Chess } from 'chess.js';
 import { addMinutes } from 'date-fns';
 import { DeckInfo, PageOption } from './learn';
 import RatingButton from './RatingButton';
+import { NextFetchEvent } from 'next/server';
 
 interface CardsRow {
     ease: number;       
@@ -183,22 +184,6 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 				cards.set(lines.id, card)
 			}
 
-			const movesData: ChessMove[] = [];
-			const lineIds: number[] = Array.from(cards.keys());
-			for (let i = 0; i < lineIds.length; i = i + 50) {
-				const movesResult = await getMovesData(lineIds.slice(i, Math.min(i + 50, lineIds.length)));
-				if (movesResult) movesData.push(...movesResult);
-			};
-
-			for (let move of movesData) {
-				if (!move) {
-					console.error('Moves row from db was null!');
-					continue;
-				};
-				const card = cards.get(move.lines_id);
-				if (card) card.addMove(move);
-			}
-
 			// Add cards to scheduler
 			const scheduler = new Scheduler(totalNew);
 			for (let key of Array.from(cards.keys())) {
@@ -211,24 +196,7 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 		}
 		
 		fetchCards();
-	}, [ids]);
-
-
-	async function getMovesData(lineIds: number[]): Promise<ChessMove[] | null> {
-		const movesResponse = await supabaseClient
-		  .from('moves')
-		  .select('lines_id, fen, order_in_line')
-		  .in('lines_id', lineIds);
-		  
-		const movesData: ChessMove[] | null = movesResponse.data;
-		const movesError: PostgrestError | null = movesResponse.error;
-		if (movesError) { 
-		  console.error('error', movesError);
-		  return null;
-		};
-		return movesData!;
-	  };
-	  
+	}, [ids]);  
 
 
 	function getNewCards(): number {
@@ -252,40 +220,49 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 
 
 	const renderCards = useCallback(() => {
-		if (!scheduler) return;
-		if (!scheduler.hasNextCard()) {
-			setPosition(defaultPosition);
-			setIfGradeTimes({Easy: 'N/A',  Good: 'N/A', Hard: 'N/A', Again: 'N/A'});
-			return;
+		const fetchCard = async () => {
+			if (!scheduler) return;
+			if (!scheduler.hasNextCard()) {
+				setPosition(defaultPosition);
+				setIfGradeTimes({Easy: 'N/A',  Good: 'N/A', Hard: 'N/A', Again: 'N/A'});
+				return;
+			};
+			const nextCard = await scheduler.getNextCard();
+			if (!nextCard || !nextCard.hasMoves()) {
+				console.error('Did not fetch next card successfully.');
+				setPosition(defaultPosition);
+				setIfGradeTimes({Easy: 'N/A',  Good: 'N/A', Hard: 'N/A', Again: 'N/A'});
+				return;
+			}
+	
+			setIfGradeTimes({
+				Easy: scheduler.resultIfGrade('Easy'),
+				Good: scheduler.resultIfGrade('Good'),
+				Hard: scheduler.resultIfGrade('Hard'),
+				Again: scheduler.resultIfGrade('Again')
+			})
+	
+			const nextMoves = nextCard.getMoves();
+			const nextMoveFens = nextMoves.map(move => move.fen);
+			const nextAnswer = nextMoveFens[nextMoveFens.length - 1];
+			const nextMoveFensBlind = nextMoveFens.slice(0, nextMoveFens.length - 1)
+	
+			const newGame = new Chess();
+			newGame.load(nextMoveFensBlind[nextMoveFensBlind.length - 1])
+	
+			setPosition({
+				line: nextMoveFensBlind, 
+				move: nextMoveFensBlind.length - 1,
+				answer: nextAnswer,
+				game: newGame,
+				eco: nextCard.eco,
+				name: nextCard.name,
+				guess: {row: '', col: '', color: ''}
+			});
+			setStoredPosition(undefined);
 		};
-		const nextCard = scheduler.getNextCard()!;
-		if (!nextCard.hasMoves()) return;
 
-		setIfGradeTimes({
-			Easy: scheduler.resultIfGrade('Easy'),
-			Good: scheduler.resultIfGrade('Good'),
-			Hard: scheduler.resultIfGrade('Hard'),
-			Again: scheduler.resultIfGrade('Again')
-		})
-
-		const nextMoves = nextCard.getMoves();
-		const nextMoveFens = nextMoves.map(move => move.fen);
-		const nextAnswer = nextMoveFens[nextMoveFens.length - 1];
-		const nextMoveFensBlind = nextMoveFens.slice(0, nextMoveFens.length - 1)
-
-		const newGame = new Chess();
-		newGame.load(nextMoveFensBlind[nextMoveFensBlind.length - 1])
-
-		setPosition({
-			line: nextMoveFensBlind, 
-			move: nextMoveFensBlind.length - 1,
-			answer: nextAnswer,
-			game: newGame,
-			eco: nextCard.eco,
-			name: nextCard.name,
-			guess: {row: '', col: '', color: ''}
-		});
-		setStoredPosition(undefined);
+		fetchCard();
 	}, [scheduler]);
 	  
 

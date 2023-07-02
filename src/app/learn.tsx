@@ -17,6 +17,7 @@ interface DecksRow {
     name: string;
     total: number;
     new_cards: number;
+    all_new_cards: number;
 }
 
 interface TotalsRow {
@@ -45,10 +46,10 @@ const DecksPage: React.FC = () => {
             if (error) { console.log(error); return; };
             const { data: data2, error: error2 } = await supabaseClient.rpc('get_total_card_counts');
             if (error2) { console.log(error2); return; };
-
+            
             const newAndReviewData: DecksRow[] = data;
             const totalsData: TotalsRow[] = data2;
-
+            console.log(newAndReviewData)
             const updatedOption = new Map<number, DeckInfo>();
             let newAllDecks = 0;
             let reviewAllDecks = 0;
@@ -57,11 +58,11 @@ const DecksPage: React.FC = () => {
                 updatedOption.set(row.deck_id, {
                     name: row.name, 
                     newDue: row.new_cards, 
-                    reviewDue: row.total - row.new_cards,
+                    reviewDue: row.total - row.all_new_cards,
                     totalCards: 0
                 });
                 newAllDecks = newAllDecks + row.new_cards;
-                reviewAllDecks = reviewAllDecks + (row.total - row.new_cards);
+                reviewAllDecks = reviewAllDecks + (row.total - row.all_new_cards);
             };
             for (let row of totalsData) {
                 const deck = updatedOption.get(row.id)
@@ -70,6 +71,7 @@ const DecksPage: React.FC = () => {
                 totalAllDecks = totalAllDecks + row.total;
             }
             updatedOption.set(-1, {name: 'Review All', newDue: newAllDecks, reviewDue: reviewAllDecks, totalCards: totalAllDecks});
+            console.log(updatedOption)
             setDeckIdOptions(updatedOption);
         }
 

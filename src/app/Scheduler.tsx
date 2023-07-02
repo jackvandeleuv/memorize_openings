@@ -3,6 +3,8 @@ import { Card } from './Card';
 import { scheduler } from 'timers/promises';
 import { update } from 'plotly.js';
 import { supabaseClient } from '../../utils/supabaseClient';
+import { ChessMove } from './ReviewSession';
+import { PostgrestError } from '@supabase/supabase-js';
 
 
 export class Scheduler {
@@ -13,6 +15,7 @@ export class Scheduler {
     private steps: number[];
     private newCount: number = 0;
     private reviewCount: number = 0;
+    private cardCache: Map<number, Card>;
 
 
     constructor(newCardLimit: number) {
@@ -20,16 +23,19 @@ export class Scheduler {
         this.cards = [];
         this.queue = [];
         this.newCardRatio = 5;
-        this.steps = [1, 6, 10, 24 * 60]
+        this.steps = [1, 6, 10, 24 * 60];
+        this.cardCache = new Map<number, Card>();
     }
 
 
     deepCopy(): Scheduler {
         const schedulerCopy = new Scheduler(this.newCardLimit);
-        schedulerCopy.cards = this.cards;
+        schedulerCopy.cards = [...this.cards];
         schedulerCopy.queue = this.queue;
         schedulerCopy.newCardRatio = this.newCardRatio;
         schedulerCopy.newCount = this.newCount;
+        const newMap = new Map(this.cardCache);
+        schedulerCopy.cardCache = newMap;
         return schedulerCopy;
     }
 
@@ -60,10 +66,58 @@ export class Scheduler {
     }
 
 
-    getNextCard(): Card | null {
-        if (this.queue.length > 0) return this.queue[0].deepCopy();
-        return null;
+    async getNextCard(): Promise<Card | null> {
+        if (this.queue.length == 0) { return null };
+        if (this.queue.length > 1 && !this.queue[1].hasMoves()) {
+            this.updateCardCache(this.queue[1].deepCopy());
+        }
+        if (this.queue[0].hasMoves()) return this.queue[0].deepCopy();
+        if (this.cardCache.has(this.queue[0].lines_id)) {
+            return this.cardCache.get(this.queue[0].lines_id)!.deepCopy();
+        };
+
+        const card = this.queue[0].deepCopy();
+
+        const moves = await this.getMovesData(card.lines_id);
+        if (!moves) {
+            console.error('Could not fetch moves successfully.');
+            return null;
+        }
+        for (let move of moves) {
+            card.addMove(move);
+        }
+        return card.deepCopy();
     }
+
+
+    async updateCardCache(cardToCache: Card): Promise<void> {
+        if (cardToCache.hasMoves()) return;
+        const moves = await this.getMovesData(cardToCache.lines_id);
+        if (!moves) {
+            console.error('Move caching failed.');
+            return;
+        }
+        for (let move of moves) {
+            cardToCache.addMove(move);
+        }
+        this.cardCache.set(cardToCache.lines_id, cardToCache);
+    }
+    
+
+    async getMovesData(lineId: number): Promise<ChessMove[] | null> {
+		const movesResponse = await supabaseClient
+		  .from('moves')
+		  .select('lines_id, fen, order_in_line')
+		  .in('lines_id', [lineId]);
+
+		const movesData: ChessMove[] | null = movesResponse.data;
+		const movesError: PostgrestError | null = movesResponse.error;
+		if (movesError) { 
+		  console.error('error', movesError);
+		  return null;
+		};
+		return movesData!;
+	  };
 
 
     getQueue(): Card[] {
@@ -71,22 +125,8 @@ export class Scheduler {
     }
 
 
-    addCard(card: Card): boolean {
-        if (!card.hasMoves()) return false;
-
-        // Make sure cards moves go from 1-n in order
-        const moves = card.getMoves();
-        let i = 1;
-        for (let move of moves) {
-            if (move.order_in_line !== i) {
-                console.error('Tried to add card with incomplete moves to scheduler.');
-                return false;
-            };
-            i++;
-        };
-
+    addCard(card: Card): void {
         this.cards.push(card.deepCopy());
-        return true;
     }
 
 
@@ -118,12 +158,9 @@ export class Scheduler {
         });
 
         let limit = this.newCardLimit;
-        console.log('new cards left: ' + limit);
         let i = 0;
-        console.log('(limit && newCards.length)' + (limit && newCards.length))
         while (revCards.length || (limit && newCards.length)) {
             if (limit && newCards.length && i % this.newCardRatio === 0) {
-                console.log('pushing newCards.pop()')
                 this.queue.push(newCards.pop()!);
                 limit--;
                 i++;
@@ -134,10 +171,6 @@ export class Scheduler {
             i++;
         }
         this.queue.push(...newCards);
-        console.log('Queue after build: ')
-        console.log(this.queue)
-        console.log('Cards after build:')
-        console.log(this.cards)
     }
 
 
@@ -157,6 +190,7 @@ export class Scheduler {
             return false;
         };
 
+        console.log('Setting remaining cards to: ' + this.newCardLimit);
         const { data: limitData, error: limitError } = await supabaseClient
             .from('new_card_limits')
             .update({'remaining_cards': this.newCardLimit})
