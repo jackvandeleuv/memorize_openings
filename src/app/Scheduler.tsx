@@ -34,6 +34,7 @@ export class Scheduler {
         schedulerCopy.queue = this.queue;
         schedulerCopy.newCardRatio = this.newCardRatio;
         schedulerCopy.newCount = this.newCount;
+        schedulerCopy.reviewCount = this.reviewCount
         const newMap = new Map(this.cardCache);
         schedulerCopy.cardCache = newMap;
         return schedulerCopy;
@@ -135,10 +136,12 @@ export class Scheduler {
         const newCards: Card[] = [];
         const revCards: Card[] = [];
         for (const card of this.cards) {
-            if (card.isNew) {
+            if (card.never_seen) {
                 newCards.push(card);
             };
-            if (!card.isNew && isAfter(new Date(), card.getReviewAt())) {
+            if (!card.never_seen && 
+                (card.isNew || isAfter(new Date(), card.getReviewAt()))
+            ) {
                 revCards.push(card);
             };
         }
@@ -182,7 +185,8 @@ export class Scheduler {
                 'is_new': card.isNew ? 1 : 0,
                 'review_at': card.reviewAt,
                 'interval': card.interval,
-                'ease': card.ease
+                'ease': card.ease,
+                'never_seen': card.never_seen
             })
             .match({'id': card.id});
         if (cardError) {
@@ -210,13 +214,24 @@ export class Scheduler {
             return false;
         }
 
-        const gradingNewCard = this.queue[0].isNew;
+        const gradingNeverSeen = this.queue[0].never_seen;
+        const gradingNew = this.queue[0].isNew;
         this.gradeCard(grade, this.queue[0]);
-        if (gradingNewCard && !this.queue[0].isNew) {
-            this.newCount--; 
-        };
+        this.queue[0].never_seen = 0;
 
-        this.newCardLimit = this.newCardLimit - 1;
+        if (gradingNeverSeen === 1) {
+            this.newCount--; 
+            this.newCardLimit = this.newCardLimit - 1;
+            // Easy will set review time four days out, and thus out of the queue.
+            if (grade !== 'Easy') this.reviewCount++;
+        }
+
+        // If the card has been seen, but is new, it is in the review queue.
+        // Because it changed status to be rescheduled at least a day in the
+        // future, we need to decrement the review queue counter.
+        if (!gradingNeverSeen && gradingNew && !this.queue[0].isNew) this.reviewCount--;
+        
+
         const updateSuccess = await this.updateDbCard(this.queue[0]);
         if (!updateSuccess) throw new Error('Db update failed.');
         this.updateQueue();

@@ -13,6 +13,7 @@ export class Card {
     name: string = '';
     eco: string = '';
     decks_id: number;
+    never_seen: number;
 
     constructor(
         ease: number, 
@@ -22,6 +23,7 @@ export class Card {
         reviewAt: Date, 
         newId: number,
         decks_id: number,
+        never_seen: number
     ) {
         this.ease = ease;
         this.interval = interval;
@@ -30,6 +32,7 @@ export class Card {
         this.reviewAt = reviewAt;
         this.id = newId;
         this.decks_id = decks_id;
+        this.never_seen = never_seen
     }
 
 
@@ -79,7 +82,8 @@ export class Card {
             this.step,
             new Date(this.reviewAt.getTime()),
             this.id,
-            this.decks_id
+            this.decks_id,
+            this.never_seen
         );
         cardCopy.moves = [...this.moves];
         cardCopy.lines_id = this.lines_id;

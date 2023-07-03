@@ -22,6 +22,7 @@ interface CardsRow {
 	lines: LinesRow | LinesRow[] | null;
 	id: number;
 	decks_id: number;
+	never_seen: number;
 }
 
 export interface ChessMove {
@@ -122,7 +123,8 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 					step, 
 					review_at,
 					lines(id, name, eco),
-					decks_id
+					decks_id,
+					never_seen
 				`)
 				.in('decks_id', ids)
 				.eq('is_new', 1)
@@ -143,7 +145,8 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 					step, 
 					review_at,
 					lines(id, name, eco),
-					decks_id
+					decks_id,
+					never_seen
 				`)
 				.in('decks_id', ids)
 				.gte('review_at', new Date().toISOString());
@@ -170,7 +173,8 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 					cardsRow.step, 
 					new Date(cardsRow.review_at),
 					cardsRow.id,
-					cardsRow.decks_id
+					cardsRow.decks_id,
+					cardsRow.never_seen
 				);
 				
 				const lines = cardsRow.lines

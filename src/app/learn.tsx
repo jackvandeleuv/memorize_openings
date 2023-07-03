@@ -36,7 +36,7 @@ export interface DeckInfo {
 
 const DecksPage: React.FC = () => {
     const [activePage, setActivePage] = useState<PageOption>(PageOption.DeckPicker);
-    const [deckChoice, setDeckChoice] = useState<number>(-1);
+    const [deckChoice, setDeckChoice] = useState<number>(3);
     const [deckIdOptions, setDeckIdOptions] = useState<Map<number, DeckInfo>>(new Map());
     const [isSignedIn, setIsSignedIn] = useState<boolean>(false);
 
