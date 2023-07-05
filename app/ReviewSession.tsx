@@ -310,7 +310,7 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 
 	const ratingButtonClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
 		if (!scheduler) return;
-		if (position.guess.color === '') {
+		if (position.guess.color === '' && !solutionToggled) {
 			setRatingHelpMessage('Make a move to see the answer!');
 			return;
 		} else {
