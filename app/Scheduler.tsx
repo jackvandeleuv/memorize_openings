@@ -2,9 +2,9 @@ import { addMinutes, addDays, isAfter, formatDistanceToNow } from 'date-fns';
 import { Card } from './Card';
 import { scheduler } from 'timers/promises';
 import { update } from 'plotly.js';
-import { supabaseClient } from '../../utils/supabaseClient';
 import { ChessMove } from './ReviewSession';
 import { PostgrestError } from '@supabase/supabase-js';
+import { supabaseClient } from '../utils/supabaseClient';
 
 
 export class Scheduler {

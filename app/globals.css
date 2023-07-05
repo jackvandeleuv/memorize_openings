@@ -18,5 +18,10 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: #6366f1; /* This is the approximate equivalent of bg-indigo-400 in Tailwind CSS */
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
 }

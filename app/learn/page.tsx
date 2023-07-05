@@ -1,16 +1,14 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import DeckPicker from './DeckPicker';
 import { supabaseClient } from '../../utils/supabaseClient';
 import { Link } from 'react-router-dom';
-import ReviewSession from './ReviewSession';
 import { getRandomValues } from 'crypto';
+import DeckPicker from '../DeckPicker';
+import ReviewSession from '../ReviewSession';
 
-export enum PageOption {
-    DeckPicker,
-    Review
-}
+export type PageOption = 'DeckPicker' | 'Review'
+
 
 interface DecksRow {
     deck_id: number;
@@ -35,7 +33,7 @@ export interface DeckInfo {
 
 
 const DecksPage: React.FC = () => {
-    const [activePage, setActivePage] = useState<PageOption>(PageOption.DeckPicker);
+    const [activePage, setActivePage] = useState<PageOption>('DeckPicker');
     const [deckChoice, setDeckChoice] = useState<number>(3);
     const [deckIdOptions, setDeckIdOptions] = useState<Map<number, DeckInfo>>(new Map());
     const [isSignedIn, setIsSignedIn] = useState<boolean>(false);
@@ -96,7 +94,7 @@ const DecksPage: React.FC = () => {
 
 
     const handleGoButton = () => {
-        setActivePage(PageOption.Review);
+        setActivePage('Review');
     }
 
 
@@ -109,7 +107,7 @@ const DecksPage: React.FC = () => {
 
     return (
         <>
-            {!isSignedIn ? <></> : activePage === PageOption.DeckPicker ? 
+            {!isSignedIn ? <></> : activePage === 'DeckPicker' ? 
                 <DeckPicker 
                     deckIdOptions={deckIdOptions}
                     deckChoice={deckChoice}

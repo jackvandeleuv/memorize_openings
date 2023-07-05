@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useState, useCallback, HtmlHTMLAttributes } from 'react';
-import { supabaseClient } from '../../utils/supabaseClient';
 import ChessBoard from './ChessBoard';
 import { PostgrestError, PostgrestResponse, SupabaseClient } from '@supabase/supabase-js';
 import Button from './Button';
@@ -9,9 +8,10 @@ import { Card } from './Card';
 import { Scheduler } from './Scheduler';
 import { Chess } from 'chess.js';
 import { addMinutes } from 'date-fns';
-import { DeckInfo, PageOption } from './learn';
 import RatingButton from './RatingButton';
 import { NextFetchEvent } from 'next/server';
+import { DeckInfo, PageOption } from './learn/page';
+import { supabaseClient } from '../utils/supabaseClient';
 
 interface CardsRow {
     ease: number;       
@@ -304,7 +304,7 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 
 
 	const backButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-		setActivePage(PageOption.DeckPicker);
+		setActivePage('DeckPicker');
 	};
 
 

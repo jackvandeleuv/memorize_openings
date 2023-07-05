@@ -1,6 +1,8 @@
 'use client';
 
 import React from "react";
+import MenuBar from "./MenuBar";
+import Footer from "./Footer";
 
 const HomePage: React.FC = () => {
 	return (
@@ -22,7 +24,7 @@ const HomePage: React.FC = () => {
 				<div className="py-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[400px_minmax(500px,_1fr)] bg-indigo-500">
 					<h2 className="flex justify-center items-center px-10 text-xl sm:text-2xl lg:text-3xl font-bold text-center">How it Works</h2>
 					<p className="flex items-center px-6 text-base sm:text-lg lg:text-xl text-gray-700">
-						Just like Anki, Fried Liver uses spaced repetition to help you remember chess openings. The more you get a position right, the less you'll see it. But if you get it wrong, we'll show it again soon, until you know it by heart.
+						{"Just like Anki, Fried Liver uses spaced repetition to help you remember chess openings. The more you get a position right, the less you'll see it. But if you get it wrong, we'll show it again soon, until you know it by heart."}
 					</p>
 				</div>
 

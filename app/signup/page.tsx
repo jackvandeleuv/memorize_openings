@@ -1,61 +1,38 @@
 'use client';
 
 import React, { useState } from "react";
-import { useNavigate } from 'react-router-dom';
 import { supabaseClient } from '../../utils/supabaseClient';
+import { Link } from 'react-router-dom';
 
-const SignIn: React.FC = () => {
+const SignUp: React.FC = () => {
 	const [email, setEmail] = useState<string>('');
 	const [password, setPassword] = useState<string>('');
 	const [userMessage, setUserMessage] = useState<string>('');
 
-  const navigate = useNavigate();
-
 	const handleSubmit = async (event: React.FormEvent) => {
 		event.preventDefault();
-		const { data, error } = await supabaseClient.auth.signInWithPassword({
+		const { data, error } = await supabaseClient.auth.signUp({
 			email: email,
 			password: password,
-		})
-
-		if (error) {
-			console.error('Error signing in:', error.message);
-			setUserMessage('Email or Password Incorrect');
-      setEmail('');
-      setPassword('');
-      return;
-		}
+		});
 
     setEmail('');
-    setPassword('');
+		setPassword('');
 
-    // Update the cards in the user database if necessary.
-    const { data: data2, error: error2 } = await supabaseClient.rpc('insert_default_user_cards');
-    if (error2) {
-      console.error('Error updating database: ', error2.message);
-      setUserMessage(error2.message);
+		if (error) {
       return;
-    };
+		};
 
-    // Update the card limits in the user database if necessary.
-    const { data: data3, error: error3 } = await supabaseClient.rpc('insert_default_user_limits');
-    if (error3) {
-      console.error('Error updating database: ', error3.message);
-      setUserMessage(error3.message);
-      return;
-    };
-
-    setUserMessage('Success!');
-    navigate('/');
+		setUserMessage('Success! Check the email you signed up with to sign in.');
 	};
 
 	
   return (
     <div className="flex items-center justify-center py-16 bg-indigo-400">
-      <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-xl">
+      <div className="mx-2 sm:mx-0 max-w-md w-full space-y-8 bg-white p-10 rounded-xl">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to your account
+            Set up a new account
           </h2>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
@@ -103,7 +80,7 @@ const SignIn: React.FC = () => {
               type="submit"
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-500 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
-              Sign in
+              Sign up
             </button>
           </div>
         </form>
@@ -112,4 +89,4 @@ const SignIn: React.FC = () => {
   );
 };
 
-export default SignIn;
+export default SignUp;
