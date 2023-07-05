@@ -43,9 +43,6 @@ const DeckPicker: React.FC<DeckPickerProps> = ({deckIdOptions, deckChoice, setDe
                 >
                     Go
                 </button>
-                <p className="mt-8 text-sm text-center text-gray-600">
-                    Review all shows the cards from all active openings.
-                </p>
             </div>
         </div>
     );
