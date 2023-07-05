@@ -55,7 +55,6 @@ export class Scheduler {
 
 
     setNewQueueSize(newSize: number): void {
-        console.log('setting new queue size: ' + newSize);
         this.newCount = newSize;
     }
 
@@ -192,7 +191,6 @@ export class Scheduler {
             return false;
         };
 
-        console.log('Setting remaining cards to: ' + this.newCardLimit);
         const { data: limitData, error: limitError } = await supabaseClient
             .from('new_card_limits')
             .update({'remaining_cards': this.newCardLimit})
@@ -208,7 +206,6 @@ export class Scheduler {
     
     async answerCard(grade: string): Promise<boolean> {
         if (!this.queue.length) {
-            console.log('Empty queue!');
             return false;
         }
 

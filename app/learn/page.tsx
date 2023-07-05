@@ -2,8 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { supabaseClient } from '../../utils/supabaseClient';
-import { Link } from 'react-router-dom';
-import { getRandomValues } from 'crypto';
 import DeckPicker from '../DeckPicker';
 import ReviewSession from '../ReviewSession';
 
@@ -34,7 +32,7 @@ export interface DeckInfo {
 
 const DecksPage: React.FC = () => {
     const [activePage, setActivePage] = useState<PageOption>('DeckPicker');
-    const [deckChoice, setDeckChoice] = useState<number>(3);
+    const [deckChoice, setDeckChoice] = useState<number>(-1);
     const [deckIdOptions, setDeckIdOptions] = useState<Map<number, DeckInfo>>(new Map());
     const [isSignedIn, setIsSignedIn] = useState<boolean>(false);
 
@@ -47,7 +45,7 @@ const DecksPage: React.FC = () => {
             
             const newAndReviewData: DecksRow[] = data;
             const totalsData: TotalsRow[] = data2;
-            console.log(newAndReviewData)
+
             const updatedOption = new Map<number, DeckInfo>();
             let newAllDecks = 0;
             let reviewAllDecks = 0;
@@ -68,8 +66,6 @@ const DecksPage: React.FC = () => {
                 else deck.totalCards = row.total;
                 totalAllDecks = totalAllDecks + row.total;
             }
-            updatedOption.set(-1, {name: 'Review All', newDue: newAllDecks, reviewDue: reviewAllDecks, totalCards: totalAllDecks});
-            console.log(updatedOption)
             setDeckIdOptions(updatedOption);
         }
 

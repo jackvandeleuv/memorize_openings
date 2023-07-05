@@ -386,6 +386,7 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 
 	useEffect(() => {
 		const setSchedulerCardCounts = () => {
+			if (deckIdOptions.size === 0) return;
 			let newCards = 0;
 			for (let id of ids) {
 				const deck = deckIdOptions.get(id)!;
