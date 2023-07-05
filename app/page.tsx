@@ -17,7 +17,7 @@ const HomePage: React.FC = () => {
 			// Otherwise, ask the database to update cards and new card limits if necessary.
 			const { data: limitData, error: limitError } = await supabaseClient.rpc('insert_default_user_limits');
 			if (limitError) console.log(limitError);
-			const { data: cardsData, error: cardsError } = await supabaseClient.rpc('insert_default_user_limits');
+			const { data: cardsData, error: cardsError } = await supabaseClient.rpc('insert_default_user_cards');
 			if (cardsError) console.log(cardsError);
 		};
 
