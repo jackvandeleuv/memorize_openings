@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Cell from './Cell';
 import Piece from './Piece';
 import { Chess, Square } from 'chess.js';
-import { Position, Guess } from './ReviewSession';
+import { Position } from './ReviewSession';
 
 export interface Piece {
 	piece: 'p' | 'r' | 'n' | 'b' | 'k' | 'q';
@@ -271,7 +271,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 
 
 	return (
-		<div className="grid grid-cols-8 aspect-[1] w-full h-full p-2 sm:p-0 sm:w-[50vh] sm:h-[50vh]">
+		<div className="grid grid-cols-8 aspect-[1] w-full h-full p-4 sm:p-0 md:w-[40vh] md:h-[40vh] lg:w-[50vh] lg:h-[50vh] xl:w-[60vh] xl:h-[60vh]">
 			{renderBoard()}
 		</div>
 	)}

@@ -130,6 +130,7 @@ export class Card {
     }
     
     reviewTime(): string {
-        return formatDistanceToNow(this.reviewAt);
+        let time = formatDistanceToNow(this.reviewAt);
+        return time.replace('minute', 'min');
     }
 }
