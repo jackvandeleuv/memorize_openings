@@ -28,6 +28,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 
 	// When the position changes, figure out if the board should be from black's perspective
 	useEffect(() => {
+		if (position.line[position.move] === '8/8/8/8/8/8/8/8 w KQkq - 0 1') return;
 		setReversed(new Chess(position.answer).turn() === 'b')
 	}, [position]);
 

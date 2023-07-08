@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabaseClient } from '../utils/supabaseClient';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const MenuBar: React.FC = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -30,7 +31,6 @@ const MenuBar: React.FC = () => {
 
 
   async function signUserOut() {
-    console.log('clicked sign user out');
     try {
       await supabaseClient.auth.signOut();
       setIsSignedIn(false);
@@ -48,16 +48,19 @@ const MenuBar: React.FC = () => {
           
           <div className="flex justify-start items-center lg:w-0 lg:flex-1">
             <Link href='/' className="flex title-font font-medium items-center text-gray-900">
-              <img
-                className="h-12 w-auto"
-                src="/blue-pawn.png"
-                alt="logo"
-              />
-              <span className="ml-3 text-2xl text-black font-bold bg-orange-200 hover:bg-orange-100">Fried Liver</span>
+              <div className="flex justify-center items-center">
+                <Image
+                  src='/blue-pawn.png'
+                  alt="logo"
+                  width={48}
+                  height={48}
+                />
+              </div>
+              <span className="ml-2 text-2xl text-black font-bold bg-orange-200 hover:bg-orange-100">Fried Liver</span>
             </Link>
           </div>
 
-          <div className="mr-3 -mr-2 -my-2 md:hidden">
+          <div className="mr-3 -my-2 md:hidden">
             <button type="button" onClick={toggleMenu} className="inline-flex items-center justify-center p-2 rounded-md text-black hover:text-black hover:bg-orange-100 bg-orange-200 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
               <span className="sr-only">Open menu</span>
               <svg className="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">

@@ -30,7 +30,7 @@ const HomePage: React.FC = () => {
 				<div className="py-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[400px_minmax(500px,_1fr)] bg-indigo-400 gap-2">
 					<h2 className="flex justify-center items-center px-10 text-xl sm:text-2xl lg:text-3xl font-bold text-center">Welcome to Fried Liver</h2>
 					<p className="flex items-center px-6 text-base sm:text-lg lg:text-xl text-gray-700">
-					{"Fried Liver is an innovative platform for learning chess openings, inspired by Anki's spaced repetition system. Its unique approach focuses on helping you master your favorite chess openings one move at a time, storing them in your long-term memory for a stronger gameplay."}
+					{"Fried Liver is an innovative platform for learning chess openings, inspired by Anki's spaced repetition system. Its unique approach focuses on helping you master your favorite chess openings one move at a time, storing them in your long-term memory for stronger gameplay."}
 					</p>
 				</div>
 
@@ -44,7 +44,7 @@ const HomePage: React.FC = () => {
 				<div className="py-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[400px_minmax(500px,_1fr)] bg-indigo-400 gap-2">
 					<h2 className="flex justify-center items-center px-10 text-xl sm:text-2xl lg:text-3xl font-bold text-center">Optimized Opening Preparation</h2>
 					<p className="flex items-center px-6 text-base sm:text-lg lg:text-xl text-gray-700">
-						{"Fried Liver uses analytics from the Lichess player API to create the most useful possible opening preparation. For every move you learn, we make sure that 80% of your real-life opponents' responses are covered by your learning material"}
+						{"Fried Liver uses analytics from the Lichess player database to create the most useful possible opening preparation. For every move you learn, we make sure that 80% of your real-life opponents' responses are covered by your learning material."}
 					</p>
 				</div>
 

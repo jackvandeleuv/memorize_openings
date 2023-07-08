@@ -14,6 +14,7 @@ interface DecksRow {
     total: number;
     new_cards: number;
     all_new_cards: number;
+    image_path: string;
 }
 
 interface TotalsRow {
@@ -23,10 +24,12 @@ interface TotalsRow {
 }
 
 export interface DeckInfo {
+    deck_id: number;
     name: string;
     newDue: number;
     reviewDue: number;
     totalCards: number;
+    image_path: string;
 }
 
 
@@ -37,11 +40,11 @@ const DecksPage: React.FC = () => {
     const [isSignedIn, setIsSignedIn] = useState<boolean>(false);
 
     useEffect(() => {
-        const getAvailableDecks = async () =>{
+        const getAvailableDecks = async () => {
             const { data, error } = await supabaseClient.rpc('get_due_cards_counts');
-            if (error) { console.log(error); return; };
+            if (error) { console.error(error); return; };
             const { data: data2, error: error2 } = await supabaseClient.rpc('get_total_card_counts');
-            if (error2) { console.log(error2); return; };
+            if (error2) { console.error(error2); return; };
             
             const newAndReviewData: DecksRow[] = data;
             const totalsData: TotalsRow[] = data2;
@@ -50,27 +53,41 @@ const DecksPage: React.FC = () => {
             let newAllDecks = 0;
             let reviewAllDecks = 0;
             let totalAllDecks = 0;
+
             for (let row of newAndReviewData) {
                 updatedOption.set(row.deck_id, {
                     name: row.name, 
                     newDue: row.new_cards, 
                     reviewDue: row.total - row.all_new_cards,
-                    totalCards: 0
+                    totalCards: 0,
+                    deck_id: row.deck_id,
+                    image_path: row.image_path
                 });
                 newAllDecks = newAllDecks + row.new_cards;
                 reviewAllDecks = reviewAllDecks + (row.total - row.all_new_cards);
             };
+
             for (let row of totalsData) {
                 const deck = updatedOption.get(row.id)
-                if (!deck) updatedOption.set(row.id, {name: row.name, newDue: 0, reviewDue: 0, totalCards: row.total});
+                if (!deck) updatedOption.set(row.id, {
+                    name: row.name, 
+                    newDue: 0, 
+                    reviewDue: 0, 
+                    totalCards: 
+                    row.total, 
+                    deck_id: row.id,
+                    image_path: ''
+                });
                 else deck.totalCards = row.total;
                 totalAllDecks = totalAllDecks + row.total;
             }
+            console.log(updatedOption)
+            setDeckChoice(updatedOption.keys().next().value)
             setDeckIdOptions(updatedOption);
         }
 
         getAvailableDecks();
-    }, [activePage]);
+    }, []);
 
 
     useEffect(() => {
@@ -114,7 +131,6 @@ const DecksPage: React.FC = () => {
                     ids={processDeckChoice()}
                     setActivePage={setActivePage}
                     deckIdOptions={deckIdOptions}
-                    setDeckIdOptions={setDeckIdOptions}
                 />
             }
         </>

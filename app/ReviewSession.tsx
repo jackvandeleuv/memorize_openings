@@ -12,6 +12,7 @@ import SolutionButton from './SolutionButton';
 import BackButton from './BackButton';
 import ArrowButton from './ArrowButton';
 import DeckInfoPanel from './DeckInfoPanel';
+import { BeatLoader } from 'react-spinners';
 
 interface CardsRow {
     ease: number;       
@@ -69,14 +70,13 @@ interface ReviewSessionProps {
 	ids: number[];
 	setActivePage: React.Dispatch<React.SetStateAction<PageOption>>;
 	deckIdOptions: Map<number, DeckInfo>;
-	setDeckIdOptions: React.Dispatch<React.SetStateAction<Map<number, DeckInfo>>>;
 }
 
-const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckIdOptions, setDeckIdOptions}) => {
+const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckIdOptions}) => {
 	const defaultPosition = {
 		move: 0, 
-		line: ['rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'], 
-		answer: 'rnbqkbnr/pppppppp/8/8/P7/8/1PPPPPPP/RNBQKBNR w KQkq - 0 1', 
+		line: ['8/8/8/8/8/8/8/8 w KQkq - 0 1'], 
+		answer: '8/8/8/8/8/8/8/8 w KQkq - 0 1', 
 		game: new Chess(), 
 		name: 'No Cards Due', 
 		eco: '',
@@ -88,6 +88,11 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 	const [ifGradeTimes, setIfGradeTimes] = useState<IfGradeTimes>({Easy: 'N/A',  Good: 'N/A', Hard: 'N/A', Again: 'N/A'});
 	const [storedPosition, setStoredPosition] = useState<Position>();
 	const [solutionToggled, setSolutionToggled] = useState<boolean>(false);
+	const [isLoaded, setIsLoaded] = useState<boolean>(false);
+
+	useEffect(() => {
+		window.scrollTo(0, 0);
+	}, [ids]);
 
 	useEffect(() => {
 		const fetchCards = async () => {
@@ -196,6 +201,7 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 			scheduler.setReviewQueueSize(getReviewCards());
 			scheduler.setNewQueueSize(getNewCards());
 			setScheduler(scheduler);
+			setIsLoaded(true);
 		}
 		
 		fetchCards();
@@ -406,7 +412,7 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 				<div className="h-full flex flex-col bg-indigo-500 md:rounded-lg">	
 					
 					<div className="pt-4 px-1 sm:py-6 text-center text-2xl md:text-3xl font-bold text-white">
-						{position.name}
+						{isLoaded ? position.name : <BeatLoader color={"#FFFFFF"} loading={!isLoaded} size={16} />}
 					</div>		
 					
 					<div className="flex justify-center items-center sm:px-4 sm:pb-4">
@@ -506,10 +512,11 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 
 					<div className="w-full py-4 px-4  bg-indigo-500 sm:rounded-lg">
 						<DeckInfoPanel
-						id='infoPanel' 
-						scheduler={scheduler}
-						solutionToggled={solutionToggled}
-						position={position}
+							id='infoPanel' 
+							scheduler={scheduler}
+							solutionToggled={solutionToggled}
+							position={position}
+							isLoaded={isLoaded}
 						/>
 					</div>
 					
