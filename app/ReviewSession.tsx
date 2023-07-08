@@ -1,17 +1,18 @@
 'use client';
 
-import React, { useEffect, useState, useCallback, HtmlHTMLAttributes } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import ChessBoard from './ChessBoard';
-import { PostgrestError, PostgrestResponse, SupabaseClient } from '@supabase/supabase-js';
-import Button from './Button';
 import { Card } from './Card';
 import { Scheduler } from './Scheduler';
 import { Chess } from 'chess.js';
-import { addMinutes } from 'date-fns';
 import RatingButton from './RatingButton';
-import { NextFetchEvent } from 'next/server';
 import { DeckInfo, PageOption } from './learn/page';
 import { supabaseClient } from '../utils/supabaseClient';
+import SolutionButton from './SolutionButton';
+import BackButton from './BackButton';
+import ArrowButton from './ArrowButton';
+import DeckInfoPanel from './DeckInfoPanel';
+import { BeatLoader } from 'react-spinners';
 
 interface CardsRow {
     ease: number;       
@@ -69,14 +70,13 @@ interface ReviewSessionProps {
 	ids: number[];
 	setActivePage: React.Dispatch<React.SetStateAction<PageOption>>;
 	deckIdOptions: Map<number, DeckInfo>;
-	setDeckIdOptions: React.Dispatch<React.SetStateAction<Map<number, DeckInfo>>>;
 }
 
-const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckIdOptions, setDeckIdOptions}) => {
+const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckIdOptions}) => {
 	const defaultPosition = {
 		move: 0, 
-		line: ['rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'], 
-		answer: 'rnbqkbnr/pppppppp/8/8/P7/8/1PPPPPPP/RNBQKBNR w KQkq - 0 1', 
+		line: ['8/8/8/8/8/8/8/8 w KQkq - 0 1'], 
+		answer: '8/8/8/8/8/8/8/8 w KQkq - 0 1', 
 		game: new Chess(), 
 		name: 'No Cards Due', 
 		eco: '',
@@ -86,9 +86,13 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 	const [position, setPosition] = useState<Position>(defaultPosition);
 	const [scheduler, setScheduler] = useState<Scheduler>(new Scheduler(20));
 	const [ifGradeTimes, setIfGradeTimes] = useState<IfGradeTimes>({Easy: 'N/A',  Good: 'N/A', Hard: 'N/A', Again: 'N/A'});
-	const [ratingHelpMessage, setRatingHelpMessage] = useState<string>('');
 	const [storedPosition, setStoredPosition] = useState<Position>();
 	const [solutionToggled, setSolutionToggled] = useState<boolean>(false);
+	const [isLoaded, setIsLoaded] = useState<boolean>(false);
+
+	useEffect(() => {
+		window.scrollTo(0, 0);
+	}, [ids]);
 
 	useEffect(() => {
 		const fetchCards = async () => {
@@ -197,6 +201,7 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 			scheduler.setReviewQueueSize(getReviewCards());
 			scheduler.setNewQueueSize(getNewCards());
 			setScheduler(scheduler);
+			setIsLoaded(true);
 		}
 		
 		fetchCards();
@@ -310,12 +315,7 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 
 	const ratingButtonClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
 		if (!scheduler) return;
-		if (position.guess.color === '' && !solutionToggled) {
-			setRatingHelpMessage('Make a move to see the answer!');
-			return;
-		} else {
-			setRatingHelpMessage('');
-		}
+		if (position.guess.color === '' && !solutionToggled) return; 
 
 		// Remove the guess highlight
 		const positionCopy = deepCopyPosition(position);
@@ -407,15 +407,15 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 	
 
 	return (
-		<div className="w-full bg-indigo-400">
-			<div className="w-full flex flex-col md:flex-row md:pb-10 justify-center gap-4">
-				<div className="w-full h-full md:ml-64 md:px-8 flex flex-col bg-indigo-500 md:rounded-lg">	
+		<div className="w-full sm:px-12 md:px-4 bg-indigo-500 md:bg-indigo-400">
+			<div className="flex flex-col md:flex-row md:pb-10 justify-center md:gap-4">
+				<div className="h-full flex flex-col bg-indigo-500 md:rounded-lg">	
 					
-					<div className="py-4 md:pt-6 px-1 md:px-6 text-center text-xl md:text-2xl font-bold text-white">
-						{position.name}
+					<div className="pt-4 px-1 sm:py-6 text-center text-2xl md:text-3xl font-bold text-white">
+						{isLoaded ? position.name : <BeatLoader color={"#FFFFFF"} loading={!isLoaded} size={16} />}
 					</div>		
 					
-					<div className="flex justify-center items-center sm:px-16 md:px-4 md:pb-4">
+					<div className="flex justify-center items-center sm:px-4 sm:pb-4">
 						{position.line && position.line.length > 0 &&				
 							<ChessBoard
 								solutionToggled={solutionToggled}
@@ -425,99 +425,99 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 						}
 					</div>
 			
-					<div className="flex flex-row justify-center items-center">
-						<RatingButton
-							id="Again"
-							time={ifGradeTimes.Again}
-							handleClick={ratingButtonClick}
-						>
-							{'Again'}
-						</RatingButton>
-	
-						<RatingButton
-							id="Hard"
-							time={ifGradeTimes.Hard}
-							handleClick={ratingButtonClick}
-						>
-							{'Hard'}
-						</RatingButton>
-	
-						<RatingButton
-							id="Good"
-							time={ifGradeTimes.Good}
-							handleClick={ratingButtonClick}
-						>
-							{'Good'}
-						</RatingButton>
-	
-						<RatingButton
-							id="Easy"
-							time={ifGradeTimes.Easy}
-							handleClick={ratingButtonClick}
-						>
-							{'Easy'}
-						</RatingButton>
+					<div className="flex flex-row justify-center items-center mb-2 sm:mb-4 mx-4 gap-2">
+						<div className='flex flex-grow justify-center items-center'>
+							<RatingButton
+								id="Again"
+								time={ifGradeTimes.Again}
+								handleClick={ratingButtonClick}
+								position={position}
+								solutionToggled={solutionToggled}
+							>
+								{'Again'}
+							</RatingButton>
+						</div>
+						<div className='flex flex-grow justify-center items-center'>
+							<RatingButton
+								id="Hard"
+								time={ifGradeTimes.Hard}
+								handleClick={ratingButtonClick}
+								position={position}
+								solutionToggled={solutionToggled}
+							>
+								{'Hard'}
+							</RatingButton>
+						</div>
+
+						<div className='flex flex-grow justify-center items-center'>
+							<RatingButton
+								id="Good"
+								time={ifGradeTimes.Good}
+								handleClick={ratingButtonClick}
+								position={position}
+								solutionToggled={solutionToggled}
+							>
+								{'Good'}
+							</RatingButton>
+						</div>
+						<div className='flex flex-grow justify-center items-center'>
+							<RatingButton
+								id="Easy"
+								time={ifGradeTimes.Easy}
+								handleClick={ratingButtonClick}
+								position={position}
+								solutionToggled={solutionToggled}
+							>
+								{'Easy'}
+							</RatingButton>
+						</div>
 					</div>
 				</div>
 
 	
-				<div className="flex flex-col md:mr-64 pb-4 sm:px-4 items-center space-y-4">
-					<div className="w-full pt-2 bg-indigo-500 sm:rounded-lg">
-						<div className="flex justify-center p-1 sm:px-8 rounded-lg">
-							<Button
-								id='solution'
-								handleClick={handleShowSolution}
-								color={'bg-indigo-400'}
-							>
-								{solutionToggled ? 'Hide Solution' : 'Show Solution'}
-							</Button>
-						</div>
-
-						<div className="flex justify-center py-2 space-x-4 rounded-lg">
-							<Button
+				<div className="flex flex-col items-center">
+					<div className="px-4 md:py-4 md:mb-4 flex flex-row md:flex-col w-full bg-indigo-500 sm:rounded-lg gap-2 md:gap-0">
+						<div className="flex flex-grow justify-center items-center py-2 space-x-2 rounded-md">
+							<ArrowButton
 								id='<'
 								handleClick={arrowButtonClick}
-								color={'bg-indigo-400'}
 							>
 								{'<'}
-							</Button>
-							<Button
+							</ArrowButton>
+							<ArrowButton
 								id='>'
 								handleClick={arrowButtonClick}
-								color={'bg-indigo-400'}
 							>
 								{'>'}
-							</Button>
+							</ArrowButton>
 						</div>
-		
-						<div className="flex justify-center pb-4 rounded-lg">
-							<Button 
+						<div className="flex flex-grow justify-center items-center sm:px-8 md:px-0 md:pt-2 md:pb-4 rounded-md">
+							<SolutionButton
+								id='solution'
+								handleClick={handleShowSolution}
+								solutionToggled={solutionToggled}
+							>
+								Toggle Answer
+							</SolutionButton>
+						</div>
+						<div className="flex flex-grow justify-center items-center rounded-md">
+							<BackButton 
 								id='back'
 								handleClick={backButtonClick}
-								color={'bg-indigo-400'}
 							>
 								{'Back'}
-							</Button>
+							</BackButton>
 						</div>
 					</div>
 
-					<div className="w-full py-4 px-16 md:px-8 bg-indigo-500 sm:rounded-lg">
-						<div className="text-center text-xl font-bold text-white">
-							{position.game.turn() === 'w' && !solutionToggled ? 'White to Move' : 'Black to Move'}
-						</div>
-						
-						<div className="flex flex-col py-4 w-full">
-							<div className="p-1 text-center text-lg font-bold text-white bg-indigo-300">
-								{`New: ${scheduler.getNewQueueSize()}`}
-							</div>
-							<div className="p-1 text-center text-lg font-bold text-white bg-indigo-400">
-								{`Review: ${scheduler.getReviewQueueSize()}`}
-							</div>
-						</div>
-
-						<div className="text-white text-1xl pb-3 flex justify-center font-bold rounded-lg">
-							{ratingHelpMessage}
-						</div>
+					<div className="w-full py-4 px-4  bg-indigo-500 sm:rounded-lg">
+						<DeckInfoPanel
+							id='infoPanel' 
+							scheduler={scheduler}
+							solutionToggled={solutionToggled}
+							position={position}
+							isLoaded={isLoaded}
+						/>
 					</div>
 					
 				</div>
