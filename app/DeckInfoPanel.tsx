@@ -5,7 +5,7 @@ import { BeatLoader } from 'react-spinners';
 
 interface DeckInfoPanelProps {
 	id: string;
-    scheduler: Scheduler;
+    scheduler: Scheduler | undefined;
     solutionToggled: boolean;
 	position: Position;
 	isLoaded: boolean;
@@ -23,10 +23,10 @@ const DeckInfoPanel: React.FC<DeckInfoPanelProps> = ({ id, scheduler, solutionTo
 			
 			<div className="flex flex-col py-4 w-full">
 				<div className="p-1 text-center text-lg font-bold text-white bg-indigo-500 rounded-sm">
-					{`New: ${scheduler.getNewQueueSize()}`}
+					{`New: ${!scheduler ? '0' : scheduler.getNewQueueSize()}`}
 				</div>
 				<div className="p-1 text-center text-lg font-bold text-white bg-indigo-400 rounded-sm">
-					{`Review: ${scheduler.getReviewQueueSize()}`}
+					{`Review: ${!scheduler ? '0' : scheduler.getReviewQueueSize()}`}
 				</div>
 			</div>
 		</div>

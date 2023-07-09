@@ -56,7 +56,7 @@ const MenuBar: React.FC = () => {
                   height={48}
                 />
               </div>
-              <span className="ml-2 text-2xl text-black font-bold bg-orange-200 hover:bg-orange-100">Fried Liver</span>
+              <span className="ml-2 text-2xl text-black font-bold hover:bg-orange-100">Fried Liver</span>
             </Link>
           </div>
 
@@ -105,17 +105,17 @@ const MenuBar: React.FC = () => {
                 </div>
 
               </div>
-              <div className="mt-6">
-                <nav className="grid gap-y-4">
-                  <Link href='/about' onClick={() => setIsOpen(!isOpen)} className="text-gray-900 hover:bg-orange-100">About</Link>
+              <div className="mt-4">
+                <nav className="grid gap-y-2">
+                  <Link href='/about' onClick={() => setIsOpen(!isOpen)} className="text-black bg-orange-300 hover:bg-orange-100 rounded-lg p-2">About</Link>
                   {isSignedIn ? 
                     <>
-                      <Link href='/learn' onClick={() => setIsOpen(!isOpen)} className="text-gray-900 hover:bg-orange-100">Learn</Link>
-                      <Link href='/' onClick={() => {signUserOut();}} className="text-gray-900 hover:bg-orange-100">Sign Out</Link> 
+                      <Link href='/learn' onClick={() => setIsOpen(!isOpen)} className="text-black bg-orange-300 hover:bg-orange-100 rounded-lg p-2">Learn</Link>
+                      <Link href='/' onClick={() => {signUserOut();}} className="text-black bg-orange-300 hover:bg-orange-100 rounded-lg p-2">Sign Out</Link> 
                     </> :
                     <>
-                      <Link href='/signin' onClick={() => setIsOpen(!isOpen)} className="text-gray-900 hover:bg-orange-100">Sign In</Link>
-                      <Link href='/signup' onClick={() => setIsOpen(!isOpen)} className="text-gray-900 hover:undbg-orange-100">Sign Up</Link>
+                      <Link href='/signin' onClick={() => setIsOpen(!isOpen)} className="text-black bg-orange-300 hover:bg-orange-100 rounded-lg p-2">Sign In</Link>
+                      <Link href='/signup' onClick={() => setIsOpen(!isOpen)} className="text-black bg-orange-300 hover:undbg-orange-100 rounded-lg p-2">Sign Up</Link>
                     </>
                   }
                 </nav>
