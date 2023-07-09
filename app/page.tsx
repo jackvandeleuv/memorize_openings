@@ -34,7 +34,7 @@ const HomePage: React.FC = () => {
 					</p>
 				</div>
 
-				<div className="py-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[400px_minmax(500px,_1fr)] bg-indigo-500 text-indigo-100 gap-2">
+				<div className="py-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[400px_minmax(500px,_1fr)] bg-indigo-500 text-indigo-200 gap-2">
 					<h2 className="flex justify-center items-center px-10 text-xl sm:text-2xl lg:text-3xl font-bold text-center">How It Works</h2>
 					<p className="flex items-center px-6 text-base sm:text-lg lg:text-xl">
 						{"The better you get at recognizing a position, the less often you'll see it. But if you get it wrong, we'll show it again soon, until you know it by heart."}
@@ -48,7 +48,7 @@ const HomePage: React.FC = () => {
 					</p>
 				</div>
 
-				<div className="py-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[400px_minmax(500px,_1fr)] bg-indigo-500 text-indigo-100 gap-2">
+				<div className="py-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[400px_minmax(500px,_1fr)] bg-indigo-500 text-indigo-200 gap-2">
 					<h2 className="flex justify-center items-center px-10 text-xl sm:text-2xl lg:text-3xl font-bold text-center">Get Started</h2>
 					<p className="flex items-center px-6 text-base sm:text-lg lg:text-xl">
 						{"Start your journey with Fried Liver today. Sign up for a free account and begin your journey to opening mastery!"}

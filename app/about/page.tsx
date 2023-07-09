@@ -6,10 +6,10 @@ const About: React.FC = () => {
 	return (
 		<div className="flex flex-col bg-indigo-400 w-full">
 
-			<div className="py-16 grid grid-cols-1 bg-indigo-500 text-indigo-100">
+			<div className="py-16 grid grid-cols-1 bg-indigo-500 text-indigo-200">
 				<h2 className="pb-6 flex justify-center items-center px-10 text-xl sm:text-2xl lg:text-3xl font-bold text-center">About Fried Liver</h2>
 				<p className="px-6 text-base sm:text-lg lg:text-xl">
-					Fried Liver is an application designed to help users improve their chess skills. It teaches chess openings through spaced repetition, which is a well-studied and effective method for memorization. Fried Liver uses Anki&apos;s implementation of the SuperMemo 2 spaced-repetition algorithm. Learn more about <a href='https://faqs.ankiweb.net/what-spaced-repetition-algorithm.html' className='underline hover:text-indigo-200'>the original algorithm.</a>
+					Fried Liver is an application designed to help users improve their chess skills. It teaches chess openings through spaced repetition, which is a well-studied and effective method for memorization. Fried Liver uses Anki&apos;s implementation of the SuperMemo 2 spaced-repetition algorithm. Learn more about <a href='https://faqs.ankiweb.net/what-spaced-repetition-algorithm.html' className='underline hover:text-indigo-300'>the original algorithm.</a>
 				</p>
 			</div>
 
@@ -26,11 +26,11 @@ const About: React.FC = () => {
 				</p>
 			</div>
 
-			<div className="py-16 grid grid-cols-1 bg-indigo-500 text-indigo-100">
+			<div className="py-16 grid grid-cols-1 bg-indigo-500 text-indigo-200">
 				<h3 className="pb-6 flex justify-center items-center px-10 text-xl sm:text-2xl lg:text-3xl font-bold text-center">Contact Us</h3>
 				<p className="px-6 text-base sm:text-lg lg:text-xl">
 					If you have any questions or feedback, please forward them to&nbsp;
-					<a href="mailto:jack.vandeleuv@gmail.com" className='underline hover:text-indigo-200'>jack.vandeleuv@gmail.com.</a>
+					<a href="mailto:jack.vandeleuv@gmail.com" className='underline hover:text-indigo-300'>jack.vandeleuv@gmail.com.</a>
 				</p>
 			</div>
 		</div>
