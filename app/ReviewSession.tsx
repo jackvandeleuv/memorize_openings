@@ -83,16 +83,33 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 		guess: {row: '', col: '', color: ''}
 	};
 
-	const [position, setPosition] = useState<Position>(defaultPosition);
-	const [scheduler, setScheduler] = useState<Scheduler>(new Scheduler(20));
+	const initialPosition = {
+		move: 0, 
+		line: ['8/8/8/8/8/8/8/8 w KQkq - 0 1'], 
+		answer: '8/8/8/8/8/8/8/8 w KQkq - 0 1', 
+		game: new Chess(), 
+		name: 'Cards Not Loaded', 
+		eco: '',
+		guess: {row: '', col: '', color: ''}
+	}
+
+	const [position, setPosition] = useState<Position>(initialPosition);
+	const [scheduler, setScheduler] = useState<Scheduler>();
 	const [ifGradeTimes, setIfGradeTimes] = useState<IfGradeTimes>({Easy: 'N/A',  Good: 'N/A', Hard: 'N/A', Again: 'N/A'});
 	const [storedPosition, setStoredPosition] = useState<Position>();
 	const [solutionToggled, setSolutionToggled] = useState<boolean>(false);
 	const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
+	
 	useEffect(() => {
 		window.scrollTo(0, 0);
 	}, [ids]);
+
+
+	useEffect(() => {
+		setIsLoaded(scheduler !== undefined && position.name !== 'Cards Not Loaded')
+	}, [scheduler, position]);
+
 
 	useEffect(() => {
 		const fetchCards = async () => {
@@ -111,6 +128,8 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 				console.error(limitError);
 				return;
 			};
+			console.log('Thing I asked for:')
+			console.log(limitData)
 			let totalNew = 0
 			for (let row of limitData) {
 				totalNew = totalNew + row.remaining_cards;
@@ -201,7 +220,6 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 			scheduler.setReviewQueueSize(getReviewCards());
 			scheduler.setNewQueueSize(getNewCards());
 			setScheduler(scheduler);
-			setIsLoaded(true);
 		}
 		
 		fetchCards();
@@ -386,6 +404,7 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 
 	useEffect(() => {
 		const setSchedulerCardCounts = () => {
+			if (!scheduler) return;
 			if (deckIdOptions.size === 0) return;
 			let newCards = 0;
 			for (let id of ids) {
@@ -409,7 +428,7 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 	return (
 		<div className="w-full sm:px-12 md:px-4 bg-indigo-500 md:bg-indigo-400">
 			<div className="flex flex-col md:flex-row md:pb-10 justify-center md:gap-4">
-				<div className="h-full flex flex-col bg-indigo-500 md:rounded-lg">	
+				<div className="md:px-4 h-full flex flex-col bg-indigo-500 md:rounded-lg">	
 					
 					<div className="pt-4 px-1 sm:py-6 text-center text-2xl md:text-3xl font-bold text-white">
 						{isLoaded ? position.name : <BeatLoader color={"#FFFFFF"} loading={!isLoaded} size={16} />}
@@ -433,6 +452,7 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 								handleClick={ratingButtonClick}
 								position={position}
 								solutionToggled={solutionToggled}
+								sidePadding={'px-2'}
 							>
 								{'Again'}
 							</RatingButton>
@@ -444,6 +464,7 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 								handleClick={ratingButtonClick}
 								position={position}
 								solutionToggled={solutionToggled}
+								sidePadding={'px-3'}
 							>
 								{'Hard'}
 							</RatingButton>
@@ -456,6 +477,7 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 								handleClick={ratingButtonClick}
 								position={position}
 								solutionToggled={solutionToggled}
+								sidePadding={'px-2'}
 							>
 								{'Good'}
 							</RatingButton>
@@ -467,6 +489,7 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 								handleClick={ratingButtonClick}
 								position={position}
 								solutionToggled={solutionToggled}
+								sidePadding={'px-3'}
 							>
 								{'Easy'}
 							</RatingButton>

@@ -9,19 +9,19 @@ const SignIn: React.FC = () => {
 	const [userMessage, setUserMessage] = useState<string>('');
 
 	const handleSubmit = async (event: React.FormEvent) => {
-		event.preventDefault();
-		const { data, error } = await supabaseClient.auth.signInWithPassword({
-			email: email,
-			password: password,
-		})
+    event.preventDefault();
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
+      email: email,
+      password: password,
+    })
 
-		if (error) {
-			console.error('Error signing in:', error.message);
-			setUserMessage('Email or Password Incorrect');
+    if (error) {
+      console.error('Error signing in:', error.message);
+      setUserMessage('Email or Password Incorrect');
       setEmail('');
       setPassword('');
       return;
-		}
+    }
 
     setEmail('');
     setPassword('');
@@ -48,7 +48,7 @@ const SignIn: React.FC = () => {
 	
   return (
     <div className="flex items-center justify-center py-16 bg-indigo-400">
-      <div className="mx-2 sm:mx-0 max-w-md w-full space-y-8 bg-white p-10 rounded-xl">
+      <div className="mx-2 sm:mx-0 max-w-md w-full space-y-8 bg-indigo-100 p-10 rounded-xl">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Sign in to your account

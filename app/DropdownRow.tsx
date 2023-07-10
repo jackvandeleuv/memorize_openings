@@ -36,19 +36,6 @@ const DropdownRow: React.FC<DropdownRowProps> = ({ info, isLoaded, handleClick }
 							</div>
 						</div>
 					</div> 
-					<div className="flex flex-grow"></div>
-					<AboutDeckButton
-						id={info.name}
-						handleClick={() => {console.log('Deck info to come later!')}}
-					>
-						<div style={{ height: '32px', width: '32px', position: 'relative' }}>
-							<Image
-								src='/lightbulb-icon.png'
-								alt='learn more'
-								layout='fill'
-							/>
-						</div>
-					</AboutDeckButton>
 				</div> :
 				<div className='flex justify-center items-center py-8'>
 					<BeatLoader color={"#818cf8"} loading={!isLoaded} size={12} />
