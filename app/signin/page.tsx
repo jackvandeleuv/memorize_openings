@@ -6,7 +6,7 @@ import { supabaseClient } from '../../utils/supabaseClient';
 const SignIn: React.FC = () => {
 	const [email, setEmail] = useState<string>('');
 	const [password, setPassword] = useState<string>('');
-	const [userMessage, setUserMessage] = useState<string>('');
+	const [userMessage, setUserMessage] = useState<JSX.Element>(<></>);
 
 	const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -16,8 +16,12 @@ const SignIn: React.FC = () => {
     })
 
     if (error) {
-      console.error('Error signing in:', error.message);
-      setUserMessage('Email or Password Incorrect');
+      console.error(error)
+      setUserMessage(
+        <div className='bg-rose-400 py-3 px-3 mt-2 rounded-md text-sm'>
+          {error.message}
+        </div>
+      );
       setEmail('');
       setPassword('');
       return;
@@ -29,20 +33,32 @@ const SignIn: React.FC = () => {
     // Update the cards in the user database if necessary.
     const { data: data2, error: error2 } = await supabaseClient.rpc('insert_default_user_cards');
     if (error2) {
-      console.error('Error updating database: ', error2.message);
-      setUserMessage(error2.message);
+      console.error(error2)
+      setUserMessage(
+        <div className='bg-rose-400 py-3 px-3 mt-2 rounded-md text-sm'>
+          {error2.message}
+        </div>
+      );
       return;
     };
 
     // Update the card limits in the user database if necessary.
     const { data: data3, error: error3 } = await supabaseClient.rpc('insert_default_user_limits');
     if (error3) {
-      console.error('Error updating database: ', error3.message);
-      setUserMessage(error3.message);
+      console.error(error3.message);
+      setUserMessage(
+        <div className='bg-rose-400 py-3 px-3 mt-2 rounded-md text-sm'>
+          {error3.message}
+        </div>
+      );
       return;
     };
 
-    setUserMessage('Success!');
+    setUserMessage(
+      <div className='bg-green-400 py-3 px-3 mt-2 rounded-md text-sm'>
+        Success!
+      </div>
+    );
 	};
 
 	

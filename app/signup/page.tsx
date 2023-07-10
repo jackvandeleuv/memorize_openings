@@ -2,12 +2,11 @@
 
 import React, { useState } from "react";
 import { supabaseClient } from '../../utils/supabaseClient';
-import { Link } from 'react-router-dom';
 
 const SignUp: React.FC = () => {
 	const [email, setEmail] = useState<string>('');
 	const [password, setPassword] = useState<string>('');
-	const [userMessage, setUserMessage] = useState<string>('');
+	const [userMessage, setUserMessage] = useState<JSX.Element>(<></>);
 
 	const handleSubmit = async (event: React.FormEvent) => {
 		event.preventDefault();
@@ -20,10 +19,19 @@ const SignUp: React.FC = () => {
 		setPassword('');
 
 		if (error) {
+      setUserMessage(
+        <div className='bg-rose-400 py-3 px-3 mt-2 rounded-md text-sm'>
+          {error.message}
+        </div>
+      );
       return;
 		};
 
-		setUserMessage('Success! Check the email you signed up with to sign in.');
+		setUserMessage(
+    <div className='bg-green-400 py-3 px-3 mt-2 rounded-md text-sm'>
+      Success! Check the email you signed up with to sign in.
+    </div>
+    );
 	};
 
 	

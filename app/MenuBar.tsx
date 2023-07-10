@@ -73,6 +73,7 @@ const MenuBar: React.FC = () => {
             <Link href='/about' onClick={() => setIsOpen(!isOpen)} className="sm:py-1 sm:px-4 rounded-md bg-orange-200 text-black hover:bg-orange-100">About</Link>
             {isSignedIn ? 
                 <>
+                  <Link href='/account' onClick={() => setIsOpen(!isOpen)} className="sm:py-1 sm:px-4 rounded-md bg-orange-200 text-black hover:bg-orange-100">Account</Link>
                   <Link href='/learn' onClick={() => setIsOpen(!isOpen)} className="sm:py-1 sm:px-4 rounded-md bg-orange-200 text-black hover:bg-orange-100">Learn</Link>
                   <Link href='/' onClick={() => {signUserOut(); setIsOpen(!isOpen)}} className="sm:p-1 sm:px-2 rounded-md bg-orange-200 text-black hover:bg-orange-100">Sign Out</Link> 
                 </> :
@@ -110,6 +111,7 @@ const MenuBar: React.FC = () => {
                   <Link href='/about' onClick={() => setIsOpen(!isOpen)} className="text-black bg-orange-100 hover:bg-orange-300 rounded-lg p-2">About</Link>
                   {isSignedIn ? 
                     <>
+                      <Link href='/account' onClick={() => setIsOpen(!isOpen)} className="text-black bg-orange-100 hover:bg-orange-300 rounded-lg p-2">Account</Link>
                       <Link href='/learn' onClick={() => setIsOpen(!isOpen)} className="text-black bg-orange-100 hover:bg-orange-300 rounded-lg p-2">Learn</Link>
                       <Link href='/' onClick={() => {signUserOut();}} className="text-black bg-orange-100 hover:bg-orange-300 rounded-lg p-2">Sign Out</Link> 
                     </> :
