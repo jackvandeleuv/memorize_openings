@@ -29,7 +29,7 @@ const SignUp: React.FC = () => {
 	
   return (
     <div className="flex items-center justify-center py-16 bg-indigo-400">
-      <div className="mx-2 sm:mx-0 max-w-md w-full space-y-8 bg-white p-10 rounded-xl">
+      <div className="mx-2 sm:mx-0 max-w-md w-full space-y-8 bg-indigo-100 p-10 rounded-xl">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Set up a new account

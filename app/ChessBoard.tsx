@@ -272,7 +272,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 
 
 	return (
-		<div className="grid grid-cols-8 aspect-[1] w-full h-full p-4 sm:p-0 md:w-[40vh] md:h-[40vh] lg:w-[50vh] lg:h-[50vh] xl:w-[60vh] xl:h-[60vh]">
+		<div className="grid grid-cols-8 aspect-[1] w-full h-full p-4 sm:p-0 md:w-[50vh] md:h-[50vh] xl:w-[50vh] xl:h-[50vh]">
 			{renderBoard()}
 		</div>
 	)}

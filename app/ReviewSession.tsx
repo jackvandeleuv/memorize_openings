@@ -428,7 +428,7 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 	return (
 		<div className="w-full sm:px-12 md:px-4 bg-indigo-500 md:bg-indigo-400">
 			<div className="flex flex-col md:flex-row md:pb-10 justify-center md:gap-4">
-				<div className="h-full flex flex-col bg-indigo-500 md:rounded-lg">	
+				<div className="md:px-4 h-full flex flex-col bg-indigo-500 md:rounded-lg">	
 					
 					<div className="pt-4 px-1 sm:py-6 text-center text-2xl md:text-3xl font-bold text-white">
 						{isLoaded ? position.name : <BeatLoader color={"#FFFFFF"} loading={!isLoaded} size={16} />}
@@ -452,6 +452,7 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 								handleClick={ratingButtonClick}
 								position={position}
 								solutionToggled={solutionToggled}
+								sidePadding={'px-2'}
 							>
 								{'Again'}
 							</RatingButton>
@@ -463,6 +464,7 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 								handleClick={ratingButtonClick}
 								position={position}
 								solutionToggled={solutionToggled}
+								sidePadding={'px-3'}
 							>
 								{'Hard'}
 							</RatingButton>
@@ -475,6 +477,7 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 								handleClick={ratingButtonClick}
 								position={position}
 								solutionToggled={solutionToggled}
+								sidePadding={'px-2'}
 							>
 								{'Good'}
 							</RatingButton>
@@ -486,6 +489,7 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({ids, setActivePage, deckId
 								handleClick={ratingButtonClick}
 								position={position}
 								solutionToggled={solutionToggled}
+								sidePadding={'px-3'}
 							>
 								{'Easy'}
 							</RatingButton>
