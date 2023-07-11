@@ -371,8 +371,7 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({id, activePage, setActiveP
 	return (
 		<div className="w-full sm:px-12 md:px-4 bg-indigo-500 md:bg-indigo-400">
 			<div className="flex flex-col md:flex-row md:pb-10 justify-center md:gap-4">
-				<div className='md:w-1/3'></div>
-				<div className="md:px-4 flex-grow flex flex-col justify-center bg-indigo-500 md:rounded-lg">	
+				<div className="md:px-4 flex flex-col justify-center bg-indigo-500 md:rounded-lg">	
 					
 					<div className="pt-4 px-1 sm:py-6 text-center text-2xl md:text-3xl font-bold text-white">
 						{isLoaded ? position.name : <BeatLoader color={"#FFFFFF"} loading={!isLoaded} size={16} />}
@@ -500,7 +499,6 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({id, activePage, setActiveP
 					</div>
 					
 				</div>
-				<div className='md:w-1/3'></div>
 			</div>
 		</div>
 	);
