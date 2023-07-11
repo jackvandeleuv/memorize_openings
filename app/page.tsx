@@ -35,9 +35,12 @@ const HomePage: React.FC = () => {
 			</div>
 			<div className='sm:pt-7 sm:pr-4 bg-indigo-500'>
 				<div className='flex flex-col'>
-					<div className="flex items-center pt-1 sm:pt-8 sm:pb-12 px-6 text-base sm:text-lg lg:text-xl ">
+					<div className="flex flex-row items-center pt-1 sm:pt-8 sm:pb-12 px-6 text-base sm:text-lg lg:text-xl gap-3 sm:gap-4">
+						<Link href='/demo' className="p-1 px-6 rounded-lg bg-orange-200 text-black text-lg hover:bg-orange-100">
+							Try It
+						</Link>
 						<Link href='/signup' className="p-1 px-4 rounded-lg bg-orange-200 text-black text-lg hover:bg-orange-100">
-							Sign Up for a Free Account
+							Sign Up
 						</Link>
 					</div>
 				</div>
