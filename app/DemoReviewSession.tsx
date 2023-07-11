@@ -327,7 +327,6 @@ const DemoReviewSession: React.FC = () => {
 		<div className="w-full sm:px-12 md:px-4 bg-indigo-500 md:bg-indigo-400">
 			<div className="flex flex-col md:flex-row md:pb-10 justify-center md:gap-4">
 				<div className="md:px-4 h-full flex flex-col bg-indigo-500 md:rounded-lg">	
-					
 					<div className="pt-4 px-1 sm:pt-6 sm:pb-3 text-center text-2xl md:text-3xl font-bold text-white">
 						{isLoaded ? position.name : <BeatLoader color={"#FFFFFF"} loading={!isLoaded} size={16} />}
 					</div>		
