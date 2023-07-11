@@ -1,11 +1,11 @@
-import { addMinutes, addDays, isAfter, formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 import { ChessMove } from './ReviewSession';
 
 export class Card {
     private moves: ChessMove[] = [];
     ease: number;
     interval: number;
-    isNew: boolean;
+    isLearning: boolean;
     step: number;
     reviewAt: Date;
     lines_id: number = -1;
@@ -13,7 +13,7 @@ export class Card {
     name: string = '';
     eco: string = '';
     decks_id: number;
-    never_seen: number;
+    neverSeen: number;
 
     constructor(
         ease: number, 
@@ -27,12 +27,12 @@ export class Card {
     ) {
         this.ease = ease;
         this.interval = interval;
-        this.isNew = isNew;
+        this.isLearning = isNew;
         this.step = step;
         this.reviewAt = reviewAt;
         this.id = newId;
         this.decks_id = decks_id;
-        this.never_seen = never_seen
+        this.neverSeen = never_seen
     }
 
 
@@ -78,12 +78,12 @@ export class Card {
         const cardCopy =  new Card(
             this.ease,
             this.interval,
-            this.isNew,
+            this.isLearning,
             this.step,
             new Date(this.reviewAt.getTime()),
             this.id,
             this.decks_id,
-            this.never_seen
+            this.neverSeen
         );
         cardCopy.moves = [...this.moves];
         cardCopy.lines_id = this.lines_id;
@@ -123,7 +123,7 @@ export class Card {
             'Card: ' + this.id +
             ', Review: ' + this.reviewTime() +
             ', Ease: ' + this.ease +
-            ', New: ' + this.isNew +
+            ', New: ' + this.isLearning +
             ', Step: ' + this.step + 
             ', Moves: ' + moveData
         );
@@ -131,6 +131,8 @@ export class Card {
     
     reviewTime(): string {
         let time = formatDistanceToNow(this.reviewAt);
-        return time.replace('minute', 'min');
+        time = time.replace('less than a minute', '1 min')
+        time = time.replace('minute', 'min');
+        return time.replace('1 min', '< 1 min')
     }
 }

@@ -6,13 +6,14 @@ import { Card } from './Card';
 import { Scheduler } from './Scheduler';
 import { Chess } from 'chess.js';
 import RatingButton from './RatingButton';
-import { PageOption } from './learn/page';
 import { supabaseClient } from '../utils/supabaseClient';
 import SolutionButton from './SolutionButton';
 import BackButton from './BackButton';
 import ArrowButton from './ArrowButton';
 import DeckInfoPanel from './DeckInfoPanel';
 import { BeatLoader } from 'react-spinners';
+import Link from 'next/link';
+import DemoInfoPanel from './DemoInfoPanel';
 
 interface CardsRow {
     ease: number;       
@@ -61,13 +62,7 @@ interface IfGradeTimes {
 	Again: string;
 }
 
-interface ReviewSessionProps {
-	id: number;
-	activePage: PageOption;
-	setActivePage: React.Dispatch<React.SetStateAction<PageOption>>;
-}
-
-const ReviewSession: React.FC<ReviewSessionProps> = ({id, activePage, setActivePage}) => {
+const DemoReviewSession: React.FC = () => {
 	const defaultPosition = {
 		move: 0, 
 		line: ['8/8/8/8/8/8/8/8 w KQkq - 0 1'], 
@@ -94,7 +89,7 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({id, activePage, setActiveP
 	const [storedPosition, setStoredPosition] = useState<Position>();
 	const [solutionToggled, setSolutionToggled] = useState<boolean>(false);
 	const [isLoaded, setIsLoaded] = useState<boolean>(false);
-
+	const DECK_TO_SHOW = 24;
 	
 	useEffect(() => {
 		window.scrollTo(0, 0);
@@ -108,17 +103,9 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({id, activePage, setActiveP
 
 	useEffect(() => {
 		const fetchCards = async () => {
-			const { data: limitData, error: limitError } = await supabaseClient
-				.from('new_card_limits')
-				.select('remaining_cards')
-				.eq('decks_id', id);
-			if (limitError) { console.error(limitError); return; };
-
-			const totalNew = limitData[0].remaining_cards
-
 			// Request all new cards data from the API
 			const { data: newCardData, error: newCardError} = await supabaseClient
-				.from('cards')
+				.from('default_cards')
 				.select(`
 					id,
 					ease, 
@@ -130,45 +117,18 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({id, activePage, setActiveP
 					decks_id,
 					never_seen
 				`)
-				.eq('decks_id', id)
-				.eq('never_seen', 1)
-				.limit(totalNew);
+				.eq('decks_id', 24)
 			if (newCardError) { 
 				console.error('error', newCardError);
-				throw new Error('Supabase returned error!');
-			};
-
-			// We'll get all cards due within the next hour
-			const oneHourFromNow = new Date(new Date().getTime() + 60 * 60 * 1000).toISOString();
-
-			// Request all review cards data from the API
-			const { data: revCardData, error: revCardError} = await supabaseClient
-				.from('cards')
-				.select(`
-					id,
-					ease, 
-					interval, 
-					is_learning, 
-					step, 
-					review_at,
-					lines(id, name, eco),
-					decks_id,
-					never_seen
-				`)
-				.eq('decks_id', id)
-				.lte('review_at', oneHourFromNow);
-			if (revCardError) { 
-				console.error(newCardError);
 				throw new Error('Supabase returned error!');
 			};
 
 			// Format the data so it can be inserted into Cards and the Scheduler
 			const cards = new Map<number, Card>();
 
-			while (newCardData.length > 0 || revCardData.length > 0) {
+			while (newCardData.length > 0) {
 				let cardsRow: CardsRow;
-				if (newCardData.length > 0) cardsRow = newCardData.pop()!;
-				else cardsRow = revCardData.pop()!;
+				cardsRow = newCardData.pop()!;
 
 				// If there are no associated moves, ignore this card.
 				if (!cardsRow.lines) continue;
@@ -196,7 +156,7 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({id, activePage, setActiveP
 			}
 
 			// Add cards to scheduler
-			const scheduler = new Scheduler(totalNew);
+			const scheduler = new Scheduler(cards.size);
 			for (let key of Array.from(cards.keys())) {
 				scheduler.addCard(cards.get(key)!);
 			}
@@ -205,7 +165,7 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({id, activePage, setActiveP
 		}
 		
 		fetchCards();
-	}, [id, activePage]);  
+	}, []);  
 
 
 	const renderCards = useCallback(() => {
@@ -287,12 +247,6 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({id, activePage, setActiveP
 		}	
 	}
 
-
-	const backButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-		setActivePage('DeckPicker');
-	};
-
-
 	const ratingButtonClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
 		if (!scheduler) return;
 		if (position.guess.color === '' && !solutionToggled) return; 
@@ -370,9 +324,13 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({id, activePage, setActiveP
 			<div className="flex flex-col md:flex-row md:pb-10 justify-center md:gap-4">
 				<div className="md:px-4 h-full flex flex-col bg-indigo-500 md:rounded-lg">	
 					
-					<div className="pt-4 px-1 sm:py-6 text-center text-2xl md:text-3xl font-bold text-white">
+					<div className="pt-4 px-1 sm:pt-6 sm:pb-3 text-center text-2xl md:text-3xl font-bold text-white">
 						{isLoaded ? position.name : <BeatLoader color={"#FFFFFF"} loading={!isLoaded} size={16} />}
 					</div>		
+
+					<div className='bg-rose-400 py-3 px-3 mx-4 md:w-[50vh] mt-3 sm:mb-4 sm:mt-0 mb-1 rounded-md text-md'>
+						Your progress is not being saved! <a href='https://fried-liver.com/signup' className='underline hover:text-rose-300'>Sign up</a> for a free account to save your progress.
+					</div>
 					
 					<div className="flex justify-center items-center sm:px-4 sm:pb-4">
 						{position.line && position.line.length > 0 &&				
@@ -463,22 +421,19 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({id, activePage, setActiveP
 								Toggle Answer
 							</SolutionButton>
 						</div>
-						<div className="flex flex-grow justify-center items-center rounded-md">
+						<Link href='/' className="flex flex-grow justify-center items-center rounded-md">
 							<BackButton 
 								id='back'
-								handleClick={backButtonClick}
+								handleClick={(() => {})}
 							>
 								{'Back'}
 							</BackButton>
-						</div>
+						</Link>
 					</div>
 
 					<div className="w-full py-4 px-4  bg-indigo-500 sm:rounded-lg">
-						<DeckInfoPanel
-							deckId={id}
+						<DemoInfoPanel
 							scheduler={scheduler}
-							solutionToggled={solutionToggled}
-							position={position}
 							isLoaded={isLoaded}
 						/>
 					</div>
@@ -492,4 +447,4 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({id, activePage, setActiveP
 	
 }
 
-export default ReviewSession;
+export default DemoReviewSession;

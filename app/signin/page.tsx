@@ -30,30 +30,6 @@ const SignIn: React.FC = () => {
     setEmail('');
     setPassword('');
 
-    // Update the cards in the user database if necessary.
-    const { data: data2, error: error2 } = await supabaseClient.rpc('insert_default_user_cards');
-    if (error2) {
-      console.error(error2)
-      setUserMessage(
-        <div className='bg-rose-400 py-3 px-3 mt-2 rounded-md text-sm'>
-          {error2.message}
-        </div>
-      );
-      return;
-    };
-
-    // Update the card limits in the user database if necessary.
-    const { data: data3, error: error3 } = await supabaseClient.rpc('insert_default_user_limits');
-    if (error3) {
-      console.error(error3.message);
-      setUserMessage(
-        <div className='bg-rose-400 py-3 px-3 mt-2 rounded-md text-sm'>
-          {error3.message}
-        </div>
-      );
-      return;
-    };
-
     setUserMessage(
       <div className='bg-green-400 py-3 px-3 mt-2 rounded-md text-sm'>
         Success!
@@ -83,7 +59,7 @@ const SignIn: React.FC = () => {
                 type="email"
                 autoComplete="email"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-none relative block w-full px-3 py-2 bg-indigo-100 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -99,7 +75,7 @@ const SignIn: React.FC = () => {
                 type="password"
                 autoComplete="current-password"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 bg-indigo-100 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
