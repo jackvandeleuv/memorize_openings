@@ -1,9 +1,9 @@
 'use client';
 
 import React, { MouseEventHandler, useEffect } from 'react';
-import { DeckInfo, DecksRow } from './learn/page';
 import DeckDropdown from './DeckDropdown';
 import { supabaseClient } from '@/utils/supabaseClient';
+import { DeckInfo, DecksRow } from '@/app/learn/page';
 
 interface DeckPickerProps {
     deckIdOptions: Map<number, DeckInfo>;

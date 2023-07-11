@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import DropdownRow from './DropdownRow';
-import { DeckInfo } from './learn/page';
+import { DeckInfo } from '@/app/learn/page';
 
 interface DeckDropdownProps {
   deckIdOptions: Map<number, DeckInfo>;

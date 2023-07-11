@@ -1,8 +1,6 @@
+import { Scheduler } from '@/app/Scheduler';
 import React, { useEffect, useState } from 'react';
-import { Scheduler } from './Scheduler';
-import { Position } from './ReviewSession';
 import { BeatLoader } from 'react-spinners';
-import { supabaseClient } from '@/utils/supabaseClient';
 
 interface NeverseenAndDue {
 	neverseen_below_limit: number;
@@ -10,29 +8,33 @@ interface NeverseenAndDue {
 }
 
 interface DeckInfoPanelProps {
-	deckId: number;
-    scheduler: Scheduler | undefined;
-    solutionToggled: boolean;
-	position: Position;
+	scheduler: Scheduler | undefined;
 	isLoaded: boolean;
 };
 
-const DeckInfoPanel: React.FC<DeckInfoPanelProps> = ({ deckId, scheduler, solutionToggled, position, isLoaded }) => {
+const DemoInfoPanel: React.FC<DeckInfoPanelProps> = ({ scheduler, isLoaded }) => {
 	const [queueSize, setQueueSize] = useState<NeverseenAndDue>({neverseen_below_limit: 0, other_due_cards: 0});
 
 	useEffect(() => {
 		const updateCardCounts = async () => {
-			const { data, error } = await supabaseClient.rpc('get_neverseen_and_due', { _current_deck_id: deckId });
-			if (error) { console.error(error); return; }
+            if (!scheduler) return;
+			const cards = scheduler.getCards();
+            let newCount = 0;
+            let revCount = 0;
 
-			const neverseenAndDue: NeverseenAndDue[] = data;
-			let updatedQueueSize = neverseenAndDue[0]
-			if (updatedQueueSize === undefined || updatedQueueSize === null) updatedQueueSize = {neverseen_below_limit: 0, other_due_cards: 0};
-			setQueueSize(updatedQueueSize);
+            for (let card of cards) {
+                if (card.neverSeen) {
+                    newCount = newCount + 1;
+                } else {
+                    revCount = revCount + 1;
+                }
+            };
+
+            setQueueSize({neverseen_below_limit: newCount, other_due_cards: revCount});
 		};
 
 		updateCardCounts();
-	}, [scheduler, deckId])
+	}, [scheduler])
 	
 
 	return (
@@ -56,4 +58,4 @@ const DeckInfoPanel: React.FC<DeckInfoPanelProps> = ({ deckId, scheduler, soluti
 	);
 };
 
-export default DeckInfoPanel;
+export default DemoInfoPanel;

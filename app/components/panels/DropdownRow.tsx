@@ -1,5 +1,5 @@
 import React from 'react';
-import { DeckInfo } from './learn/page';
+import { DeckInfo } from '../../learn/page';
 import { BeatLoader } from 'react-spinners';
 import Image from 'next/image';
 

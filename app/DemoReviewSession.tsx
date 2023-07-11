@@ -1,18 +1,18 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import ChessBoard from './ChessBoard';
+import ChessBoard from './components/chess/ChessBoard';
 import { Card } from './Card';
 import { Scheduler } from './Scheduler';
 import { Chess } from 'chess.js';
-import RatingButton from './RatingButton';
+import RatingButton from './components/buttons/RatingButton';
 import { supabaseClient } from '../utils/supabaseClient';
-import SolutionButton from './SolutionButton';
-import BackButton from './BackButton';
-import ArrowButton from './ArrowButton';
+import SolutionButton from './components/buttons/SolutionButton';
 import { BeatLoader } from 'react-spinners';
 import Link from 'next/link';
-import DemoInfoPanel from './DemoInfoPanel';
+import ArrowButton from './components/buttons/ArrowButton';
+import BackButton from './components/buttons/BackButton';
+import DemoInfoPanel from './components/panels/DemoInfoPanel';
 
 interface CardsRow {
     ease: number;       

@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Cell from './Cell';
 import Piece from './Piece';
 import { Chess, Square } from 'chess.js';
-import { Position } from './ReviewSession';
+import { Position } from '../../ReviewSession';
+import Cell from './Cell';
 
 export interface Piece {
 	piece: 'p' | 'r' | 'n' | 'b' | 'k' | 'q';
