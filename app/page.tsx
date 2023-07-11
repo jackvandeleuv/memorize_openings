@@ -1,31 +1,9 @@
 'use client';
 
-import React, { useEffect } from "react";
-import { supabaseClient } from "@/utils/supabaseClient";
-import { Session } from "@supabase/supabase-js";
+import React from "react";
 import Link from "next/link";
 
 const HomePage: React.FC = () => {
-	useEffect(() => {
-		const updateDbForNewUser = async () => {
-			// Check for an existing session
-			let session: Session;
-			const { data, error } = await supabaseClient.auth.getSession();
-
-			// If there isn't one, return.
-			if (error || !data.session) return;
-
-			// Otherwise, ask the database to update cards and new card limits if necessary.
-			const { data: limitData, error: limitError } = await supabaseClient.rpc('insert_default_user_limits');
-			if (limitError) console.log(limitError);
-			const { data: cardsData, error: cardsError } = await supabaseClient.rpc('insert_default_user_cards');
-			if (cardsError) console.log(cardsError);
-		};
-
-		updateDbForNewUser();
-	}, []);
-	
-
 	return (
 		<div className="flex flex-col sm:grid sm:grid-cols-[1fr,5fr] bg-indigo-400 w-full">
 			<div className="px-6 pb-2 sm:pl-8 pt-4 sm:pt-8 bg-indigo-400">

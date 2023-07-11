@@ -6,7 +6,7 @@ import { supabaseClient } from '../../utils/supabaseClient';
 const SignIn: React.FC = () => {
 	const [email, setEmail] = useState<string>('');
 	const [password, setPassword] = useState<string>('');
-	const [userMessage, setUserMessage] = useState<string>('');
+	const [userMessage, setUserMessage] = useState<JSX.Element>(<></>);
 
 	const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -16,8 +16,12 @@ const SignIn: React.FC = () => {
     })
 
     if (error) {
-      console.error('Error signing in:', error.message);
-      setUserMessage('Email or Password Incorrect');
+      console.error(error)
+      setUserMessage(
+        <div className='bg-rose-400 py-3 px-3 mt-2 rounded-md text-sm'>
+          {error.message}
+        </div>
+      );
       setEmail('');
       setPassword('');
       return;
@@ -26,23 +30,11 @@ const SignIn: React.FC = () => {
     setEmail('');
     setPassword('');
 
-    // Update the cards in the user database if necessary.
-    const { data: data2, error: error2 } = await supabaseClient.rpc('insert_default_user_cards');
-    if (error2) {
-      console.error('Error updating database: ', error2.message);
-      setUserMessage(error2.message);
-      return;
-    };
-
-    // Update the card limits in the user database if necessary.
-    const { data: data3, error: error3 } = await supabaseClient.rpc('insert_default_user_limits');
-    if (error3) {
-      console.error('Error updating database: ', error3.message);
-      setUserMessage(error3.message);
-      return;
-    };
-
-    setUserMessage('Success!');
+    setUserMessage(
+      <div className='bg-green-400 py-3 px-3 mt-2 rounded-md text-sm'>
+        Success!
+      </div>
+    );
 	};
 
 	
@@ -67,7 +59,7 @@ const SignIn: React.FC = () => {
                 type="email"
                 autoComplete="email"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-none relative block w-full px-3 py-2 bg-indigo-100 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -83,7 +75,7 @@ const SignIn: React.FC = () => {
                 type="password"
                 autoComplete="current-password"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 bg-indigo-100 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

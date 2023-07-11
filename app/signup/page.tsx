@@ -2,12 +2,11 @@
 
 import React, { useState } from "react";
 import { supabaseClient } from '../../utils/supabaseClient';
-import { Link } from 'react-router-dom';
 
 const SignUp: React.FC = () => {
 	const [email, setEmail] = useState<string>('');
 	const [password, setPassword] = useState<string>('');
-	const [userMessage, setUserMessage] = useState<string>('');
+	const [userMessage, setUserMessage] = useState<JSX.Element>(<></>);
 
 	const handleSubmit = async (event: React.FormEvent) => {
 		event.preventDefault();
@@ -20,10 +19,19 @@ const SignUp: React.FC = () => {
 		setPassword('');
 
 		if (error) {
+      setUserMessage(
+        <div className='bg-rose-400 py-3 px-3 mt-2 rounded-md text-sm'>
+          {error.message}
+        </div>
+      );
       return;
 		};
 
-		setUserMessage('Success! Check the email you signed up with to sign in.');
+		setUserMessage(
+    <div className='bg-green-400 py-3 px-3 mt-2 rounded-md text-sm'>
+      Success! Check the email you signed up with to sign in.
+    </div>
+    );
 	};
 
 	
@@ -48,7 +56,7 @@ const SignUp: React.FC = () => {
                 type="email"
                 autoComplete="email"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border bg-indigo-100 border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -64,7 +72,7 @@ const SignUp: React.FC = () => {
                 type="password"
                 autoComplete="current-password"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-none relative block w-full px-3 py-2 bg-indigo-100 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

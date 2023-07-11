@@ -40,7 +40,6 @@ const DeckDropdown: React.FC<DeckDropdownProps> = ({ deckIdOptions, deckChoice, 
 						name: '', 
 						newDue: 0, 
 						reviewDue: 0, 
-						totalCards: 0,
 						deck_id: -1,
 						image_path: ''
 					}}

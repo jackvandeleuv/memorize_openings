@@ -1,4 +1,4 @@
-import { addMinutes, addDays, isAfter, formatDistanceToNow } from 'date-fns';
+import { addMinutes, addDays, isAfter } from 'date-fns';
 import { Card } from './Card';
 import { ChessMove } from './ReviewSession';
 import { PostgrestError } from '@supabase/supabase-js';
@@ -11,8 +11,6 @@ export class Scheduler {
     private queue: Card[];
     private newCardRatio: number;
     private steps: number[];
-    private newCount: number = 0;
-    private reviewCount: number = 0;
     private cardCache: Map<number, Card>;
 
 
@@ -31,31 +29,9 @@ export class Scheduler {
         schedulerCopy.cards = [...this.cards];
         schedulerCopy.queue = this.queue;
         schedulerCopy.newCardRatio = this.newCardRatio;
-        schedulerCopy.newCount = this.newCount;
-        schedulerCopy.reviewCount = this.reviewCount
         const newMap = new Map(this.cardCache);
         schedulerCopy.cardCache = newMap;
         return schedulerCopy;
-    }
-
-
-    getReviewQueueSize(): number {
-        return this.reviewCount;
-    }
-
-
-    setReviewQueueSize(newReview: number): void {
-        this.reviewCount = newReview;
-    }
-
-
-    getNewQueueSize(): number {
-        return this.newCount;
-    }
-
-
-    setNewQueueSize(newSize: number): void {
-        this.newCount = newSize;
     }
 
 
@@ -64,8 +40,18 @@ export class Scheduler {
     }
 
 
+    getCards(): Card[] {
+        const cardsToReturn = [];
+        for (let card of this.cards) {
+            const cardCopy = card.deepCopy();
+            cardsToReturn.push(cardCopy);
+        }
+        return cardsToReturn;
+    }
+
+
     async getNextCard(): Promise<Card | null> {
-        if (this.queue.length == 0) { return null };
+        if (this.queue.length == 0) return null;
         if (this.queue.length > 1 && !this.queue[1].hasMoves()) {
             this.updateCardCache(this.queue[1].deepCopy());
         }
@@ -133,14 +119,11 @@ export class Scheduler {
         const newCards: Card[] = [];
         const revCards: Card[] = [];
         for (const card of this.cards) {
-            if (card.never_seen) {
+            if (card.neverSeen) {
                 newCards.push(card);
-            };
-            if (!card.never_seen && 
-                (card.isNew || isAfter(new Date(), card.getReviewAt()))
-            ) {
+            } else {
                 revCards.push(card);
-            };
+            }
         }
 
         newCards.sort((a, b) => {
@@ -174,16 +157,16 @@ export class Scheduler {
     }
 
 
-    private async updateDbCard(card: Card): Promise<boolean> {
+    private async updateDbCard(card: Card, gradingNeverSeen: boolean): Promise<boolean> {
         const { data: cardData, error: cardError } = await supabaseClient
             .from('cards')
             .update({
                 'step': card.step,
-                'is_new': card.isNew ? 1 : 0,
+                'is_learning': card.isLearning ? 1 : 0,
                 'review_at': card.reviewAt,
                 'interval': card.interval,
                 'ease': card.ease,
-                'never_seen': card.never_seen
+                'never_seen': card.neverSeen
             })
             .match({'id': card.id});
         if (cardError) {
@@ -191,10 +174,10 @@ export class Scheduler {
             return false;
         };
 
+        // Let the db know if we used up one of our new cards for the day
+        if (!gradingNeverSeen) return true; 
         const { data: limitData, error: limitError } = await supabaseClient
-            .from('new_card_limits')
-            .update({'remaining_cards': this.newCardLimit})
-            .in('decks_id', [card.decks_id])
+            .rpc('decrement_remaining_cards', { _id_to_update: card.decks_id});
         if (limitError) {
             console.error(limitError); 
             return false;
@@ -209,28 +192,23 @@ export class Scheduler {
             return false;
         }
 
-        const gradingNeverSeen = this.queue[0].never_seen;
-        const gradingNew = this.queue[0].isNew;
+        const gradingNeverSeen = this.queue[0].neverSeen;
         this.gradeCard(grade, this.queue[0]);
-        this.queue[0].never_seen = 0;
+        this.queue[0].neverSeen = 0;
 
         if (gradingNeverSeen === 1) {
-            this.newCount--; 
             this.newCardLimit = this.newCardLimit - 1;
-            // Easy will set review time four days out, and thus out of the queue.
-            if (grade !== 'Easy') this.reviewCount++;
-        }
+        }       
 
-        // If the card has been seen, but is new, it is in the review queue.
-        // Because it changed status to be rescheduled at least a day in the
-        // future, we need to decrement the review queue counter.
-        if (!gradingNeverSeen && gradingNew && !this.queue[0].isNew) this.reviewCount--;
-        
-
-        const updateSuccess = await this.updateDbCard(this.queue[0]);
+        const updateSuccess = await this.updateDbCard(this.queue[0], gradingNeverSeen === 1);
         if (!updateSuccess) throw new Error('Db update failed.');
-        this.updateQueue();
 
+        const oneHourFromNow = new Date(new Date().getTime() + 60 * 60 * 1000);
+        if (this.queue[0].neverSeen !== 1 && isAfter(this.queue[0].reviewAt, oneHourFromNow)) {
+            this.cards = this.cards.filter(card => card.id !== this.queue[0].id);
+        };
+
+        this.updateQueue();
         return true;
     }
 
@@ -244,7 +222,7 @@ export class Scheduler {
 
     // Modify card and return it
     private gradeCard(grade: string, card: Card): Card {     
-        if (card.isNew) {
+        if (card.isLearning) {
             if (card.step === 1 && grade === 'Hard') {
                 card.step = 2;
             } else if (card.step === 1 && grade === 'Good') {
@@ -254,17 +232,18 @@ export class Scheduler {
             } else if (grade === 'Good') {
                 card.step = card.step + 1;
                 if (card.step === this.steps.length) {
-                    card.isNew = false;
+                    card.isLearning = false;
                     card.setReviewAt(addDays(new Date(), card.interval));
                 };
             } else if (grade === 'Easy') {
-                card.isNew = false;
+                card.isLearning = false;
                 card.setReviewAt(addDays(new Date(), card.interval * 4));
             } else if (grade !== 'Hard') {
                 throw new Error('Unexpected value received for grade');
             }
 
-            if (card.isNew) card.setReviewAt(addMinutes(new Date(), this.steps[card.step - 1]));
+            // Currently set to add seconds to prevent in from not being displayed as a review card during session
+            if (card.isLearning) card.setReviewAt(addMinutes(new Date(), this.steps[card.step - 1]));
             return card;
         }
         
@@ -275,9 +254,8 @@ export class Scheduler {
 
     private updateReviewCard(grade: string, card: Card): void {
         if (grade === 'Again') {
-            card.ease = Math.max(card.ease * 0.8 / 1000, 1.3);
-            card.isNew = true;
-            this.newCount++;
+            card.ease = Math.max(card.ease * 0.8 / 1000, 1300);
+            card.isLearning = true;
             card.step = 1;
             card.setReviewAt(addMinutes(new Date(), 1));
             return;
@@ -286,7 +264,7 @@ export class Scheduler {
             card.ease = card.ease * 1.15;
         }
         if (grade === 'Hard') {
-            card.ease = card.ease * 0.85;
+            card.ease = Math.max(card.ease * 0.85, 1300);
         }
         
         card.interval = card.interval * card.ease / 1000;
