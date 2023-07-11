@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Position } from "./ReviewSession";
+import { Position } from "../../ReviewSession";
 
 interface RatingButtonProps {
   id: string;

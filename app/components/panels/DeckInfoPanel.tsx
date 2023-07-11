@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Scheduler } from './Scheduler';
 import { BeatLoader } from 'react-spinners';
+import { supabaseClient } from '@/utils/supabaseClient';
+import { Scheduler } from '@/app/Scheduler';
+import { Position } from '@/app/ReviewSession';
 
 interface NeverseenAndDue {
 	neverseen_below_limit: number;
@@ -8,33 +10,29 @@ interface NeverseenAndDue {
 }
 
 interface DeckInfoPanelProps {
-	scheduler: Scheduler | undefined;
+	deckId: number;
+    scheduler: Scheduler | undefined;
+    solutionToggled: boolean;
+	position: Position;
 	isLoaded: boolean;
 };
 
-const DemoInfoPanel: React.FC<DeckInfoPanelProps> = ({ scheduler, isLoaded }) => {
+const DeckInfoPanel: React.FC<DeckInfoPanelProps> = ({ deckId, scheduler, solutionToggled, position, isLoaded }) => {
 	const [queueSize, setQueueSize] = useState<NeverseenAndDue>({neverseen_below_limit: 0, other_due_cards: 0});
 
 	useEffect(() => {
 		const updateCardCounts = async () => {
-            if (!scheduler) return;
-			const cards = scheduler.getCards();
-            let newCount = 0;
-            let revCount = 0;
+			const { data, error } = await supabaseClient.rpc('get_neverseen_and_due', { _current_deck_id: deckId });
+			if (error) { console.error(error); return; }
 
-            for (let card of cards) {
-                if (card.neverSeen) {
-                    newCount = newCount + 1;
-                } else {
-                    revCount = revCount + 1;
-                }
-            };
-
-            setQueueSize({neverseen_below_limit: newCount, other_due_cards: revCount});
+			const neverseenAndDue: NeverseenAndDue[] = data;
+			let updatedQueueSize = neverseenAndDue[0]
+			if (updatedQueueSize === undefined || updatedQueueSize === null) updatedQueueSize = {neverseen_below_limit: 0, other_due_cards: 0};
+			setQueueSize(updatedQueueSize);
 		};
 
 		updateCardCounts();
-	}, [scheduler])
+	}, [scheduler, deckId])
 	
 
 	return (
@@ -58,4 +56,4 @@ const DemoInfoPanel: React.FC<DeckInfoPanelProps> = ({ scheduler, isLoaded }) =>
 	);
 };
 
-export default DemoInfoPanel;
+export default DeckInfoPanel;

@@ -1,5 +1,4 @@
-import React, { ReactNode, ReactSVG } from 'react';
-import Image from 'next/image';
+import React, { ReactNode } from 'react';
 
 interface AboutDeckButtonProps {
 	children: ReactNode;

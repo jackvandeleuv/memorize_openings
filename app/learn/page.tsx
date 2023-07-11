@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { supabaseClient } from '../../utils/supabaseClient';
-import DeckPicker from '../DeckPicker';
 import ReviewSession from '../ReviewSession';
+import DeckPicker from '../components/panels/DeckPicker';
 
 export type PageOption = 'DeckPicker' | 'Review'
 
