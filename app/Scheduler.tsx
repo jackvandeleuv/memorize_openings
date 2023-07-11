@@ -141,17 +141,14 @@ export class Scheduler {
         });
 
         let limit = this.newCardLimit;
-        let i = 0;
         while (revCards.length || (limit && newCards.length)) {
-            if (limit && newCards.length && i % this.newCardRatio === 0) {
+            if (limit && newCards.length && Math.floor(Math.random() * Math.sqrt(revCards.length)) % this.newCardRatio === 0) {
                 this.queue.push(newCards.pop()!);
                 limit--;
-                i++;
                 continue;
             };
 
             if (revCards.length) this.queue.push(revCards.pop()!);
-            i++;
         }
         this.queue.push(...newCards);
     }
