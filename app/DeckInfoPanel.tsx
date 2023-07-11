@@ -36,16 +36,16 @@ const DeckInfoPanel: React.FC<DeckInfoPanelProps> = ({ deckId, scheduler, soluti
 	
 
 	return (
-		<div className="p-4 bg-indigo-600 rounded-md">
+		<div className="rounded-md p-4 md:p-0 bg-indigo-600 md:bg-indigo-500">
 			<div className={`text-center text-xl font-bold text-white`}>
 				{
-					isLoaded ? (position.game.turn() === 'w' && !solutionToggled) ? 'White to Move' : 'Black to Move' :
+					isLoaded ? 'Positions to Study' :
 					<BeatLoader color={"#FFFFFF"} loading={!isLoaded} size={12} />
 				}
 			</div>
 			
 			<div className="flex flex-col py-4 w-full">
-				<div className="p-1 text-center text-lg font-bold text-white bg-indigo-500 rounded-sm">
+				<div className="p-1 text-center text-lg font-bold text-white bg-indigo-500 md:bg-indigo-600 rounded-sm">
 					{`New: ${!scheduler ? '0' : queueSize.neverseen_below_limit}`}
 				</div>
 				<div className="p-1 text-center text-lg font-bold text-white bg-indigo-400 rounded-sm">

@@ -17,10 +17,11 @@ interface ChessBoardProps {
 	solutionToggled: boolean;
 	position: Position;
 	setPosition: React.Dispatch<React.SetStateAction<Position>>;
+	setUserMessage: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 
-const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setPosition }) => {
+const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setPosition, setUserMessage }) => {
 	const [prevClickedPiece, setPrevClickedPiece] = useState('');
 	const [highlightMap, setHighlightMap] = useState(new Map<string, string>());
 	const [reversed, setReversed] = useState<boolean>(false);
@@ -94,6 +95,9 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 
 		// Update cell highlight colors
 		const destinationColor = isCorrect ? 'bg-green-400' : 'bg-rose-300';
+		const successMessage = ['Correct!', 'Great job! To see the next card, rate how hard it was for you to remember that move.']
+		const failureMessage = ['Incorrect!', "That wasn't the expected move. But don't worry, you'll see it again soon. Rate the difficulty to proceed."]
+		setUserMessage(isCorrect ? successMessage : failureMessage);
 
 		setPosition({
 			move: updatedMove, 

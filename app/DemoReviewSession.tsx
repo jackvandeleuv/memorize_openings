@@ -10,7 +10,6 @@ import { supabaseClient } from '../utils/supabaseClient';
 import SolutionButton from './SolutionButton';
 import BackButton from './BackButton';
 import ArrowButton from './ArrowButton';
-import DeckInfoPanel from './DeckInfoPanel';
 import { BeatLoader } from 'react-spinners';
 import Link from 'next/link';
 import DemoInfoPanel from './DemoInfoPanel';
@@ -89,6 +88,9 @@ const DemoReviewSession: React.FC = () => {
 	const [storedPosition, setStoredPosition] = useState<Position>();
 	const [solutionToggled, setSolutionToggled] = useState<boolean>(false);
 	const [isLoaded, setIsLoaded] = useState<boolean>(false);
+
+	const defaultMessage = ['Make a Move', "Give your best guess, and then rate yourself to decide how long to wait before you see this position again."];
+	const [userMessage, setUserMessage] = useState<string[]>(defaultMessage);
 	const DECK_TO_SHOW = 24;
 	
 	useEffect(() => {
@@ -251,6 +253,8 @@ const DemoReviewSession: React.FC = () => {
 		if (!scheduler) return;
 		if (position.guess.color === '' && !solutionToggled) return; 
 
+		setUserMessage(defaultMessage);
+
 		// Remove the guess highlight
 		const positionCopy = deepCopyPosition(position);
 		positionCopy.guess.color = '';
@@ -338,6 +342,7 @@ const DemoReviewSession: React.FC = () => {
 								solutionToggled={solutionToggled}
 								position={position}
 								setPosition={setPosition}
+								setUserMessage={setUserMessage}
 							/>
 						}
 					</div>
@@ -396,7 +401,7 @@ const DemoReviewSession: React.FC = () => {
 				</div>
 
 	
-				<div className="flex flex-col items-center">
+				<div className="flex flex-col items-center md:w-1/4">
 					<div className="px-4 md:py-4 md:mb-4 flex flex-row md:flex-col w-full bg-indigo-500 sm:rounded-lg gap-2 md:gap-0">
 						<div className="flex flex-grow justify-center items-center py-2 space-x-2 rounded-md">
 							<ArrowButton
@@ -431,6 +436,17 @@ const DemoReviewSession: React.FC = () => {
 						</Link>
 					</div>
 
+					<div className='flex-grow h-full justify-center mb-4 bg-indigo-500 rounded-lg'>
+						<div className='m-3 px-1 py-5 md:py-3 rounded-md bg-indigo-600 md:bg-indigo-500'>
+							<div className='flex justify-center items-center text-center pb-1 text-xl font-bold text-white'>
+								{userMessage[0]}
+							</div>
+							<div className='text-md text-white px-4 md:px-0'>
+								{userMessage[1]}
+							</div>
+						</div>
+					</div>
+
 					<div className="w-full py-4 px-4  bg-indigo-500 sm:rounded-lg">
 						<DemoInfoPanel
 							scheduler={scheduler}
@@ -439,7 +455,6 @@ const DemoReviewSession: React.FC = () => {
 					</div>
 					
 				</div>
-
 			</div>
 		</div>
 	);
