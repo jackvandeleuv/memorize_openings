@@ -18,7 +18,7 @@ const SignIn: React.FC = () => {
     if (error) {
       console.error(error)
       setUserMessage(
-        <div className='bg-rose-400 py-3 px-3 mt-2 rounded-md text-sm'>
+        <div className='bg-rose-400 text-black py-3 px-3 mt-3 rounded-md text-sm'>
           {error.message}
         </div>
       );
@@ -31,7 +31,7 @@ const SignIn: React.FC = () => {
     setPassword('');
 
     setUserMessage(
-      <div className='bg-green-400 py-3 px-3 mt-2 rounded-md text-sm'>
+      <div className='bg-green-400 text-black py-3 px-3 mt-3 rounded-md text-sm'>
         Success!
       </div>
     );
@@ -39,8 +39,8 @@ const SignIn: React.FC = () => {
 
 	
   return (
-    <div className="flex items-center justify-center py-16 bg-indigo-400">
-      <div className="mx-2 sm:mx-0 max-w-md w-full space-y-8 bg-indigo-100 p-10 rounded-xl">
+    <div className="flex items-center justify-center py-16 bg-slate-700">
+      <div className="mx-2 sm:mx-0 max-w-md w-full space-y-8 bg-slate-300 p-10 rounded-xl">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Sign in to your account
@@ -59,7 +59,7 @@ const SignIn: React.FC = () => {
                 type="email"
                 autoComplete="email"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 bg-indigo-100 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-none relative block w-full px-3 py-2 bg-slate-200 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-slate-500 focus:border-slate-500 focus:z-10 sm:text-sm"
                 placeholder="Email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -75,7 +75,7 @@ const SignIn: React.FC = () => {
                 type="password"
                 autoComplete="current-password"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 bg-indigo-100 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-slate-300 bg-slate-200 placeholder-slate-500 text-slate-800 rounded-b-md focus:outline-none focus:ring-slate-500 focus:border-slate-500 focus:z-10 sm:text-sm"
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -89,7 +89,7 @@ const SignIn: React.FC = () => {
           <div>
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-500 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-slate-700 hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
               Sign in
             </button>

@@ -16,13 +16,14 @@ const DropdownRow: React.FC<DropdownRowProps> = ({ info, isLoaded, handleClick }
 				<div onClick={(e) => {handleClick(e)}} id={info.deck_id.toString()} className='flex flex-row items-center p-2 hover:bg-indigo-200'>
 					<div className='flex justify-center items-center'>
 						<Image
+							className='rounded-md'
 							src={info.image_path}
 							alt="logo"
 							height={48}
 							width={48}
 						/>
 					</div>
-					<div className='flex flex-col p-2'>
+					<div className='flex flex-col p-2 text-slate-800'>
 						<div className="text-lg sm:text-xl">
 							{info.name}
 						</div>

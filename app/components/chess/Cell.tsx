@@ -10,7 +10,7 @@ interface CellProps {
 
 const Cell: React.FC<CellProps> = ({ row, col, handleClick, children, highlight }) => {
 	const isWhite = (row + col) % 2 === 0;
-	const cellStyle = `w-full h-full ${highlight !== undefined ? highlight : (isWhite ? 'bg-indigo-100' : 'bg-indigo-400')}`;
+	const cellStyle = `w-full h-full ${highlight !== undefined ? highlight : (isWhite ? 'bg-slate-200' : 'bg-slate-400')}`;
 
 	return (
 		<div
