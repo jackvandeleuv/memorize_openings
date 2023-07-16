@@ -55,7 +55,7 @@ const DeckPicker: React.FC<DeckPickerProps> = ({deckIdOptions, setDeckIdOptions,
                 <h2 className="mb-4 text-2xl font-semibold text-center text-slate-800">
                     Pick an opening
                 </h2>
-                <div className='bg-rose-400 text-slate-800 py-3 px-3 md:w-[50vh] my-2 sm:my-3 rounded-md text-md'>
+                <div className='bg-rose-400 text-slate-800 py-3 px-3 my-2 sm:my-3 rounded-md text-md'>
 					<a href='https://fried-liver.com/signup' className='underline hover:text-rose-300'>Sign up</a> for a free account to save your progress.
 				</div>
                 <div className="relative mb-2">
