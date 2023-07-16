@@ -13,6 +13,7 @@ import Link from 'next/link';
 import ArrowButton from './components/buttons/ArrowButton';
 import BackButton from './components/buttons/BackButton';
 import DemoInfoPanel from './components/panels/DemoInfoPanel';
+import { PageOption } from './learn/page';
 
 interface CardsRow {
     ease: number;       
@@ -61,7 +62,14 @@ interface IfGradeTimes {
 	Again: string;
 }
 
-const DemoReviewSession: React.FC = () => {
+interface ReviewSessionProps {
+	id: number;
+	activePage: PageOption;
+	setActivePage: React.Dispatch<React.SetStateAction<PageOption>>;
+}
+
+
+const DemoReviewSession: React.FC<ReviewSessionProps> = ({id, activePage, setActivePage}) => {
 	const defaultPosition = {
 		move: 0, 
 		line: ['8/8/8/8/8/8/8/8 w KQkq - 0 1'], 
@@ -107,7 +115,7 @@ const DemoReviewSession: React.FC = () => {
 		const fetchCards = async () => {
 			// Request all new cards data from the API
 			const { data: newCardData, error: newCardError} = await supabaseClient
-				.from('default_cards')
+				.from('demo_cards')
 				.select(`
 					id,
 					ease, 
@@ -119,7 +127,7 @@ const DemoReviewSession: React.FC = () => {
 					decks_id,
 					never_seen
 				`)
-				.eq('decks_id', 24)
+				.eq('decks_id', id)
 			if (newCardError) { 
 				console.error('error', newCardError);
 				throw new Error('Supabase returned error!');
@@ -324,14 +332,14 @@ const DemoReviewSession: React.FC = () => {
 	
 
 	return (
-		<div className="w-full sm:px-12 md:px-4 bg-indigo-500 md:bg-indigo-400">
+		<div className="w-full sm:px-12 md:px-4 bg-slate-800 md:bg-slate-700">
 			<div className="flex flex-col md:flex-row md:pb-10 justify-center md:gap-4">
-				<div className="md:px-4 h-full flex flex-col bg-indigo-500 md:rounded-lg">	
+				<div className="md:px-4 h-full flex flex-col bg-slate-800 md:rounded-lg">	
 					<div className="pt-4 px-1 sm:pt-6 sm:pb-3 text-center text-2xl md:text-3xl font-bold text-white">
 						{isLoaded ? position.name : <BeatLoader color={"#FFFFFF"} loading={!isLoaded} size={16} />}
 					</div>		
 
-					<div className='bg-rose-400 py-3 px-3 mx-4 md:w-[50vh] mt-3 sm:mb-4 sm:mt-0 mb-1 rounded-md text-md'>
+					<div className='bg-rose-400 text-slate-800 py-3 px-3 mx-4 md:w-[50vh] mt-3 sm:mb-4 sm:mt-0 mb-1 rounded-md text-md'>
 						Your progress is not being saved! <a href='https://fried-liver.com/signup' className='underline hover:text-rose-300'>Sign up</a> for a free account to save your progress.
 					</div>
 					
@@ -401,7 +409,7 @@ const DemoReviewSession: React.FC = () => {
 
 	
 				<div className="flex flex-col items-center md:w-1/4">
-					<div className="px-4 md:py-4 md:mb-4 flex flex-row md:flex-col w-full bg-indigo-500 sm:rounded-lg gap-2 md:gap-0">
+					<div className="px-4 md:py-4 md:mb-4 flex flex-row md:flex-col w-full bg-slate-800 sm:rounded-lg gap-2 md:gap-0">
 						<div className="flex flex-grow justify-center items-center py-2 space-x-2 rounded-md">
 							<ArrowButton
 								id='<'
@@ -425,18 +433,18 @@ const DemoReviewSession: React.FC = () => {
 								Toggle Answer
 							</SolutionButton>
 						</div>
-						<Link href='/' className="flex flex-grow justify-center items-center rounded-md">
+						<div className="flex flex-grow justify-center items-center rounded-md">
 							<BackButton 
 								id='back'
-								handleClick={(() => {})}
+								handleClick={(() => {setActivePage('DeckPicker')})}
 							>
 								{'Back'}
 							</BackButton>
-						</Link>
+						</div>
 					</div>
 
-					<div className='flex-grow h-full justify-center mb-4 bg-indigo-500 rounded-lg'>
-						<div className='m-3 px-1 py-5 md:py-3 rounded-md bg-indigo-600 md:bg-indigo-500'>
+					<div className='flex-grow h-full justify-center mb-4 bg-slate-800 rounded-lg'>
+						<div className='m-3 px-1 py-5 md:py-3 rounded-md bg-slate-700 md:bg-slate-800'>
 							<div className='flex justify-center items-center text-center pb-1 text-xl font-bold text-white'>
 								{userMessage[0]}
 							</div>
@@ -446,7 +454,7 @@ const DemoReviewSession: React.FC = () => {
 						</div>
 					</div>
 
-					<div className="w-full py-4 px-4  bg-indigo-500 sm:rounded-lg">
+					<div className="w-full py-4 px-4  bg-slate-800 sm:rounded-lg">
 						<DemoInfoPanel
 							scheduler={scheduler}
 							isLoaded={isLoaded}

@@ -47,7 +47,6 @@ export class Card {
 
 
     setIsLearning(isLearning: boolean): void {
-        console.log('Setting is learning to: ' + isLearning);
         this.isLearning = isLearning;
     }
 

@@ -38,7 +38,7 @@ const DemoInfoPanel: React.FC<DeckInfoPanelProps> = ({ scheduler, isLoaded }) =>
 	
 
 	return (
-		<div className="rounded-md p-4 md:p-0 bg-slate-800 md:bg-slate-700">
+		<div className="rounded-md p-4 md:p-0 bg-slate-700 md:bg-slate-800">
 			<div className={`text-center text-xl font-bold text-slate-300`}>
 				{
 					isLoaded ? 'Positions to Study' :
@@ -50,7 +50,7 @@ const DemoInfoPanel: React.FC<DeckInfoPanelProps> = ({ scheduler, isLoaded }) =>
 				<div className="p-1 text-center text-lg font-bold text-white bg-slate-800 md:bg-slate-700 rounded-sm">
 					{`New: ${!scheduler ? '0' : queueSize.neverseen_below_limit}`}
 				</div>
-				<div className="p-1 text-center text-lg font-bold text-white bg-slate-700 rounded-sm">
+				<div className="p-1 text-center text-lg font-bold text-white bg-slate-600 rounded-sm">
 					{`Review: ${!scheduler ? '0' : queueSize.other_due_cards}`}
 				</div>
 			</div>
