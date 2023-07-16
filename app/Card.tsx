@@ -5,7 +5,7 @@ export class Card {
     private moves: ChessMove[] = [];
     ease: number;
     interval: number;
-    isLearning: boolean;
+    private isLearning: boolean;
     step: number;
     reviewAt: Date;
     lines_id: number = -1;
@@ -38,6 +38,17 @@ export class Card {
 
     setLinesId(lines_id: number) {
         this.lines_id = lines_id;
+    }
+
+
+    getIsLearning(): boolean {
+        return this.isLearning;
+    }
+
+
+    setIsLearning(isLearning: boolean): void {
+        console.log('Setting is learning to: ' + isLearning);
+        this.isLearning = isLearning;
     }
 
 

@@ -239,7 +239,6 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({id, activePage, setActiveP
 	
 			const newGame = new Chess();
 			newGame.load(nextMoveFensBlind[nextMoveFensBlind.length - 1])
-	
 			setPosition({
 				line: nextMoveFensBlind, 
 				move: nextMoveFensBlind.length - 1,
