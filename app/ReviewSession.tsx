@@ -369,11 +369,11 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({id, activePage, setActiveP
 	
 
 	return (
-		<div className="w-full sm:px-12 md:px-4 bg-indigo-500 md:bg-indigo-400">
+		<div className="w-full sm:px-12 md:px-4 bg-slate-800 md:bg-slate-700">
 			<div className="flex flex-col md:flex-row md:pb-10 justify-center md:gap-4">
-				<div className="md:px-4 flex flex-col justify-center bg-indigo-500 md:rounded-lg">	
+				<div className="md:px-4 flex flex-col justify-center bg-slate-800 md:rounded-lg">	
 					
-					<div className="pt-4 px-1 sm:py-6 text-center text-2xl md:text-3xl font-bold text-white">
+					<div className="pt-4 px-1 sm:py-6 text-center text-2xl md:text-3xl font-bold text-slate-300">
 						{isLoaded ? position.name : <BeatLoader color={"#FFFFFF"} loading={!isLoaded} size={16} />}
 					</div>		
 					
@@ -443,7 +443,7 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({id, activePage, setActiveP
 
 	
 				<div className="flex flex-col items-center md:w-1/4">
-					<div className="px-4 md:py-4 md:mb-4 flex flex-row md:flex-col w-full bg-indigo-500 sm:rounded-lg gap-2 md:gap-0">
+					<div className="px-4 md:py-4 md:mb-4 flex flex-row md:flex-col w-full bg-slate-800 sm:rounded-lg gap-2 md:gap-0">
 						<div className="flex flex-grow justify-center items-center py-2 space-x-2 rounded-md">
 							<ArrowButton
 								id='<'
@@ -477,18 +477,18 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({id, activePage, setActiveP
 						</div>
 					</div>
 
-					<div className='flex-grow h-full justify-center mb-4 bg-indigo-500 rounded-lg'>
-						<div className='m-3 px-1 py-5 md:py-3 rounded-md bg-indigo-600 md:bg-indigo-500'>
-							<div className='flex justify-center items-center text-center pb-1 text-xl font-bold text-white'>
+					<div className='flex-grow h-full justify-center mb-4 bg-slate-800 rounded-lg'>
+						<div className='m-3 px-1 py-5 md:py-3 rounded-md bg-slate-700 md:bg-slate-800'>
+							<div className='flex justify-center items-center text-center pb-1 text-xl font-bold text-slate-300'>
 								{userMessage[0]}
 							</div>
-							<div className='text-md text-white px-4 md:px-0'>
+							<div className='text-md px-4 md:px-0'>
 								{userMessage[1]}
 							</div>
 						</div>
 					</div>
 
-					<div className="w-full py-4 px-4  bg-indigo-500 sm:rounded-lg">
+					<div className="w-full py-4 px-4  bg-slate-800 sm:rounded-lg">
 						<DeckInfoPanel
 							deckId={id}
 							scheduler={scheduler}

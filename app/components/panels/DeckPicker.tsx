@@ -44,9 +44,9 @@ const DeckPicker: React.FC<DeckPickerProps> = ({deckIdOptions, setDeckIdOptions,
     }, []);
 
     return (
-        <div className="flex items-center justify-center py-10 sm:py-20 bg-indigo-400">
-            <div className="bg-white rounded-lg shadow-md max-w-lg w-full p-4 sm:p-8 mx-2 sm:mx-0">
-                <h2 className="mb-4 text-2xl font-semibold text-center text-black">
+        <div className="flex items-center justify-center py-10 sm:py-20 bg-slate-700">
+            <div className="bg-slate-300 rounded-lg shadow-md max-w-lg w-full p-4 sm:p-8 mx-2 sm:mx-0">
+                <h2 className="mb-4 text-2xl font-semibold text-center text-slate-800">
                     Pick an opening
                 </h2>
                 <div className="relative mb-2">
@@ -58,7 +58,7 @@ const DeckPicker: React.FC<DeckPickerProps> = ({deckIdOptions, setDeckIdOptions,
     
                 </div>
                 <button 
-                    className="w-full p-3 mt-4 text-lg text-white bg-indigo-500 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 hover:bg-indigo-600"
+                    className="w-full p-3 mt-4 text-lg text-slate-300 bg-slate-700 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-500 hover:bg-slate-600"
                     onClick={handleGoButton}
                 >
                     Go

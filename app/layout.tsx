@@ -23,10 +23,10 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
       <body className={inter.className}>
-        <div className="flex flex-col min-h-screen">
+        <div className="flex flex-col text-slate-300 min-h-screen">
           <MenuBar />
             {children}
-          <div className="flex-grow bg-indigo-500">
+          <div className="flex-grow bg-slate-800">
             <Footer />
           </div>
         </div>
