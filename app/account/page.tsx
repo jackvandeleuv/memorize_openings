@@ -34,7 +34,7 @@ const AccountManagement: React.FC = () => {
 
 		if (error) {
 			setMessage(
-				<div className='bg-rose-400 py-3 px-3 mt-2 rounded-md text-sm'>
+				<div className='bg-rose-400 text-black py-3 px-3 mt-3 rounded-md text-sm'>
 					{error.message}
 				</div>
 			);
@@ -42,7 +42,7 @@ const AccountManagement: React.FC = () => {
 		}
 
 		setMessage(
-			<div className='bg-green-400 py-3 px-3 mt-2 rounded-md text-sm'>
+			<div className='bg-green-400 text-black py-3 px-3 mt-3 rounded-md text-sm'>
 				Password successfully changed!
 			</div>
 		);
@@ -54,7 +54,7 @@ const AccountManagement: React.FC = () => {
 
 		if (error) {
 			setMessage(
-				<div className='bg-rose-400 py-3 px-3 mt-2 rounded-md text-sm'>
+				<div className='bg-rose-400 text-black py-3 px-3 mt-3 rounded-md text-sm'>
 					{error.message}
 				</div>
 			);
@@ -62,7 +62,7 @@ const AccountManagement: React.FC = () => {
 		}
 
 		setMessage(
-			<div className='bg-green-400 py-3 px-3 mt-2 rounded-md text-sm'>
+			<div className='bg-green-400 text-black py-3 px-3 mt-3 rounded-md text-sm'>
 				Email successfully changed!
 			</div>
 		);
@@ -71,15 +71,15 @@ const AccountManagement: React.FC = () => {
 	return (
         <>
             {isSignedIn && (
-                <div className="flex items-center justify-center py-16 bg-indigo-400">
-                <div className="mx-2 sm:mx-0 max-w-md w-full space-y-8 bg-indigo-100 p-10 rounded-xl">
+                <div className="flex items-center justify-center py-16 bg-slate-700">
+                <div className="mx-2 sm:mx-0 max-w-md w-full space-y-8 bg-slate-300 text-slate-800 text-slate-8009 p-10 rounded-xl">
                     <div className="flex justify-center text-3xl font-extrabold">
                         Account Management
                     </div>
                     <form className="mt-8 space-y-6" onSubmit={handleChangeEmail}>
                     <input type="hidden" name="remember" value="true" />
-                    <div className="rounded-md shadow-sm -space-y-px">
-                        <div className='pb-6'>
+                    <div className="rounded-md shadow-sm -space-y-">
+                        <div className='pb-2'>
                         <label htmlFor="new-email" className="sr-only">
                             New email
                         </label>
@@ -89,7 +89,7 @@ const AccountManagement: React.FC = () => {
                             type="email"
                             autoComplete="email"
                             required
-                            className="appearance-none rounded-none relative block w-full px-3 py-2 bg-indigo-100 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                            className="appearance-none rounded-none relative block w-full px-3 py-2 bg-slate-200 border border-slate-300 placeholder-slate-500 text-slate-900 rounded-t-md focus:outline-none focus:ring-slate-500 focus:border-slate-500 focus:z-10 sm:text-sm"
                             placeholder="New email"
                             value={newEmail}
                             onChange={(e) => setNewEmail(e.target.value)}
@@ -98,7 +98,7 @@ const AccountManagement: React.FC = () => {
                         <div>
                         <button
                             type="submit"
-                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-500 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-slate-300 bg-slate-700 hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500"
                         >
                             Change Email
                         </button>
@@ -108,7 +108,7 @@ const AccountManagement: React.FC = () => {
                     <form className="mt-8 space-y-6" onSubmit={handleChangePassword}>
                     <input type="hidden" name="remember" value="true" />
                     <div className="rounded-md shadow-sm -space-y-px">
-                        <div className='pb-6'>
+                        <div className='pb-2'>
                         <label htmlFor="new-password" className="sr-only">
                             New password
                         </label>
@@ -118,7 +118,7 @@ const AccountManagement: React.FC = () => {
                             type="password"
                             autoComplete="new-password"
                             required
-                            className="appearance-none rounded-none relative block w-full px-3 py-2 bg-indigo-100 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                            className="appearance-none rounded-none relative block w-full px-3 py-2 bg-slate-200 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-slate-500 focus:border-slate-500 focus:z-10 sm:text-sm"
                             placeholder="New password"
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
@@ -127,7 +127,7 @@ const AccountManagement: React.FC = () => {
                         <div>
                         <button
                             type="submit"
-                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-500 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-slate-300 bg-slate-700 hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500"
                         >
                             Change Password
                         </button>

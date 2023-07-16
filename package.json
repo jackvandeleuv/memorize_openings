@@ -27,5 +27,9 @@
     "react-spinners": "^0.13.8",
     "tailwindcss": "3.3.2",
     "typescript": "5.1.6"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.3",
+    "jest": "^29.6.1"
   }
 }

@@ -26,7 +26,7 @@ const DeckDropdown: React.FC<DeckDropdownProps> = ({ deckIdOptions, deckChoice, 
 
 	return (
 	<div className="flex flex-col">
-		<div onClick={() => {setIsOpen(!isOpen)}} className="flex-grow border-2 border-indigo-400 hover:bg-indigo-200">
+		<div onClick={() => {setIsOpen(!isOpen)}} className="flex-grow border-2 border-slate-700 hover:bg-slate-300">
 			{isLoaded ? 
 				<DropdownRow 
 					key={deckChoice}
