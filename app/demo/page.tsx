@@ -25,7 +25,7 @@ export interface DeckInfo {
 }
 
 
-const DecksPage: React.FC = () => {
+const DemoDecksPage: React.FC = () => {
     const [activePage, setActivePage] = useState<PageOption>('DeckPicker');
     const [deckChoice, setDeckChoice] = useState<number>(-1);
     const [deckIdOptions, setDeckIdOptions] = useState<Map<number, DeckInfo>>(new Map());
@@ -72,4 +72,4 @@ const DecksPage: React.FC = () => {
     );
 }
 
-export default DecksPage;
+export default DemoDecksPage;
