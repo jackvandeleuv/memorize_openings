@@ -51,8 +51,6 @@ export class Scheduler {
 
 
     async getNextCard(): Promise<Card | null> {
-        console.log('Getting next card. Cards:');
-        console.log(this.cards);
         if (this.queue.length == 0) return null;
         if (this.queue.length > 1 && !this.queue[1].hasMoves()) {
             this.updateCardCache(this.queue[1].deepCopy());
@@ -157,7 +155,6 @@ export class Scheduler {
 
 
     private async updateDbCard(card: Card, gradingNeverSeen: boolean): Promise<boolean> {
-        console.log('Setting isLearning in db to: ' + (card.getIsLearning() ? 1 : 0))
         const { data: cardData, error: cardError } = await supabaseClient
             .from('cards')
             .update({
@@ -199,7 +196,6 @@ export class Scheduler {
         if (gradingNeverSeen === 1) {
             this.newCardLimit = this.newCardLimit - 1;
         }       
-        console.log('about to call updateDbCard')
         const updateSuccess = await this.updateDbCard(this.queue[0], gradingNeverSeen === 1);
         if (!updateSuccess) throw new Error('Db update failed.');
 
@@ -210,8 +206,6 @@ export class Scheduler {
             this.queue[0].neverSeen !== 1 && 
             isAfter(this.queue[0].reviewAt, oneHourFromNow)
         ) {
-            console.log('Filtering cards down to:')
-            console.log(this.cards.filter(card => card.lines_id !== this.queue[0].lines_id))
             this.cards = this.cards.filter(card => card.id !== this.queue[0].id);
         };
 
