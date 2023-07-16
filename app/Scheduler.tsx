@@ -51,6 +51,8 @@ export class Scheduler {
 
 
     async getNextCard(): Promise<Card | null> {
+        console.log('Getting next card. Cards:');
+        console.log(this.cards);
         if (this.queue.length == 0) return null;
         if (this.queue.length > 1 && !this.queue[1].hasMoves()) {
             this.updateCardCache(this.queue[1].deepCopy());
@@ -155,11 +157,12 @@ export class Scheduler {
 
 
     private async updateDbCard(card: Card, gradingNeverSeen: boolean): Promise<boolean> {
+        console.log('Setting isLearning in db to: ' + (card.getIsLearning() ? 1 : 0))
         const { data: cardData, error: cardError } = await supabaseClient
             .from('cards')
             .update({
                 'step': card.step,
-                'is_learning': card.isLearning ? 1 : 0,
+                'is_learning': (card.getIsLearning() ? 1 : 0),
                 'review_at': card.reviewAt,
                 'interval': card.interval,
                 'ease': card.ease,
@@ -196,12 +199,19 @@ export class Scheduler {
         if (gradingNeverSeen === 1) {
             this.newCardLimit = this.newCardLimit - 1;
         }       
-
+        console.log('about to call updateDbCard')
         const updateSuccess = await this.updateDbCard(this.queue[0], gradingNeverSeen === 1);
         if (!updateSuccess) throw new Error('Db update failed.');
 
         const oneHourFromNow = new Date(new Date().getTime() + 60 * 60 * 1000);
-        if (this.queue[0].neverSeen !== 1 && isAfter(this.queue[0].reviewAt, oneHourFromNow)) {
+
+        // If the top cards has been seen before and the next review is over an hour, remove it.
+        if (
+            this.queue[0].neverSeen !== 1 && 
+            isAfter(this.queue[0].reviewAt, oneHourFromNow)
+        ) {
+            console.log('Filtering cards down to:')
+            console.log(this.cards.filter(card => card.lines_id !== this.queue[0].lines_id))
             this.cards = this.cards.filter(card => card.id !== this.queue[0].id);
         };
 
@@ -219,7 +229,7 @@ export class Scheduler {
 
     // Modify card and return it
     private gradeCard(grade: string, card: Card): Card {     
-        if (card.isLearning) {
+        if (card.getIsLearning()) {
             if (card.step === 1 && grade === 'Hard') {
                 card.step = 2;
             } else if (card.step === 1 && grade === 'Good') {
@@ -229,18 +239,18 @@ export class Scheduler {
             } else if (grade === 'Good') {
                 card.step = card.step + 1;
                 if (card.step === this.steps.length) {
-                    card.isLearning = false;
+                    card.setIsLearning(false);
                     card.setReviewAt(addDays(new Date(), card.interval));
                 };
             } else if (grade === 'Easy') {
-                card.isLearning = false;
+                card.setIsLearning(false);
                 card.setReviewAt(addDays(new Date(), card.interval * 4));
             } else if (grade !== 'Hard') {
                 throw new Error('Unexpected value received for grade');
             }
 
             // Currently set to add seconds to prevent in from not being displayed as a review card during session
-            if (card.isLearning) card.setReviewAt(addMinutes(new Date(), this.steps[card.step - 1]));
+            if (card.getIsLearning()) card.setReviewAt(addMinutes(new Date(), this.steps[card.step - 1]));
             return card;
         }
         
@@ -251,10 +261,10 @@ export class Scheduler {
 
     private updateReviewCard(grade: string, card: Card): void {
         if (grade === 'Again') {
-            card.ease = Math.max(card.ease * 0.8 / 1000, 1300);
-            card.isLearning = true;
+            card.ease = Math.max(card.ease * 0.8, 1300);
+            card.setIsLearning(true);
             card.step = 1;
-            card.setReviewAt(addMinutes(new Date(), 1));
+            card.setReviewAt(addMinutes(new Date(), 10));
             return;
         }
         if (grade === 'Easy') {
@@ -264,7 +274,7 @@ export class Scheduler {
             card.ease = Math.max(card.ease * 0.85, 1300);
         }
         
-        card.interval = card.interval * card.ease / 1000;
+        card.interval = card.interval * (card.ease / 1000);
         card.setReviewAt(addDays(new Date(), card.interval));
     }
 }

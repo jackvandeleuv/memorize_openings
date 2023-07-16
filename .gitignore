@@ -36,3 +36,4 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 utils/supabaseClient.ts
+supabaseClient.ts

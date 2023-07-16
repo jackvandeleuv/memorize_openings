@@ -86,7 +86,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 			from:indexToAlgebraic(fromCol, fromRow),
 			to:indexToAlgebraic(toCol, toRow)
 		})
-		const isCorrect = newGameState.fen() === position.answer;
+		const isCorrect = newGameState.fen().split(' ')[0] === position.answer.split(' ')[0];
 
 		// Update the position
 		const updatedLine = [...position.line];
