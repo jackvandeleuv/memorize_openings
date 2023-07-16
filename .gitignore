@@ -37,3 +37,4 @@ yarn-error.log*
 next-env.d.ts
 utils/supabaseClient.ts
 utils/supabaseClient.ts
+utils/supabaseClient.ts
