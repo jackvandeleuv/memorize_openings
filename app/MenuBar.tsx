@@ -58,9 +58,9 @@ const MenuBar: React.FC = () => {
 
   return (
     <div className="relative bg-white">
-      <div className="bg-slate-700 text-slate-300 max-w-full mx-auto px-4 sm:px-6">
+      <div className="bg-slate-700 text-slate-300 max-w-full mx-auto px-4 md:px-6">
         
-      <div className="flex justify-between items-center border-b-3 border-gray-100 pt-6 pb-4 md:space-x-10 w-full">
+      <div className="flex justify-between items-center border-b-3 border-gray-100 pt-6 pb-4 lg:space-x-10 w-full">
           
           <div className="flex justify-start items-center lg:w-0 lg:flex-1">
             <Link href='/' className="flex title-font font-medium items-center">
@@ -76,7 +76,7 @@ const MenuBar: React.FC = () => {
             </Link>
           </div>
 
-          <div className="-my-2 md:hidden">
+          <div className="-my-2 lg:hidden">
             <button type="button" onClick={toggleMenu} className="inline-flex items-center justify-center p-2 rounded-md text-black hover:text-black hover:bg-orange-100 bg-orange-200 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-slate-500">
               <span className="sr-only">Open menu</span>
               <svg className="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
@@ -85,7 +85,7 @@ const MenuBar: React.FC = () => {
             </button>
           </div>
 
-          <nav className="hidden md:flex items-center space-x-4">
+          <nav className="hidden lg:flex items-center space-x-4">
             {isSignedIn ? 
               <Link href='/learn' onClick={() => setIsOpen(!isOpen)} className="w-24 text-center sm:py-1 rounded-md bg-orange-200 text-slate-700 hover:bg-orange-100">Learn</Link>
               :
