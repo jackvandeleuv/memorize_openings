@@ -399,7 +399,7 @@ const ChessOpeningsPage: React.FC = () => {
                     <h2 className="text-3xl font-bold">{"Closed Game (Black)"}</h2>
                 </div>
                 <div className="mb-6 sm:pt-4 sm:pr-8 px-4 sm:px-6 pb-10 sm:pb-28 text-base sm:text-lg lg:text-xl">
-                    {"This deck unleashes stockfish on d4 openings from black's perspective. It offers traditional, symmetric play, which allows for solid development early in the game."}
+                    {"This deck unleashes Stockfish on d4 openings from black's perspective. It offers traditional, symmetric play, which allows for solid development early in the game."}
                     <div className="bg-gradient-to-r from-slate-800 to-slate-900 p-6 mt-4 rounded-md shadow-md">
                         <ul className="list-decimal space-y-2">
                             {[

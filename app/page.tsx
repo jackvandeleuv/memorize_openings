@@ -23,11 +23,11 @@ const HomePage: React.FC = () => {
 				</p>
 			</div>
 			<div className="px-6 pb-2 pt-8 sm:pt-16 sm:pl-8 bg-slate-700">
-				<h2 className="text-3xl font-bold">Optimized Preparation</h2>
+				<h2 className="text-3xl font-bold">Unique Approach</h2>
 			</div>
 			<div>
 			<p className="sm:pt-16 sm:pr-8 px-6 pb-10 sm:pb-28 text-base sm:text-lg lg:text-xl">
-				{"Fried Liver uses analytics from the Lichess player database to create the most useful possible opening preparation. For every move you learn, we make sure that 80% of your real-life opponents' responses are covered by your learning material."}
+				{"Fried Liver uses analytics from the Lichess player database to create the most useful possible opening preparation. For every move you learn, we make sure that 80% of your real-life opponents' responses are covered."}
 				</p>
 			</div>
 			<div className="px-6 pb-2 pt-8 sm:pt-14 sm:pl-8 bg-slate-800">
