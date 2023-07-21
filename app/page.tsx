@@ -15,19 +15,20 @@ const HomePage: React.FC = () => {
 				</p>
 			</div>
 			<div className="px-6 pb-2 pt-8 sm:pt-16 sm:pl-8 bg-slate-800">
-				<h2 className="text-3xl font-bold">Learn Openings</h2>
+				<h2 className="text-3xl font-bold">Spaced Repetition</h2>
 			</div>
 			<div className='sm:pt-16 bg-slate-800'>
 			<p className="px-6 pb-10 sm:pb-28 sm:pr-8 text-base sm:text-lg lg:text-xl">
-				{"The better you get at recognizing a position, the less often you'll see it. But if you get it wrong, we'll show it again soon, until you know it by heart."}
+				{"As you start to forget the opening positions you learned, the system will show them to you again until you know them by heart. The better you get at recognizing a position, the less often you'll see it."}
 				</p>
 			</div>
 			<div className="px-6 pb-2 pt-8 sm:pt-16 sm:pl-8 bg-slate-700">
-				<h2 className="text-3xl font-bold">Optimized Preparation</h2>
+				<h2 className="text-3xl font-bold">Unique Approach</h2>
 			</div>
 			<div>
 			<p className="sm:pt-16 sm:pr-8 px-6 pb-10 sm:pb-28 text-base sm:text-lg lg:text-xl">
-				{"Fried Liver uses analytics from the Lichess player database to create the most useful possible opening preparation. For every move you learn, we make sure that 80% of your real-life opponents' responses are covered by your learning material."}
+				{"Fried Liver uses analytics from the Lichess player database to create the most useful possible opening preparation. Rather than learning the openings seen in master-level play, which most players are unlikely to encounter, you'll focus on learning responses to the moves made by typical players."} 
+				&nbsp;<a href='https://fried-liver.com/about' className='underline hover:text-slate-200'>Learn more.</a>
 				</p>
 			</div>
 			<div className="px-6 pb-2 pt-8 sm:pt-14 sm:pl-8 bg-slate-800">

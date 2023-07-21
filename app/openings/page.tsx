@@ -19,7 +19,7 @@ const ChessOpeningsPage: React.FC = () => {
                     <h2 className="text-3xl font-bold">{"King's Gambit"}</h2>
                 </div>
                 <div className="mb-6 sm:pt-4 sm:pr-8 px-4 sm:px-6 pb-10 sm:pb-28 text-base sm:text-lg lg:text-xl">
-                    {"The King's Gambit, beginning with 1.e4 e5 2.f4, is a daring and aggressive opening, in which White sacrifices the f-pawn to gain quick development and control of the center. While uncommon in master level play, the opening is still one of the sharpest and most aggressive openings, and can serve a prepared amateur well."}
+                    {"The King's Gambit, beginning with 1.e4 e5 2.f4, is an aggressive opening in which white sacrifices the f-pawn to gain quick development and control of the center. While uncommon in master level play, the opening is still one of the sharpest and most aggressive openings, and can serve a prepared amateur well."}
                     <br /><br />
                     {"Playing the King's Gambit requires not only theoretical knowledge, but also a combative spirit and a willingness to embrace complex positions. However, the upside is that you will be playing a sharp opening that is likely unfamiliar to your opponent, which comes with its own advantages."}
                     <div className="bg-gradient-to-r from-slate-800 to-slate-900 p-6 mt-4 rounded-md shadow-md">
@@ -96,9 +96,9 @@ const ChessOpeningsPage: React.FC = () => {
                     <h2 className="text-3xl font-bold">{"Scandinavian Defense"}</h2>
                 </div>
                 <div className="mb-6 sm:pt-4 sm:pr-8 px-4 sm:px-6 pb-10 sm:pb-28 text-base sm:text-lg lg:text-xl">
-                    {"This somewhat unconventional response to 1. e4 has been employed by grandmasters at the highest levels and offers an interesting alternative to black's more typical choices. Black aims to rapidly develop their pieces immediately challenging white's control of the center."}
+                    {"This somewhat unconventional response to 1. e4 has been employed by grandmasters at the highest levels and offers an interesting alternative to black's more typical choices. Black aims to rapidly develop their pieces, immediately challenging white's control of the center."}
                     <br /><br />
-                    {"This deck teaches the Modern Scandinavian, which delays capturing the pawn immediately with black queen. This variation of the Scandinavian can lead to unbalanced positions that catch some opponents off guard, especially if they are more accustomed to facing 2...Qxd5."}
+                    {"This deck teaches the Modern Scandinavian, which delays capturing the pawn immediately with the black queen. This variation of the Scandinavian can lead to unbalanced positions that catch some opponents off guard, especially if they are more accustomed to facing 2...Qxd5."}
                     <div className="bg-gradient-to-r from-slate-800 to-slate-900 p-6 mt-4 rounded-md shadow-md">
                         <ul className="list-decimal space-y-2">
                             {[
@@ -130,7 +130,7 @@ const ChessOpeningsPage: React.FC = () => {
                     <h2 className="text-3xl font-bold">{"French Defense"}</h2>
                 </div>
                 <div className="mb-6 sm:pt-4 sm:pr-8 px-4 sm:px-6 pb-10 sm:pb-28 text-base sm:text-lg lg:text-xl">
-                    {"The French Defense is one of the most well-established answers to 1.e4, characterized by the moves: 1. e4 e6. The pawn on e6 helps to support a later ...d5 push, directly contesting White's claim to the center."}
+                    {"The French Defense is one of the most well-established answers to 1.e4, characterized by the moves: 1. e4 e6. The pawn on e6 helps to support a later ...d5 push, directly contesting white's claim to the center."}
                     <br /><br />
                     {"The French Defense is rich in strategic and tactical motifs. It allows for a wide range of middle game positions, from quiet positional games to sharp tactical battles, and remains a favorite among club players and professionals alike."}
                     <div className="bg-gradient-to-r from-slate-800 to-slate-900 p-6 mt-4 rounded-md shadow-md">
@@ -399,7 +399,7 @@ const ChessOpeningsPage: React.FC = () => {
                     <h2 className="text-3xl font-bold">{"Closed Game (Black)"}</h2>
                 </div>
                 <div className="mb-6 sm:pt-4 sm:pr-8 px-4 sm:px-6 pb-10 sm:pb-28 text-base sm:text-lg lg:text-xl">
-                    {"This deck unleashes stockfish on d4 openings from black's perspective. It offers traditional, symmetric play, which allows for solid development early in the game."}
+                    {"This deck unleashes Stockfish on d4 openings from black's perspective. It offers traditional, symmetric play, which allows for solid development early in the game."}
                     <div className="bg-gradient-to-r from-slate-800 to-slate-900 p-6 mt-4 rounded-md shadow-md">
                         <ul className="list-decimal space-y-2">
                             {[
