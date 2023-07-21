@@ -39,10 +39,10 @@ const SignIn: React.FC = () => {
 
 	
   return (
-    <div className="flex items-center justify-center py-16 bg-slate-700">
-      <div className="mx-2 sm:mx-0 max-w-md w-full space-y-8 bg-slate-300 p-10 rounded-xl">
+    <div className="flex flex-grow items-top sm:items-center justify-center sm:py-16 bg-slate-700">
+      <div className="mx-4 mb-16 max-h-[375px] sm:max-h-[1/3] sm:mb-0 sm:mx-0 space-y-8 bg-slate-300 text-slate-800 p-8 sm:p-10 rounded-xl">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="flex text-center justify-center text-3xl font-extrabold">
             Sign in to your account
           </h2>
         </div>
@@ -89,7 +89,7 @@ const SignIn: React.FC = () => {
           <div>
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-slate-700 hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-slate-700 hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500"
             >
               Sign in
             </button>

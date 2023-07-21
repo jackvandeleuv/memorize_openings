@@ -370,13 +370,13 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({id, activePage, setActiveP
 	return (
 		<div className="w-full sm:px-12 md:px-4 bg-slate-800 md:bg-slate-700">
 			<div className="flex flex-col md:flex-row md:pb-10 justify-center md:gap-4">
-				<div className="md:px-4 flex flex-col justify-center bg-slate-800 md:rounded-lg">	
+				<div className="md:px-4 flex flex-col bg-slate-800 md:rounded-lg">	
 					
-					<div className="pt-4 px-1 sm:py-6 text-center text-2xl md:text-3xl font-bold text-slate-300">
+					<div className="pt-4 px-1 sm:pt-6 sm:pb-3 text-center text-2xl sm:text-3xl font-bold text-white">
 						{isLoaded ? position.name : <BeatLoader color={"#FFFFFF"} loading={!isLoaded} size={16} />}
 					</div>		
 					
-					<div className="flex justify-center items-center sm:px-4 sm:pb-4">
+					<div className="flex justify-center items-center sm:px-4 px-4 sm:pb-4">
 						{position.line && position.line.length > 0 &&				
 							<ChessBoard
 								solutionToggled={solutionToggled}
@@ -476,8 +476,8 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({id, activePage, setActiveP
 						</div>
 					</div>
 
-					<div className='flex-grow h-full justify-center mb-4 bg-slate-800 rounded-lg'>
-						<div className='m-3 px-1 py-5 md:py-3 rounded-md bg-slate-700 md:bg-slate-800'>
+					<div className='flex-grow h-full justify-center md:mb-4 bg-slate-800 rounded-lg'>
+						<div className='m-4 md:m-3 mt-5 md:mt-3 px-1 py-5 md:py-3 rounded-md bg-slate-700 md:bg-slate-800'>
 							<div className='flex justify-center items-center text-center pb-1 text-xl font-bold text-slate-300'>
 								{userMessage[0]}
 							</div>

@@ -9,7 +9,6 @@ import RatingButton from './components/buttons/RatingButton';
 import { supabaseClient } from '../utils/supabaseClient';
 import SolutionButton from './components/buttons/SolutionButton';
 import { BeatLoader } from 'react-spinners';
-import Link from 'next/link';
 import ArrowButton from './components/buttons/ArrowButton';
 import BackButton from './components/buttons/BackButton';
 import DemoInfoPanel from './components/panels/DemoInfoPanel';
@@ -332,18 +331,20 @@ const DemoReviewSession: React.FC<ReviewSessionProps> = ({id, activePage, setAct
 	
 
 	return (
+		
 		<div className="w-full sm:px-12 md:px-4 bg-slate-800 md:bg-slate-700">
+			<div className='flex flex-row justify-center'>
+				<div className='flex-grow bg-rose-400 text-slate-800 py-3 px-3 mx-4 sm:mx-0 md:mx-2 md:mb-4 mt-6 md:mt-0 mb-1 rounded-md text-md'>
+					Your progress is not being saved! <a href='https://fried-liver.com/signup' className='underline hover:text-rose-300'>Sign up</a> for a free account to save your progress.
+				</div>
+			</div>
 			<div className="flex flex-col md:flex-row md:pb-10 justify-center md:gap-4">
 				<div className="md:px-4 h-full flex flex-col bg-slate-800 md:rounded-lg">	
-					<div className="pt-4 px-1 sm:pt-6 sm:pb-3 text-center text-2xl md:text-3xl font-bold text-white">
+					<div className="pt-4 px-1 sm:pt-6 sm:pb-3 text-center text-2xl sm:text-3xl font-bold text-white">
 						{isLoaded ? position.name : <BeatLoader color={"#FFFFFF"} loading={!isLoaded} size={16} />}
 					</div>		
-
-					<div className='bg-rose-400 text-slate-800 py-3 px-3 mx-4 md:w-[50vh] mt-3 sm:mb-4 sm:mt-0 mb-1 rounded-md text-md'>
-						Your progress is not being saved! <a href='https://fried-liver.com/signup' className='underline hover:text-rose-300'>Sign up</a> for a free account to save your progress.
-					</div>
 					
-					<div className="flex justify-center items-center sm:px-4 sm:pb-4">
+					<div className="flex justify-center items-center sm:px-4 px-4 sm:pb-4">
 						{position.line && position.line.length > 0 &&				
 							<ChessBoard
 								solutionToggled={solutionToggled}
@@ -443,8 +444,8 @@ const DemoReviewSession: React.FC<ReviewSessionProps> = ({id, activePage, setAct
 						</div>
 					</div>
 
-					<div className='flex-grow h-full justify-center mb-4 bg-slate-800 rounded-lg'>
-						<div className='m-3 px-1 py-5 md:py-3 rounded-md bg-slate-700 md:bg-slate-800'>
+					<div className='flex-grow h-full justify-center md:mb-4 bg-slate-800 rounded-lg'>
+						<div className='m-4 md:m-3 mt-5 md:mt-3 px-1 py-5 md:py-3 rounded-md bg-slate-700 md:bg-slate-800'>
 							<div className='flex justify-center items-center text-center pb-1 text-xl font-bold text-white'>
 								{userMessage[0]}
 							</div>
