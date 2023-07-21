@@ -35,7 +35,7 @@ const DropdownRow: React.FC<DropdownRowProps> = ({ info, isLoaded, handleClick }
 								Review: {info.reviewDue}
 							</div>
 						</div>
-					</div> 
+					</div>
 				</div> :
 				<div className='flex justify-center items-center py-8'>
 					<BeatLoader color={"#818cf8"} loading={!isLoaded} size={12} />

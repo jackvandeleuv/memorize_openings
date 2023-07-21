@@ -5,7 +5,7 @@ import React from "react";
 const About: React.FC = () => {
 	return (
 		<div className="flex flex-col sm:grid sm:grid-cols-[1fr,5fr] bg-slate-800 w-full">
-			<div className="px-6 pb-2 sm:pl-8 pt-4 sm:pt-8 bg-slate-800">
+			<div className="px-6 pb-2 sm:pl-8 pt-6 sm:pt-8 bg-slate-800">
 				<h2 className="text-3xl font-bold">About Fried Liver</h2>
 			</div>
 			<div>

@@ -26,7 +26,7 @@ export default function RootLayout({
         <div className="flex flex-col text-slate-300 min-h-screen">
           <MenuBar />
             {children}
-          <div className="flex-grow bg-slate-800">
+          <div className="h-full bg-slate-800">
             <Footer />
           </div>
         </div>

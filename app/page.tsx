@@ -6,7 +6,7 @@ import Link from "next/link";
 const HomePage: React.FC = () => {
 	return (
 		<div className="flex flex-col sm:grid sm:grid-cols-[1fr,5fr] bg-slate-700 w-full">
-			<div className="px-6 pb-2 sm:pl-8 pt-4 sm:pt-8 bg-slate-700">
+			<div className="px-6 pb-2 sm:pl-8 pt-6 sm:pt-8 bg-slate-700">
 				<h2 className="text-3xl font-bold">Welcome</h2>
 			</div>
 			<div>
@@ -35,7 +35,7 @@ const HomePage: React.FC = () => {
 			</div>
 			<div className='sm:pt-7 sm:pr-4 bg-slate-800'>
 				<div className='flex flex-col'>
-					<div className="flex flex-row items-center pt-1 sm:pt-8 sm:pb-12 px-6 text-base sm:text-lg lg:text-xl gap-3 sm:gap-4">
+					<div className="flex flex-row items-center pt-1 sm:pt-8 pb-8 sm:pb-12 px-6 text-base sm:text-lg lg:text-xl gap-3 sm:gap-4">
 						<Link href='/demo' className="p-1 px-6 rounded-lg bg-orange-200 text-black text-lg hover:bg-orange-100">
 							Try It
 						</Link>

@@ -36,10 +36,10 @@ const SignUp: React.FC = () => {
 
 	
   return (
-    <div className="flex items-center justify-center py-16 bg-slate-700">
-      <div className="mx-2 sm:mx-0 max-w-md w-full space-y-8 bg-slate-300 p-10 rounded-xl">
+    <div className="flex flex-grow items-top sm:items-center justify-center sm:py-16 bg-slate-700">
+      <div className="mx-4 mb-16 max-h-[375px] sm:max-h-[1/3] sm:mb-0 sm:mx-0 space-y-8 bg-slate-300 text-slate-800 p-8 sm:p-10 rounded-xl">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="flex text-center justify-center text-3xl font-extrabold">
             Set up a new account
           </h2>
         </div>
