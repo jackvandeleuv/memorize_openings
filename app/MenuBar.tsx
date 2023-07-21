@@ -58,7 +58,7 @@ const MenuBar: React.FC = () => {
 
   return (
     <div className="relative bg-white">
-      <div className="bg-slate-700 text-slate-300 max-w-full mx-auto px-4 md:px-6">
+      <div className="bg-slate-700 text-slate-300 max-w-full mx-auto px-4 lg:px-6">
         
       <div className="flex justify-between items-center border-b-3 border-gray-100 pt-6 pb-4 lg:space-x-10 w-full">
           
@@ -110,7 +110,7 @@ const MenuBar: React.FC = () => {
 
       {/* Mobile menu, show/hide based on menu state. */}
       {isOpen && (
-        <div ref={menuRef} className="absolute top-0 inset-x-0 transition transform origin-top-right md:hidden z-50">
+        <div ref={menuRef} className="absolute top-0 inset-x-0 transition transform origin-top-right lg:hidden z-50">
           <div className="shadow-lg ring-1 ring-black ring-opacity-5 bg-slate-800 divide-y-2 divide-slate-50">
             <div className="pt-8 pb-6 px-6">
               <div className="flex items-center justify-between">
