@@ -5,6 +5,10 @@ import Piece from './Piece';
 import { Chess, Square } from 'chess.js';
 import { Position } from '../../ReviewSession';
 import Cell from './Cell';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import CustomDragLayer from './CustomDragLayer';
+import { TouchBackend } from 'react-dnd-touch-backend';
 
 export interface Piece {
 	piece: 'p' | 'r' | 'n' | 'b' | 'k' | 'q';
@@ -20,12 +24,29 @@ interface ChessBoardProps {
 	setUserMessage: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
+export interface ClickLoc {
+	x: number;
+	y: number;
+}
 
 const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setPosition, setUserMessage }) => {
 	const [prevClickedPiece, setPrevClickedPiece] = useState('');
 	const [highlightMap, setHighlightMap] = useState(new Map<string, string>());
 	const [reversed, setReversed] = useState<boolean>(false);
 
+	const [clickLoc, setClickLoc] = useState<ClickLoc>({x: -1, y: -1});
+
+	useEffect(() => {
+		const handleDragStart = (e: DragEvent) => {
+			if (e.target && (e.target as HTMLElement).dataset.draggable === "true") {
+				e.preventDefault();
+			}
+		};
+		window.addEventListener("dragstart", handleDragStart);
+		return () => {
+			window.removeEventListener("dragstart", handleDragStart);
+		};
+	}, []);
 
 	// When the position changes, figure out if the board should be from black's perspective
 	useEffect(() => {
@@ -68,9 +89,10 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 		// Toggle and return if not at the end of the line, invalid move, or if showing the solution
 		if (position.move < position.line.length - 1 || 
 			!isValidMove(fromRow, fromCol, toRow, toCol) ||
-			solutionToggled
+			solutionToggled ||
+			position.guess.color !== ''
 		) {
-			toggleYellowHighlight(`${fromRow}-${fromCol}`);
+			// toggleYellowHighlight(`${fromRow}-${fromCol}`);
 			return;
 		}
 
@@ -112,7 +134,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 				color: destinationColor
 			}
 		});
-		toggleYellowHighlight(`${fromRow}-${fromCol}`);
+		// toggleYellowHighlight(`${fromRow}-${fromCol}`);
 	}; 
 
 	
@@ -181,6 +203,11 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 	};
 
 
+	const handlePieceDrop = (fromRow: number, fromCol: number, toRow: number, toCol: number) => {
+		handlePieceMove(fromRow, fromCol, toRow, toCol);
+	};
+
+
 	const renderBoard = () => {
 		const board = [];
 		// If it's black's turn, render everything backwards
@@ -191,18 +218,15 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 					const piece = fenToBoard(position.line[position.move])[i][j];
 					board.push(
 						<Cell
-						key={key}
-						row={i}
-						col={j}
-						handleClick={handleCellClick}
-						highlight={highlightMap.get(`${i}-${j}`)}
-						>
-							{piece && (
-								<Piece
-								piece={piece.piece}
-								color={piece.color}
-							/>)}
-						</Cell>
+							key={key}
+							row={i}
+							col={j}
+							piece={piece.piece}
+							color={piece.color}
+							setClickLoc={setClickLoc}
+							handlePieceDrop={handlePieceDrop}
+							highlight={highlightMap.get(`${i}-${j}`)}
+						/>
 					);
 				}
 			}
@@ -216,18 +240,15 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 				const piece = fenToBoard(position.line[position.move])[i][j];
 				board.push(
 					<Cell
-					key={key}
-					row={i}
-					col={j}
-					handleClick={handleCellClick}
-					highlight={highlightMap.get(`${i}-${j}`)}
-					>
-						{piece && (
-							<Piece
-							piece={piece.piece}
-							color={piece.color}
-						/>)}
-					</Cell>
+						key={key}
+						row={i}
+						col={j}
+						piece={piece.piece}
+						color={piece.color}
+						setClickLoc={setClickLoc}
+						handlePieceDrop={handlePieceDrop}
+						highlight={highlightMap.get(`${i}-${j}`)}
+					/>
 				);
 			}
 		}
@@ -236,7 +257,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 
 
 	const handleCellClick = (event: React.MouseEvent<HTMLDivElement>) => {
-		toggleYellowHighlight(event.currentTarget.id);
+		// toggleYellowHighlight(event.currentTarget.id);
 		if (prevClickedPiece == '') { 
 			setPrevClickedPiece(event.currentTarget.id); 
 		} else {
@@ -253,7 +274,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 		const layout = parts[0];
 		let rankIndex = 7;
 		let fileIndex = 0;
-		const newBoard = Array.from({ length: 8 }, () => Array(8).fill(null));
+		const newBoard = Array.from({ length: 8 }, () => Array(8).fill({ piece: '', color: '' }));
 
 		for (const char of layout) {
 			if (char === "/") {
@@ -265,7 +286,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 			if (isNaN(Number(char))) {
 				const piece = char.toLowerCase();
 				const color = char === char.toLowerCase() ? 'd' : 'l';
-				newBoard[7 - rankIndex][fileIndex] = { piece:piece, color:color };
+				newBoard[7 - rankIndex][fileIndex] = { piece: piece, color: color };
 				fileIndex++;
 			} else {
 				fileIndex += Number(char);
@@ -274,11 +295,34 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 		return newBoard;
 	}
 
+	const [cellSize, setCellSize] = useState({ width: 0, height: 0 });
+	useEffect(() => {
+		function updateCellSize() {
+		  const gridElement = document.querySelector('.grid');
+		  if (gridElement) {
+			const gridWidth = gridElement.getBoundingClientRect().width;
+			const gridHeight = gridElement.getBoundingClientRect().height;
+			const newWidth = gridWidth / 8; 
+			const newHeight = gridHeight / 8; 
+			setCellSize({ width: newWidth, height: newHeight });
+		  }
+		}
+		window.addEventListener('resize', updateCellSize);
+		updateCellSize();
+		return () => window.removeEventListener('resize', updateCellSize);
+	}, []);
+	  
 
 	return (
-		<div className="grid grid-cols-8 aspect-[1] w-full h-full p-2 sm:p-4 md:p-0 mb-2 sm:mb-0 sm:w-[60vh] sm:h-[60vh] md:w-[50vh] md:h-[50vh] lg:w-[65vh] lg:h-[65vh]">
-			{renderBoard()}
-		</div>
+		<DndProvider backend={TouchBackend} options={{ enableMouseEvents: true }}>
+			<CustomDragLayer 
+				clickLoc={clickLoc}
+				cellSize={cellSize}
+			/>
+			<div className="prevent-select grid grid-cols-8 aspect-[1] w-full h-full p-2 sm:p-4 md:p-0 mb-2 sm:mb-0 sm:w-[60vh] sm:h-[60vh] md:w-[50vh] md:h-[50vh] lg:w-[65vh] lg:h-[65vh]">
+				{renderBoard()}
+			</div>
+		</DndProvider>
 	)}
 
 export default ChessBoard;

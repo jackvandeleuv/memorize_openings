@@ -293,6 +293,60 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({id, activePage, setActiveP
 	};
 
 
+	const handleRightArrow = useCallback(
+		(e: KeyboardEvent) => {
+			if (!scheduler || solutionToggled) return;
+			if (position.move < position.line.length - 1) {; 
+				setPosition({
+					line: [...position.line], 
+					move: position.move + 1, 
+					answer: position.answer, 
+					game: new Chess(position.game.fen()),
+					eco: position.eco,
+					name: position.name,
+					guess: position.guess
+				})
+			}
+		}, [position, scheduler, solutionToggled]
+	);
+
+	const handleLeftArrow = useCallback(
+		(e: KeyboardEvent) => {
+			if (!scheduler || solutionToggled) return;
+			if (position.move > 0) {; 
+				setPosition({
+					line: [...position.line], 
+					move: position.move - 1, 
+					answer: position.answer, 
+					game: new Chess(position.game.fen()),
+					eco: position.eco,
+					name: position.name,
+					guess: position.guess
+				});
+			}
+		}, [position, scheduler, solutionToggled]
+	);
+
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+		  switch (e.key) {
+			case 'ArrowLeft':
+			  handleLeftArrow(e);
+			  break;
+			case 'ArrowRight':
+			  handleRightArrow(e);
+			  break;
+			default:
+			  break;
+		  }
+		};
+		document.addEventListener('keydown', handleKeyDown);
+		return () => {
+		  document.removeEventListener('keydown', handleKeyDown);
+		};
+	}, [handleLeftArrow, handleRightArrow]); 
+
+
 	const ratingButtonClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
 		if (!scheduler) return;
 		if (position.guess.color === '' && !solutionToggled) return; 
