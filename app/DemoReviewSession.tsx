@@ -98,7 +98,7 @@ const DemoReviewSession: React.FC<ReviewSessionProps> = ({id, activePage, setAct
 
 	const defaultMessage = ['Make a Move', "Give your best guess, and then rate yourself to decide how long to wait before you see this position again."];
 	const [userMessage, setUserMessage] = useState<string[]>(defaultMessage);
-	
+	const DECK_TO_SHOW = 24;
 	
 	useEffect(() => {
 		window.scrollTo(0, 0);
@@ -243,7 +243,7 @@ const DemoReviewSession: React.FC<ReviewSessionProps> = ({id, activePage, setAct
 				guess: position.guess
 			});
 		}
-		if (e.currentTarget.id === '<') {
+		if (e.currentTarget.id === '<' && position.move > 0) {
 			setPosition({
 				line: [...position.line], 
 				move: position.move - 1, 
@@ -255,61 +255,6 @@ const DemoReviewSession: React.FC<ReviewSessionProps> = ({id, activePage, setAct
 			});
 		}	
 	}
-
-
-	const handleRightArrow = useCallback(
-		(e: KeyboardEvent) => {
-			if (!scheduler || solutionToggled) return;
-			if (position.move < position.line.length - 1) {; 
-				setPosition({
-					line: [...position.line], 
-					move: position.move + 1, 
-					answer: position.answer, 
-					game: new Chess(position.game.fen()),
-					eco: position.eco,
-					name: position.name,
-					guess: position.guess
-				})
-			}
-		}, [position, scheduler, solutionToggled]
-	);
-
-	const handleLeftArrow = useCallback(
-		(e: KeyboardEvent) => {
-			if (!scheduler || solutionToggled) return;
-			if (position.move > 0) {; 
-				setPosition({
-					line: [...position.line], 
-					move: position.move - 1, 
-					answer: position.answer, 
-					game: new Chess(position.game.fen()),
-					eco: position.eco,
-					name: position.name,
-					guess: position.guess
-				});
-			}
-		}, [position, scheduler, solutionToggled]
-	);
-
-	useEffect(() => {
-		const handleKeyDown = (e: KeyboardEvent) => {
-		  switch (e.key) {
-			case 'ArrowLeft':
-			  handleLeftArrow(e);
-			  break;
-			case 'ArrowRight':
-			  handleRightArrow(e);
-			  break;
-			default:
-			  break;
-		  }
-		};
-		document.addEventListener('keydown', handleKeyDown);
-		return () => {
-		  document.removeEventListener('keydown', handleKeyDown);
-		};
-	}, [handleLeftArrow, handleRightArrow]); 
-	
 
 	const ratingButtonClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
 		if (!scheduler) return;

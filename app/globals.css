@@ -17,14 +17,3 @@ body {
     )
     rgb(var(--background-start-rgb));
 }
-
-.prevent-select {
-  -webkit-user-select: none; /* Safari */
-  -moz-user-select: none; /* Firefox */
-  -ms-user-select: none; /* IE 10 and IE 11 */
-  user-select: none; /* Standard syntax */
-}
-
-.elementBeingDragged {
-  touch-action: none;
-}
