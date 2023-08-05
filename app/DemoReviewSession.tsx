@@ -98,7 +98,7 @@ const DemoReviewSession: React.FC<ReviewSessionProps> = ({id, activePage, setAct
 
 	const defaultMessage = ['Make a Move', "Give your best guess, and then rate yourself to decide how long to wait before you see this position again."];
 	const [userMessage, setUserMessage] = useState<string[]>(defaultMessage);
-	const DECK_TO_SHOW = 24;
+	
 	
 	useEffect(() => {
 		window.scrollTo(0, 0);
