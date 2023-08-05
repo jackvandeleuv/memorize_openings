@@ -1,100 +1,31 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useDrag, useDrop } from 'react-dnd';
-import Piece from './Piece';
-import { ClickLoc } from './ChessBoard';
-import { getEmptyImage } from 'react-dnd-html5-backend';
+import React from 'react';
 
 interface CellProps {
 	row: number;
 	col: number;
-	piece: string;
-	color: string;
-	setClickLoc: React.Dispatch<React.SetStateAction<ClickLoc>>;
-	// handleClick: (event: React.MouseEvent<HTMLDivElement>) => void;
-	handlePieceDrop: (fromRow: number, fromCol: number, toRow: number, toCol: number) => void;
+	children?: React.ReactNode;
+	handleClick: (event: React.MouseEvent<HTMLDivElement>) => void;
 	highlight: string | undefined;
 }
 
-interface DraggablePiece {
-	row: number;
-	col: number;
-	piece: string;
-	color: string;
-}
-
-const Cell: React.FC<CellProps> = ({ row, col, piece, color, handlePieceDrop, setClickLoc, highlight }) => {
+const Cell: React.FC<CellProps> = ({ row, col, handleClick, children, highlight }) => {
 	const isWhite = (row + col) % 2 === 0;
-
-	const [{ canDrop, isOver }, drop] = useDrop({
-		accept: 'PIECE',
-		drop: (item: DraggablePiece) => handlePieceDrop(item.row, item.col, row, col),
-		collect: (monitor) => ({
-		  isOver: !!monitor.isOver(),
-		  canDrop: !!monitor.canDrop(),
-		}),
-	});
-
-	const [{ isDragging }, drag, preview] = useDrag({
-		type: 'PIECE',
-		item: { row, col, piece, color },
-		collect: (monitor) => ({
-		  isDragging: !!monitor.isDragging(),
-		}),
-	});
-
-	preview(getEmptyImage());
-
-	const cellStyle = `${isDragging ? 'elementBeingDragged' : ''} w-full h-full ${highlight !== undefined ? highlight : (isWhite ? 'bg-slate-200' : 'bg-slate-400')}`;
-
-	const ref = useRef<HTMLDivElement>(null);
-
-	const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-		e.stopPropagation();
-		const rect = ref.current!.getBoundingClientRect();
-		setClickLoc({x: e.clientX - rect.left, y: e.clientY - rect.top});
-	};
-
-	function useCombinedRefs(...refs: React.Ref<HTMLDivElement>[]) {
-		const targetRef = useRef<HTMLDivElement | null>(null);
-	  
-		useEffect(() => {
-		  refs.forEach(ref => {
-			if (typeof ref === 'function') {
-			  ref(targetRef.current);
-			} else if (ref && 'current' in ref) {
-			  (ref as React.MutableRefObject<HTMLDivElement | null>).current = targetRef.current;
-			}
-		  });
-		}, [refs]);
-	  
-		return targetRef;
-	  }
-	  
-	  const combinedRef = useCombinedRefs(ref, drag, drop);
-
+	const cellStyle = `w-full h-full ${highlight !== undefined ? highlight : (isWhite ? 'bg-slate-200' : 'bg-slate-400')}`;
 
 	return (
 		<div
-			data-draggable="true"
-			onMouseDown={handleMouseDown} 
-			ref={combinedRef}
 			className={cellStyle}
 			style={{ position: 'relative' }}
+			onClick={(event) => {
+				handleClick(event); 
+			}}
 			id={`${row}-${col}`}
 		>
 			<div
 				className="absolute top-0 left-0 w-full h-full flex justify-center"
 				style={{ padding: '0%' }}
 			>
-				{piece && 
-					<Piece
-						piece={piece}
-						color={color}
-						isDragging={isDragging}
-						preview={preview}
-						isDragPreview={false}
-					/>
-				}
+				{children}
 			</div>
 		</div>
 	);
