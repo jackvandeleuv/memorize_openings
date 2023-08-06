@@ -34,8 +34,6 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 	const [highlightMap, setHighlightMap] = useState(new Map<string, string>());
 	const [reversed, setReversed] = useState<boolean>(false);
 
-	const [clickLoc, setClickLoc] = useState<ClickLoc>({x: -1, y: -1});
-
 	const [successAudio, setSuccessAudio] = useState(new Audio());
 	const [failureAudio, setFailureAudio] = useState(new Audio());
 	
@@ -109,7 +107,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 			solutionToggled ||
 			position.guess.color !== ''
 		) {
-			// toggleYellowHighlight(`${fromRow}-${fromCol}`);
+			toggleYellowHighlight(`${fromRow}-${fromCol}`);
 			return;
 		}
 
@@ -153,7 +151,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 				color: destinationColor
 			}
 		});
-		// toggleYellowHighlight(`${fromRow}-${fromCol}`);
+		toggleYellowHighlight(`${fromRow}-${fromCol}`);
 	}; 
 
 	
@@ -244,8 +242,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 							col={j}
 							piece={piece.piece}
 							color={piece.color}
-							setClickLoc={setClickLoc}
-							handlePieceDrop={handlePieceDrop}
+							handleClick={handleCellClick}
 							highlight={highlightMap.get(`${i}-${j}`)}
 						/>
 					);
@@ -266,8 +263,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 						col={j}
 						piece={piece.piece}
 						color={piece.color}
-						setClickLoc={setClickLoc}
-						handlePieceDrop={handlePieceDrop}
+						handleClick={handleCellClick}
 						highlight={highlightMap.get(`${i}-${j}`)}
 					/>
 				);
@@ -278,7 +274,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 
 
 	const handleCellClick = (event: React.MouseEvent<HTMLDivElement>) => {
-		// toggleYellowHighlight(event.currentTarget.id);
+		toggleYellowHighlight(event.currentTarget.id);
 		if (prevClickedPiece == '') { 
 			setPrevClickedPiece(event.currentTarget.id); 
 		} else {
@@ -335,15 +331,9 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 	  
 
 	return (
-		<DndProvider backend={TouchBackend} options={{ enableMouseEvents: true }}>
-			<CustomDragLayer 
-				clickLoc={clickLoc}
-				cellSize={cellSize}
-			/>
-			<div className="prevent-select grid grid-cols-8 aspect-[1] w-full h-full p-2 sm:p-4 md:p-0 mb-2 sm:mb-0 sm:w-[60vh] sm:h-[60vh] md:w-[50vh] md:h-[50vh] lg:w-[65vh] lg:h-[65vh]">
-				{renderBoard()}
-			</div>
-		</DndProvider>
+		<div className="prevent-select grid grid-cols-8 aspect-[1] w-full h-full p-2 sm:p-4 md:p-0 mb-2 sm:mb-0 sm:w-[60vh] sm:h-[60vh] md:w-[50vh] md:h-[50vh] lg:w-[65vh] lg:h-[65vh]">
+			{renderBoard()}
+		</div>
 	)}
 
 export default ChessBoard;
