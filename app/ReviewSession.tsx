@@ -447,12 +447,20 @@ const ReviewSession: React.FC<ReviewSessionProps> = ({id, activePage, setActiveP
 							<ArrowButton
 								id='<'
 								handleClick={arrowButtonClick}
+								solutionToggled={solutionToggled}
+								lineLength={position.line.length}
+								movePosition={position.move}
+								isLeft={true}
 							>
 								{'<'}
 							</ArrowButton>
 							<ArrowButton
 								id='>'
 								handleClick={arrowButtonClick}
+								solutionToggled={solutionToggled}
+								lineLength={position.line.length}
+								movePosition={position.move}
+								isLeft={false}
 							>
 								{'>'}
 							</ArrowButton>

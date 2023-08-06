@@ -26,6 +26,34 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 	const [highlightMap, setHighlightMap] = useState(new Map<string, string>());
 	const [reversed, setReversed] = useState<boolean>(false);
 
+	const [successAudio, setSuccessAudio] = useState(new Audio());
+	const [failureAudio, setFailureAudio] = useState(new Audio());
+	
+	// Then, within a useEffect hook, load the audio files.
+	useEffect(() => {
+	  const loadAudio = async () => {
+		const loadedSuccessAudio = new Audio('/538554__sjonas88__success_clipped.mp3');
+		await loadedSuccessAudio.load();
+		setSuccessAudio(loadedSuccessAudio);
+	
+		const loadedFailureAudio = new Audio('/538550__sjonas88__deep-tone_clipped.mp3');
+		await loadedFailureAudio.load();
+		setFailureAudio(loadedFailureAudio);
+	  };
+	  loadAudio();
+	}, []);
+
+	useEffect(() => {
+		const handleDragStart = (e: DragEvent) => {
+			if (e.target && (e.target as HTMLElement).dataset.draggable === "true") {
+				e.preventDefault();
+			}
+		};
+		window.addEventListener("dragstart", handleDragStart);
+		return () => {
+			window.removeEventListener("dragstart", handleDragStart);
+		};
+	}, []);
 
 	// When the position changes, figure out if the board should be from black's perspective
 	useEffect(() => {
@@ -71,6 +99,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 			solutionToggled
 		) {
 			toggleYellowHighlight(`${fromRow}-${fromCol}`);
+			toggleYellowHighlight(`${fromRow}-${fromCol}`);
 			return;
 		}
 
@@ -87,6 +116,8 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 			to:indexToAlgebraic(toCol, toRow)
 		})
 		const isCorrect = newGameState.fen().split(' ')[0] === position.answer.split(' ')[0];
+
+		isCorrect ? successAudio.play() : failureAudio.play();
 
 		// Update the position
 		const updatedLine = [...position.line];
@@ -112,6 +143,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 				color: destinationColor
 			}
 		});
+		toggleYellowHighlight(`${fromRow}-${fromCol}`);
 		toggleYellowHighlight(`${fromRow}-${fromCol}`);
 	}; 
 
@@ -181,6 +213,13 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 	};
 
 
+	const handlePieceDrop = (fromRow: number, fromCol: number, toRow: number, toCol: number) => {
+		console.log('handlePieceDrop: ', fromRow, fromCol, toRow, toCol);  // Log here
+
+		handlePieceMove(fromRow, fromCol, toRow, toCol);
+	};
+
+
 	const renderBoard = () => {
 		const board = [];
 		// If it's black's turn, render everything backwards
@@ -191,18 +230,14 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 					const piece = fenToBoard(position.line[position.move])[i][j];
 					board.push(
 						<Cell
-						key={key}
-						row={i}
-						col={j}
-						handleClick={handleCellClick}
-						highlight={highlightMap.get(`${i}-${j}`)}
-						>
-							{piece && (
-								<Piece
-								piece={piece.piece}
-								color={piece.color}
-							/>)}
-						</Cell>
+							key={key}
+							row={i}
+							col={j}
+							piece={piece.piece}
+							color={piece.color}
+							handleClick={handleCellClick}
+							highlight={highlightMap.get(`${i}-${j}`)}
+						/>
 					);
 				}
 			}
@@ -216,18 +251,14 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 				const piece = fenToBoard(position.line[position.move])[i][j];
 				board.push(
 					<Cell
-					key={key}
-					row={i}
-					col={j}
-					handleClick={handleCellClick}
-					highlight={highlightMap.get(`${i}-${j}`)}
-					>
-						{piece && (
-							<Piece
-							piece={piece.piece}
-							color={piece.color}
-						/>)}
-					</Cell>
+						key={key}
+						row={i}
+						col={j}
+						piece={piece.piece}
+						color={piece.color}
+						handleClick={handleCellClick}
+						highlight={highlightMap.get(`${i}-${j}`)}
+					/>
 				);
 			}
 		}
@@ -236,6 +267,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 
 
 	const handleCellClick = (event: React.MouseEvent<HTMLDivElement>) => {
+		toggleYellowHighlight(event.currentTarget.id);
 		toggleYellowHighlight(event.currentTarget.id);
 		if (prevClickedPiece == '') { 
 			setPrevClickedPiece(event.currentTarget.id); 
@@ -276,7 +308,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 
 
 	return (
-		<div className="grid grid-cols-8 aspect-[1] w-full h-full p-2 sm:p-4 md:p-0 mb-2 sm:mb-0 sm:w-[60vh] sm:h-[60vh] md:w-[50vh] md:h-[50vh] lg:w-[65vh] lg:h-[65vh]">
+		<div className="prevent-select grid grid-cols-8 aspect-[1] w-full h-full p-2 sm:p-4 md:p-0 mb-2 sm:mb-0 sm:w-[60vh] sm:h-[60vh] md:w-[50vh] md:h-[50vh] lg:w-[65vh] lg:h-[65vh]">
 			{renderBoard()}
 		</div>
 	)}
