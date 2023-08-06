@@ -40,19 +40,37 @@ const Cell: React.FC<CellProps> = ({ row, col, piece, color, handlePieceDrop, se
 		collect: (monitor) => ({
 		  isDragging: !!monitor.isDragging(),
 		}),
+		end: (item, monitor) => {
+			// This function runs when the drag operation ends
+			if (!monitor.didDrop()) {
+			  console.log('thing did not drop')
+			}
+		  },
 	});
 
 	preview(getEmptyImage());
 
-	const cellStyle = `${isDragging ? 'elementBeingDragged' : ''} w-full h-full ${highlight !== undefined ? highlight : (isWhite ? 'bg-slate-200' : 'bg-slate-400')}`;
+	const cellStyle = `draggable w-full h-full ${highlight !== undefined ? highlight : (isWhite ? 'bg-slate-200' : 'bg-slate-400')}`;
 
 	const ref = useRef<HTMLDivElement>(null);
 
 	const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
 		e.stopPropagation();
+		e.preventDefault();
 		const rect = ref.current!.getBoundingClientRect();
 		setClickLoc({x: e.clientX - rect.left, y: e.clientY - rect.top});
 	};
+
+	const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+		e.stopPropagation();
+		e.preventDefault();
+		const rect = ref.current!.getBoundingClientRect();
+		setClickLoc({
+		  x: e.touches[0].clientX - rect.left, 
+		  y: e.touches[0].clientY - rect.top
+		});
+	  };
+	  
 
 	function useCombinedRefs(...refs: React.Ref<HTMLDivElement>[]) {
 		const targetRef = useRef<HTMLDivElement | null>(null);
@@ -68,15 +86,15 @@ const Cell: React.FC<CellProps> = ({ row, col, piece, color, handlePieceDrop, se
 		}, [refs]);
 	  
 		return targetRef;
-	  }
+	  };
 	  
-	  const combinedRef = useCombinedRefs(ref, drag, drop);
-
+	  const combinedRef = useCombinedRefs(ref, drag, drop);	
 
 	return (
 		<div
 			data-draggable="true"
-			onMouseDown={handleMouseDown} 
+			onMouseDown={handleMouseDown}
+			onTouchStart={handleTouchStart} 
 			ref={combinedRef}
 			className={cellStyle}
 			style={{ position: 'relative' }}

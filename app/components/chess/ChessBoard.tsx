@@ -36,6 +36,23 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 
 	const [clickLoc, setClickLoc] = useState<ClickLoc>({x: -1, y: -1});
 
+	const [successAudio, setSuccessAudio] = useState(new Audio());
+	const [failureAudio, setFailureAudio] = useState(new Audio());
+	
+	// Then, within a useEffect hook, load the audio files.
+	useEffect(() => {
+	  const loadAudio = async () => {
+		const loadedSuccessAudio = new Audio('/538554__sjonas88__success_clipped.mp3');
+		await loadedSuccessAudio.load();
+		setSuccessAudio(loadedSuccessAudio);
+	
+		const loadedFailureAudio = new Audio('/538550__sjonas88__deep-tone_clipped.mp3');
+		await loadedFailureAudio.load();
+		setFailureAudio(loadedFailureAudio);
+	  };
+	  loadAudio();
+	}, []);
+
 	useEffect(() => {
 		const handleDragStart = (e: DragEvent) => {
 			if (e.target && (e.target as HTMLElement).dataset.draggable === "true") {
@@ -109,6 +126,8 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 			to:indexToAlgebraic(toCol, toRow)
 		})
 		const isCorrect = newGameState.fen().split(' ')[0] === position.answer.split(' ')[0];
+
+		isCorrect ? successAudio.play() : failureAudio.play();
 
 		// Update the position
 		const updatedLine = [...position.line];
@@ -204,6 +223,8 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 
 
 	const handlePieceDrop = (fromRow: number, fromCol: number, toRow: number, toCol: number) => {
+		console.log('handlePieceDrop: ', fromRow, fromCol, toRow, toCol);  // Log here
+
 		handlePieceMove(fromRow, fromCol, toRow, toCol);
 	};
 

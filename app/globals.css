@@ -25,6 +25,6 @@ body {
   user-select: none; /* Standard syntax */
 }
 
-.elementBeingDragged {
+.draggable {
   touch-action: none;
 }

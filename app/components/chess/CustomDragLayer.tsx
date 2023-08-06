@@ -30,6 +30,8 @@ function CustomDragLayer(props: CustomDragProps) {
         return {};
     }
 
+    console.log(currentOffset.x, currentOffset.y)
+
     const x = currentOffset.x + props.clickLoc.x - props.cellSize.width / 2;
     const y = currentOffset.y + props.clickLoc.y - props.cellSize.height / 2;
 

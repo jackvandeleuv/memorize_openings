@@ -243,7 +243,7 @@ const DemoReviewSession: React.FC<ReviewSessionProps> = ({id, activePage, setAct
 				guess: position.guess
 			});
 		}
-		if (e.currentTarget.id === '<') {
+		if (e.currentTarget.id === '<' && position.move > 0) {
 			setPosition({
 				line: [...position.line], 
 				move: position.move - 1, 
@@ -394,7 +394,7 @@ const DemoReviewSession: React.FC<ReviewSessionProps> = ({id, activePage, setAct
 				</div>
 			</div>
 			<div className="flex flex-col md:flex-row md:pb-10 justify-center md:gap-4">
-				<div className="md:px-4 h-full flex flex-col bg-slate-800 md:rounded-lg">	
+				<div className="md:px-4 flex flex-col bg-slate-800 md:rounded-lg">	
 					<div className="pt-4 px-1 sm:pt-6 sm:pb-3 text-center text-2xl sm:text-3xl font-bold text-white">
 						{isLoaded ? position.name : <BeatLoader color={"#FFFFFF"} loading={!isLoaded} size={16} />}
 					</div>		
@@ -470,12 +470,20 @@ const DemoReviewSession: React.FC<ReviewSessionProps> = ({id, activePage, setAct
 							<ArrowButton
 								id='<'
 								handleClick={arrowButtonClick}
+								solutionToggled={solutionToggled}
+								lineLength={position.line.length}
+								movePosition={position.move}
+								isLeft={true}
 							>
 								{'<'}
 							</ArrowButton>
 							<ArrowButton
 								id='>'
 								handleClick={arrowButtonClick}
+								solutionToggled={solutionToggled}
+								lineLength={position.line.length}
+								movePosition={position.move}
+								isLeft={false}
 							>
 								{'>'}
 							</ArrowButton>
