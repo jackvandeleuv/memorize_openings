@@ -20,8 +20,12 @@ interface ChessBoardProps {
 	setUserMessage: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-const successAudio = new Audio('/538554__sjonas88__success_clipped.mp3');
-const failureAudio = new Audio('/538550__sjonas88__deep-tone_clipped.mp3');
+let successAudio: HTMLAudioElement;
+let failureAudio: HTMLAudioElement;
+if (typeof window !== "undefined") {
+    successAudio = new Audio('/538554__sjonas88__success_clipped.mp3');
+    failureAudio = new Audio('/538550__sjonas88__deep-tone_clipped.mp3');
+}
 
 const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setPosition, setUserMessage }) => {
 	const [prevClickedPiece, setPrevClickedPiece] = useState('');
