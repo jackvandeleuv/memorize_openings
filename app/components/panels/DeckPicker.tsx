@@ -58,7 +58,7 @@ const DeckPicker: React.FC<DeckPickerProps> = ({deckIdOptions, setDeckIdOptions,
     
                 </div>
                 <button 
-                    className="w-full p-3 sm:px-3 sm:pb-3 sm:pt-0 mt-2 sm:mt-4 text-lg text-slate-300 bg-slate-700 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-500 hover:bg-slate-600"
+                    className="w-full p-3 sm:px-3 sm:pb-3 sm:pt-3 mt-2 sm:mt-4 text-lg text-slate-300 bg-slate-700 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-500 hover:bg-slate-600"
                     onClick={handleGoButton}
                 >
                     Go

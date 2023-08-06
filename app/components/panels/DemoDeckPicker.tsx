@@ -10,7 +10,7 @@ export interface DemoDecksRow {
     name: string;
     id: number;
     path: string;
-}
+} 
 
 interface DeckPickerProps {
     deckIdOptions: Map<number, DeckInfo>;
