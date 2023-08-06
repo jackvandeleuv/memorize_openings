@@ -5,10 +5,6 @@ import Piece from './Piece';
 import { Chess, Square } from 'chess.js';
 import { Position } from '../../ReviewSession';
 import Cell from './Cell';
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
-import CustomDragLayer from './CustomDragLayer';
-import { TouchBackend } from 'react-dnd-touch-backend';
 
 export interface Piece {
 	piece: 'p' | 'r' | 'n' | 'b' | 'k' | 'q';
