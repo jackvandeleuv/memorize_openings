@@ -7,11 +7,11 @@ import { Position } from '../../ReviewSession';
 import Cell from './Cell';
 
 export interface Piece {
-	piece: 'p' | 'r' | 'n' | 'b' | 'k' | 'q';
-	color: 'l' | 'd'; 
+	piece: 'p' | 'r' | 'n' | 'b' | 'k' | 'q' | '';
+	color: 'l' | 'd' | ''; 
 }
 
-export type BoardState = (Piece | null)[][];
+export type BoardState = (Piece)[][];
 
 interface ChessBoardProps {
 	solutionToggled: boolean;
@@ -31,6 +31,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 	const [prevClickedPiece, setPrevClickedPiece] = useState('');
 	const [highlightMap, setHighlightMap] = useState(new Map<string, string>());
 	const [reversed, setReversed] = useState<boolean>(false);
+	const [boardState, setBoardState] = useState<Piece[][]>(Array.from({ length: 8 }, () => Array(8).fill({ piece: '', color: '' })));
 
 	useEffect(() => {
 		const handleDragStart = (e: DragEvent) => {
@@ -54,7 +55,6 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 	// Toggle destination highlight if using arrow buttons
 	useEffect(() => {
 		const toggleDestinationHighlight = () => {
-			const updatedMap = new Map<string, string>(highlightMap);
 			const cellId = `${position.guess.row}-${position.guess.col}`
 
 			// If we have a color to add and move is at the end of line, 
@@ -64,7 +64,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 				position.move >= position.line.length - 1 &&
 				!solutionToggled
 			) {
-				updatedMap.set(cellId, position.guess.color);
+				setHighlightMap(prevMap => new Map(prevMap.set(cellId, position.guess.color)));
 			};
 
 			// Delete highlight if no color, not at the end of line, or no solution
@@ -72,13 +72,20 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 				position.guess.color === '' ||
 				position.move < position.line.length - 1 ||
 				solutionToggled
-			) updatedMap.delete(cellId);
-
-			setHighlightMap(updatedMap);
+			) 
+				setHighlightMap(prevMap => {
+					const newMap = new Map(prevMap);
+					newMap.delete(cellId);
+					return newMap;
+				});
 		};
-
 		toggleDestinationHighlight();
 	}, [position, solutionToggled]);
+
+
+	useEffect(() => {
+		setBoardState(fenToBoard(position.line[position.move]));
+	  }, [position]);	  
 	
 
 	const handlePieceMove = (fromRow: number, fromCol: number, toRow: number, toCol: number) => {
@@ -93,9 +100,9 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 		}
 
 		// Move the piece on the user's board
-		const updatedPieces: BoardState = [...fenToBoard(position.line[position.move])];
+		const updatedPieces: BoardState = [...boardState];
 		const pieceToMove = updatedPieces[fromRow][fromCol];
-		updatedPieces[fromRow][fromCol] = null;
+		updatedPieces[fromRow][fromCol] = { piece: '', color: '' };
 		updatedPieces[toRow][toCol] = pieceToMove;
 
 		// Check if the user got the position right
@@ -202,13 +209,6 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 	};
 
 
-	const handlePieceDrop = (fromRow: number, fromCol: number, toRow: number, toCol: number) => {
-		console.log('handlePieceDrop: ', fromRow, fromCol, toRow, toCol);  // Log here
-
-		handlePieceMove(fromRow, fromCol, toRow, toCol);
-	};
-
-
 	const renderBoard = () => {
 		const board = [];
 		// If it's black's turn, render everything backwards
@@ -216,7 +216,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 			for (let i = 7; i >= 0; i--) {
 				for (let j = 7; j >= 0; j--) {
 					const key = `${i}-${j}`;
-					const piece = fenToBoard(position.line[position.move])[i][j];
+					const piece = boardState[i][j];
 					board.push(
 						<Cell
 							key={key}
@@ -237,7 +237,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 		for (let i = 0; i < 8; i++) {
 			for (let j = 0; j < 8; j++) {
 				const key = `${i}-${j}`;
-				const piece = fenToBoard(position.line[position.move])[i][j];
+				const piece = boardState[i][j];
 				board.push(
 					<Cell
 						key={key}
@@ -270,6 +270,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 
 
 	const fenToBoard = (fen: string): Piece[][] => {
+		console.log('calling fentoboard')
 		const parts = fen.split(" ");
 		const layout = parts[0];
 		let rankIndex = 7;

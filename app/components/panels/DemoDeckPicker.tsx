@@ -47,7 +47,7 @@ const DeckPicker: React.FC<DeckPickerProps> = ({deckIdOptions, setDeckIdOptions,
         }
 
         getAvailableDecks();
-    }, []);
+    }, [setDeckChoice, setDeckIdOptions]);
 
     return (
         <div className="flex items-top justify-center px-4 sm:px-0 py-4 h-full sm:flex-grow bg-slate-700">

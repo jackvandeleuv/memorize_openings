@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import ChessBoard from './components/chess/ChessBoard';
 import { Card } from './Card';
 import { Scheduler } from './Scheduler';
@@ -69,7 +69,7 @@ interface ReviewSessionProps {
 
 
 const DemoReviewSession: React.FC<ReviewSessionProps> = ({id, activePage, setActivePage}) => {
-	const defaultPosition = {
+	const defaultPosition = useMemo(() => ({
 		move: 0, 
 		line: ['8/8/8/8/8/8/8/8 w KQkq - 0 1'], 
 		answer: '8/8/8/8/8/8/8/8 w KQkq - 0 1', 
@@ -77,9 +77,9 @@ const DemoReviewSession: React.FC<ReviewSessionProps> = ({id, activePage, setAct
 		name: 'No Cards Due', 
 		eco: '',
 		guess: {row: '', col: '', color: ''}
-	};
+	}), []);
 
-	const initialPosition = {
+	const initialPosition = useMemo(() => ({
 		move: 0, 
 		line: ['8/8/8/8/8/8/8/8 w KQkq - 0 1'], 
 		answer: '8/8/8/8/8/8/8/8 w KQkq - 0 1', 
@@ -87,7 +87,7 @@ const DemoReviewSession: React.FC<ReviewSessionProps> = ({id, activePage, setAct
 		name: 'Cards Not Loaded', 
 		eco: '',
 		guess: {row: '', col: '', color: ''}
-	}
+	}), []);
 
 	const [position, setPosition] = useState<Position>(initialPosition);
 	const [scheduler, setScheduler] = useState<Scheduler>();
@@ -98,7 +98,7 @@ const DemoReviewSession: React.FC<ReviewSessionProps> = ({id, activePage, setAct
 
 	const defaultMessage = ['Make a Move', "Give your best guess, and then rate yourself to decide how long to wait before you see this position again."];
 	const [userMessage, setUserMessage] = useState<string[]>(defaultMessage);
-	
+	 
 	useEffect(() => {
 		window.scrollTo(0, 0);
 	}, []);
@@ -173,7 +173,7 @@ const DemoReviewSession: React.FC<ReviewSessionProps> = ({id, activePage, setAct
 		}
 		
 		fetchCards();
-	}, []);  
+	}, [id]);  
 
 
 	const renderCards = useCallback(() => {
@@ -220,7 +220,7 @@ const DemoReviewSession: React.FC<ReviewSessionProps> = ({id, activePage, setAct
 		};
 
 		fetchCard();
-	}, [scheduler]);
+	}, [scheduler, defaultPosition]);
 	  
 
 	useEffect(() => {
@@ -254,6 +254,61 @@ const DemoReviewSession: React.FC<ReviewSessionProps> = ({id, activePage, setAct
 			});
 		}	
 	}
+
+
+	const handleRightArrow = useCallback(
+		(e: KeyboardEvent) => {
+			if (!scheduler || solutionToggled) return;
+			if (position.move < position.line.length - 1) {; 
+				setPosition({
+					line: [...position.line], 
+					move: position.move + 1, 
+					answer: position.answer, 
+					game: new Chess(position.game.fen()),
+					eco: position.eco,
+					name: position.name,
+					guess: position.guess
+				})
+			}
+		}, [position, scheduler, solutionToggled]
+	);
+
+	const handleLeftArrow = useCallback(
+		(e: KeyboardEvent) => {
+			if (!scheduler || solutionToggled) return;
+			if (position.move > 0) {; 
+				setPosition({
+					line: [...position.line], 
+					move: position.move - 1, 
+					answer: position.answer, 
+					game: new Chess(position.game.fen()),
+					eco: position.eco,
+					name: position.name,
+					guess: position.guess
+				});
+			}
+		}, [position, scheduler, solutionToggled]
+	);
+
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+		  switch (e.key) {
+			case 'ArrowLeft':
+			  handleLeftArrow(e);
+			  break;
+			case 'ArrowRight':
+			  handleRightArrow(e);
+			  break;
+			default:
+			  break;
+		  }
+		};
+		document.addEventListener('keydown', handleKeyDown);
+		return () => {
+		  document.removeEventListener('keydown', handleKeyDown);
+		};
+	}, [handleLeftArrow, handleRightArrow]); 
+
 
 	const ratingButtonClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
 		if (!scheduler) return;
