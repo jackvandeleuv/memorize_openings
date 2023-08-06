@@ -23,8 +23,8 @@ interface ChessBoardProps {
 let successAudio: HTMLAudioElement;
 let failureAudio: HTMLAudioElement;
 if (typeof window !== "undefined") {
-    successAudio = new Audio('/538554__sjonas88__success_clipped.mp3');
-    failureAudio = new Audio('/538550__sjonas88__deep-tone_clipped.mp3');
+    successAudio = new Audio('/538554__sjonas88__success_clipped.wav');
+    failureAudio = new Audio('/538550__sjonas88__deep-tone_clipped.wav');
 }
 
 const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setPosition, setUserMessage }) => {
