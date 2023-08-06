@@ -230,7 +230,6 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 					const piece = fenToBoard(position.line[position.move])[i][j];
 					board.push(
 						<Cell
-							key={key}
 							row={i}
 							col={j}
 							piece={piece.piece}
@@ -251,7 +250,6 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 				const piece = fenToBoard(position.line[position.move])[i][j];
 				board.push(
 					<Cell
-						key={key}
 						row={i}
 						col={j}
 						piece={piece.piece}
@@ -285,7 +283,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 		const layout = parts[0];
 		let rankIndex = 7;
 		let fileIndex = 0;
-		const newBoard = Array.from({ length: 8 }, () => Array(8).fill(null));
+		const newBoard = Array.from({ length: 8 }, () => Array(8).fill({ piece: '', color: '' }));
 
 		for (const char of layout) {
 			if (char === "/") {
