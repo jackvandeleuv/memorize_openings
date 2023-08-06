@@ -17,7 +17,6 @@ body {
     )
     rgb(var(--background-start-rgb));
 }
-<<<<<<< HEAD
 
 .prevent-select {
   -webkit-user-select: none; /* Safari */
@@ -29,5 +28,3 @@ body {
 .draggable {
   touch-action: none;
 }
-=======
->>>>>>> main
