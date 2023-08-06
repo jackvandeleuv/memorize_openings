@@ -20,28 +20,13 @@ interface ChessBoardProps {
 	setUserMessage: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
+const successAudio = new Audio('/538554__sjonas88__success_clipped.mp3');
+const failureAudio = new Audio('/538550__sjonas88__deep-tone_clipped.mp3');
 
 const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setPosition, setUserMessage }) => {
 	const [prevClickedPiece, setPrevClickedPiece] = useState('');
 	const [highlightMap, setHighlightMap] = useState(new Map<string, string>());
 	const [reversed, setReversed] = useState<boolean>(false);
-
-	const [successAudio, setSuccessAudio] = useState(new Audio());
-	const [failureAudio, setFailureAudio] = useState(new Audio());
-	
-	// Then, within a useEffect hook, load the audio files.
-	useEffect(() => {
-	  const loadAudio = async () => {
-		const loadedSuccessAudio = new Audio('/538554__sjonas88__success_clipped.mp3');
-		await loadedSuccessAudio.load();
-		setSuccessAudio(loadedSuccessAudio);
-	
-		const loadedFailureAudio = new Audio('/538550__sjonas88__deep-tone_clipped.mp3');
-		await loadedFailureAudio.load();
-		setFailureAudio(loadedFailureAudio);
-	  };
-	  loadAudio();
-	}, []);
 
 	useEffect(() => {
 		const handleDragStart = (e: DragEvent) => {
@@ -230,6 +215,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 					const piece = fenToBoard(position.line[position.move])[i][j];
 					board.push(
 						<Cell
+							key={key}
 							row={i}
 							col={j}
 							piece={piece.piece}
@@ -250,6 +236,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({ solutionToggled, position, setP
 				const piece = fenToBoard(position.line[position.move])[i][j];
 				board.push(
 					<Cell
+						key={key}
 						row={i}
 						col={j}
 						piece={piece.piece}
